@@ -27,13 +27,14 @@ library(dplyr)
 #source('ona.R')
 #load script with data import and dataprep
 #source('Sandbox.R')
-
+source('get_users.R')
 ## load functions
 source('support_fun.R')
 
 jscode <- "
 shinyjs.hrefAuto = function(url) { window.location.href = url;};
 "
+
 
 # Define UI for application 
 ui <- 
@@ -364,23 +365,8 @@ server <- function(input, output, session) {
     auth0:: logoutButton()
   })
   
-  #gt a list of users for each project
-  #sort from authorizr=ed  users by project name 
-  PO_list<-c()
-  SG_list<-c()
-  for (i in 1:length(authlist)) {
-    if (authlist$project == "PO"){
-      i_list<-authlist$nickname
-      PO_list<-c(PO_list,i_list)
-    } else if (authlist$project == "SG"){
-      i_list<-authlist$nickname
-      SG_list<-c(SG_list,i_list)
-    }
-  }
   
   
-  PO_list <<- list("reggkav", "annereina4")
-  SG_list <<- list("reginakavive")
   observeEvent(session$userData$auth0_info$nickname, {
     
     #read processed data based on project:: user designated
