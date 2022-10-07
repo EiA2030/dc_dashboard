@@ -153,18 +153,4 @@ blank2na = function(x,na.strings=c('','.','NA','na','N/A','n/a','<NA>','NaN','na
 
 
 
-#gt a list of users for each project
-#sort from authorizr=ed  users by project name 
-PO_list<-c()
-SG_list<-c()
-for (i in 1:length(authlist)) {
-  if (authlist$project == "PO"){
-    i_list<-authlist$nickname
-    PO_list<-c(PO_list,i_list)
-  } else if (authlist$project == "SG"){
-    i_list<-authlist$nickname
-    SG_list<-c(SG_list,i_list)
-  }
-}
-
 
