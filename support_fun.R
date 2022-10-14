@@ -1,3 +1,12 @@
+#toremove ...replace with auth0 after deploy
+user_base <- dplyr::tibble(
+  user = c("user1", "user2", "user3", "user4"),
+  password = sapply(c("pass1", "pass2", "pass3", "pass4"), sodium::password_store),
+  permissions = c("admin", "standard","admin", "standard"),
+  name = c("User RW1", "User RW2","User NG1", "User NG2")
+)
+list1<-c("user1","user2")
+list2<-c("user3","user4")
 
 #basemap for leaflet
 basemap <- leaflet() %>%

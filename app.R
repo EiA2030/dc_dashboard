@@ -46,8 +46,8 @@ ui <-
     # Sidebar to show user info after login
     #div(class = "pull-right", shinyauthr::logoutUI(id = "logout")),
     
-    # login section
-    #shinyauthr::loginUI(id = "login"),
+    # login section ##toremove
+    shinyauthr::loginUI(id = "login"),
     
     # to ensure display only after login
     uiOutput("sidebarpanel", padding = 0)
@@ -57,17 +57,17 @@ ui <-
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
   
-  #Authentication credentials
+  #Authentication credentials  
   #getwd()
-  # credentials <- shinyauthr::loginServer(
-  #   id = "login",
-  #   data = user_base,
-  #   user_col = user,
-  #   pwd_col = password,
-  #   sodium_hashed = TRUE,
-  #   cookie_getter = TRUE
-  #   #log_out = reactive(logout_init())
-  # )
+  credentials <- shinyauthr::loginServer(
+    id = "login",
+    data = user_base,
+    user_col = user,
+    pwd_col = password,
+    sodium_hashed = TRUE,
+    cookie_getter = TRUE
+    #log_out = reactive(logout_init())
+  )##toremove
   
   # logout_init <- shinyauthr::logoutServer(
   #                           id = "logout",
@@ -81,7 +81,7 @@ server <- function(input, output, session) {
   output$sidebarpanel <- renderUI({
     
     # Show only when authenticated
-    #req(credentials()$user_auth)
+    req(credentials()$user_auth)  ##toremove
     ## 1. Header ------------------------------
     
     dashboardPage(
@@ -362,16 +362,20 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$logoutt, {
-    #session$reload()
-    auth0:: logoutButton()
+    session$reload() ##toremove
+    #auth0:: logoutButton()
   })
   
-  
-  
-  observeEvent(session$userData$auth0_info$nickname, {
+  ##toremove
+  observeEvent((credentials()$info)$user, {
     
-    #read processed data based on project:: user designated
-  if (any(c(PO_list) %in%  session$userData$auth0_info$nickname )){
+    ##toremove
+    if ( any(c(list1) %in%  (credentials()$info)$user)){
+  
+  # observeEvent(session$userData$auth0_info$nickname, {
+  #   
+  #   #read processed data based on project:: user designated
+  # if (any(c(PO_list) %in%  session$userData$auth0_info$nickname )){
     
     path<-file.path("./data/dpath1/Processed")
     Bean <- read.csv(file.path(path,"/Bean .csv"))
@@ -406,10 +410,11 @@ server <- function(input, output, session) {
     to.remove<-c("2020B","2022","2021A","2021B")
     seasons <-seasons[!(seasons %in% to.remove)]
     
+    
+    ##toremove
+    }else if (any(c(list2) %in%  (credentials()$info)$user)) {
       
-      
-      
-    }else if (any(c(SG_list) %in% session$userData$auth0_info$nickname)) {
+    #}else if (any(c(SG_list) %in% session$userData$auth0_info$nickname)) {
       path<-file.path('./data/dpath2/Processed')
       Maize <- read.csv(file.path(path,"/Maize .csv"))
       assign_ftp<-read.csv("./data/dpath2/Assign_FDTLPO_SG.csv")
@@ -430,10 +435,10 @@ server <- function(input, output, session) {
     # #
     # #
     }else {
-      #session$reload()
-      output$selected_var <- renderText({
-        "Wait to be confirmed by the administrator"
-      })
+      session$reload()
+      # output$selected_var <- renderText({
+      #   "Wait to be confirmed by the administrator"
+      # })
      }
     
     #print(session$userData$auth0_info$name)
@@ -923,10 +928,10 @@ server <- function(input, output, session) {
 #options(shiny.port = 8080)
 
 
-#shinyApp(ui = ui, server = server)
+shinyApp(ui = ui, server = server)
 
 #####for AUTH0 login page ##to update on deploy
 ##run on a browser if locaal
 ## if run locally- error, will require callback URL updated on Auth0 -
-auth0::shinyAppAuth0(ui, server)
+#auth0::shinyAppAuth0(ui, server)
 
