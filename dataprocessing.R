@@ -84,24 +84,32 @@ for (pl in pathslist){
       }
       
       # required to join to the df the HHID and expcode values
-      vv2 <-as.data.frame( assign_ftp [c("HHID","FDID2_new", "expCode")])
+      vv2 <-as.data.frame( assign_ftp [c("HHID","FDID2", "FDID2_new", "expCode","season")])
       
       vv2<-vv2[which(vv2$FDID2_new !='n/a'), ] 
       
       #to sort mixup in the expcode given for FDID2 and FDID2_new within Assign_FDTLPO form
       #to avoid expcode  na's on join
+      
       li<-c()
+      si<-c()
       for (i in 1:nrow(vv2)){
         bbn<-assign_ftp[which(assign_ftp$FDID2==vv2$FDID2_new[i] ), ]
-        
+        #vv2$expCode[i]<-bbn$expCode
+        #assign_ftp2$FDID2[i]
+        #ifelse(is.na(vv2$expCode[i]),bbn$expCode[1], NA )
         li<-c(li,bbn$expCode[1])
+        si<-c(si,bbn$season[1])
       }
       
       for (i in 1:nrow(vv2)){
         if (is.na(vv2$expCode[i])){
           vv2$expCode[i]<-li[i]
         }
-        
+        if (is.na(vv2$season[i])){
+          vv2$season[i]<-si[i]
+        }
+        #ifelse(is.na(vv2$expCode[i]),li[i], NA )
       }
       vv2<-vv2
       
@@ -138,7 +146,8 @@ for (pl in pathslist){
     measure_plot<-cropdata
     
     #join with assign plot to get missing variables
-    v2 <- vv2 %>% dplyr:: select("HHID","FDID2_new", "expCode")
+    v2 <- vv2 %>% 
+      dplyr::select(any_of(c("HHID","FDID2","FDID2_new","expCode","season")))
     
     ###run expcode assignment in assignplot.... issues with FDID2 AND FDID2_new(repeated) n/a expcode
     

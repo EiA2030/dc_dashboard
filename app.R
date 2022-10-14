@@ -47,8 +47,8 @@ ui <-
     # Sidebar to show user info after login
     #div(class = "pull-right", shinyauthr::logoutUI(id = "logout")),
     
-    # login section
-    #shinyauthr::loginUI(id = "login"),
+    # login section ##toremove
+    shinyauthr::loginUI(id = "login"),
     
     # to ensure display only after login
     uiOutput("sidebarpanel", padding = 0)
@@ -58,17 +58,17 @@ ui <-
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
   
-  #Authentication credentials
+  #Authentication credentials  
   #getwd()
-  # credentials <- shinyauthr::loginServer(
-  #   id = "login",
-  #   data = user_base,
-  #   user_col = user,
-  #   pwd_col = password,
-  #   sodium_hashed = TRUE,
-  #   cookie_getter = TRUE
-  #   #log_out = reactive(logout_init())
-  # )
+  credentials <- shinyauthr::loginServer(
+    id = "login",
+    data = user_base,
+    user_col = user,
+    pwd_col = password,
+    sodium_hashed = TRUE,
+    cookie_getter = TRUE
+    #log_out = reactive(logout_init())
+  )##toremove
   
   # logout_init <- shinyauthr::logoutServer(
   #                           id = "logout",
@@ -82,7 +82,7 @@ server <- function(input, output, session) {
   output$sidebarpanel <- renderUI({
     
     # Show only when authenticated
-    #req(credentials()$user_auth)
+    req(credentials()$user_auth)  ##toremove
     ## 1. Header ------------------------------
     
     dashboardPage(
@@ -134,6 +134,7 @@ server <- function(input, output, session) {
           uiOutput('experimentfinderr'), #experiment code
           #uiOutput('regionfinderr'),  #country
           uiOutput('seasonfinderr'),   #season
+          uiOutput('datefinderr'),
           
           uiOutput('enumeratorfinderr'), #enumerators
           
@@ -309,7 +310,7 @@ server <- function(input, output, session) {
                      
                      tabPanel(tabName="Enumerators","ENUMERATORS", 
                               HTML('<br>'),
-                              HTML('<span  style="background-color: #BFffa590 ;align:right;" class="dot">Complete</span>&nbsp; <span  style="background-color: orange ;align:right;" class="dot">Missing Details</span>&nbsp;<span  style="background-color: #ffa590;align:right;" class="dot">Overdue</span>  &nbsp;<span  style="background-color: #BFA020F0;align:left;" class="dot">Future Event</span>'),
+                              HTML('<span  style="background-color: #BFffa590 ;align:right;" class="dot">Complete</span>&nbsp; <span  style="background-color: orange ;align:right;" class="dot">Missing Details</span>&nbsp;<span  style="background-color: #ffa590;align:right;" class="dot">Overdue</span>  &nbsp;<span  style="background-color: #BE93D4;align:left;" class="dot">Future Event</span>'),
                               
                               HTML('<br>'),
                               
@@ -362,16 +363,20 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$logoutt, {
-    #session$reload()
-    auth0:: logoutButton()
+    session$reload() ##toremove
+    #auth0:: logoutButton()
   })
   
-  
-  
-  observeEvent(session$userData$auth0_info$nickname, {
+  ##toremove
+  observeEvent((credentials()$info)$user, {
     
-    #read processed data based on project:: user designated
-  if (any(c(PO_list) %in%  session$userData$auth0_info$nickname )){
+    ##toremove
+    if ( any(c(list1) %in%  (credentials()$info)$user)){
+  
+  # observeEvent(session$userData$auth0_info$nickname, {
+  #   
+  #   #read processed data based on project:: user designated
+  # if (any(c(PO_list) %in%  session$userData$auth0_info$nickname )){
     
     path<-file.path("./data/dpath1/Processed")
     Bean <- read.csv(file.path(path,"/Bean .csv"))
@@ -389,42 +394,62 @@ server <- function(input, output, session) {
     datacrop<-rbindlist(myList, fill = TRUE)
     
     
-    #datacrop <- rbind(Bean, Cassava,Maize,Potato,Rice,Wheat)
-    
     
     datacrop<-datacrop[datacrop$projectCode=="RS",]
     register_en<-register_en[register_en$projectCode=="RS",]
+    register_hh<-register_hh[register_hh$projectCode=="RS",]
     assign_ftp<-assign_ftp[assign_ftp$projectCode=="RS",]
+    datacrop<-datacrop[datacrop$HHID!='RSHHRW001385',]
+    #datacrop$season[grepl("2022A", datacrop$season)] <- "2022A"
+    datacrop$season[grepl("2022aB", datacrop$season)] <- "2022B"
+    datacrop$season[grepl("2022b", datacrop$season)] <- "2022B"
+    datacrop$season[grepl("20B2022B", datacrop$season)] <- "2022B"
+    datacrop$season[grepl("B2022", datacrop$season)] <- "2022B"
+    seasons<-unique(datacrop$season)
+    #print(unique(seasons))
+    #seasons<-seasons [seasons != c("2020B","2022","2021A","2021B")]
+    to.remove<-c("2020B","2022","2021A","2021B")
+    seasons <-seasons[!(seasons %in% to.remove)]
+    
+    
+    ##toremove
+    }else if (any(c(list2) %in%  (credentials()$info)$user)) {
       
-      
-      
-    }else if (any(c(SG_list) %in% session$userData$auth0_info$nickname)) {
+    #}else if (any(c(SG_list) %in% session$userData$auth0_info$nickname)) {
       path<-file.path('./data/dpath2/Processed')
       Maize <- read.csv(file.path(path,"/Maize .csv"))
-      assign_ftp<-read.csv("./data/dpath2/Assign_FDTLPO.csv")
+      assign_ftp<-read.csv("./data/dpath2/Assign_FDTLPO_SG.csv")
       register_en<-read.csv("./data/dpath1/Register_EN.csv")
       register_hh<-read.csv("./data/dpath1/RegisterVerify_HH.csv")
 
     #
-      
+
+      datacrop<-Maize
+      datacrop<-datacrop[datacrop$projectCode=="SG",]
       register_en<-register_en[register_en$projectCode=="SG",]
       assign_ftp<-assign_ftp[assign_ftp$projectCode=="SG",]
       register_hh<-register_hh[register_hh$projectCode=="SG",]
-      
-      datacrop<-Maize
-      datacrop<-datacrop[datacrop$projectCode=="SG",]
+
+      datacrop$season[grepl("NOT2022", datacrop$season)] <- "2022"
+      seasons<-unique(datacrop$season)
 
     # #
     # #
     }else {
-      #session$reload()
-      output$selected_var <- renderText({
-        "Wait to be confirmed by the administrator"
-      })
+      session$reload()
+      # output$selected_var <- renderText({
+      #   "Wait to be confirmed by the administrator"
+      # })
      }
     
     #print(session$userData$auth0_info$name)
     #print(session$userData$auth0_info)
+    
+    datacrop<-datacrop[!duplicated(datacrop), ]
+    datacrop<-datacrop[which(datacrop$HHID !='n/a'), ]
+    datacrop<-datacrop[which(datacrop$HHID !='--'), ]
+    
+    
     
     output$experimentfinderr <- renderUI({
       selectInput(
@@ -442,11 +467,16 @@ server <- function(input, output, session) {
         "seasonfinder",
         label = "Season",
         multiple=FALSE,
-        choices = list("2022A"="A","2022B"="B"),
-        selected= "B")
+        choices = c(sort(seasons)),
+        selected= "2022B")
+      
     })
     
-    
+    output$datefinderr <- renderUI({
+      dateRangeInput("datefinder", "DATE:",
+                     start = min(datacrop$today),
+                     end   =  Sys.time())
+    })
     
     
     output$enumeratorfinderr <- renderUI({
@@ -477,7 +507,7 @@ server <- function(input, output, session) {
         label = "Household",
         #label =  HTML('<p style="font-weight: bold;  color:white">Sector</p>'),
         multiple=T,
-        choices = c("All",sort(unique(datacrop$HHID))),
+        choices = c("All",sort(unique(register_hh$HHID))),
         selected= "All")
     })
     
@@ -521,7 +551,7 @@ server <- function(input, output, session) {
     ###Update dashboard by user, experiment selected, enumerator , household and season   
     
     toListen2 <- reactive({
-      list(input$experimentfinder,input$seasonfinder,input$enumeratorfinder, input$householdfinder )
+      list(input$experimentfinder,input$seasonfinder,input$datefinder,input$enumeratorfinder, input$householdfinder )
     })
     
     observeEvent(toListen2(),{
@@ -535,7 +565,8 @@ server <- function(input, output, session) {
         
       }
       
-      if ("B" %in% input$seasonfinder){
+      if ( "2022B" %in% input$seasonfinder){
+        
         if ("All" %in% input$enumeratorfinder ){
           datacrop<-datacrop
         }else{
@@ -550,26 +581,16 @@ server <- function(input, output, session) {
         colnames(datacrop)[grepl('District',colnames(datacrop))] <- 'District'
         
         colnames(datacrop)[grepl('today',colnames(datacrop))] <- 'today'
-        datacrop<-datacrop %>%
-          filter(datacrop$today >= as.Date("2022-03-01") & datacrop$today < as.Date("2022-09-01"))####Filtering just for 22B
-      }else if ("A" %in% input$seasonfinder){
-        if ("All" %in% input$enumeratorfinder){
-          datacrop<-datacrop
-        }else{
-          datacrop<-datacrop[which(datacrop$ENID==input$enumeratorfinder), ]
-        }
         
-        if ("All" %in% input$householdfinder){
-          datacrop<-datacrop
-        }else{
-          datacrop<-datacrop[which(datacrop$HHID==input$householdfinder), ]
-        }
+        #datacrop<-datacrop[which(datacrop$season==input$seasonfinder), ]
+        datacrop<-datacrop[which(datacrop$season=="2022B"), ]
+      } else  {
+        datacrop<-datacrop[which(datacrop$season==input$seasonfinder), ]
         
-        colnames(datacrop)[grepl('District',colnames(datacrop))] <- 'District'
-        colnames(datacrop)[grepl('today',colnames(datacrop))] <- 'today'
-        datacrop<-datacrop %>%
-          filter(datacrop$today >= as.Date("2022-09-01")  & datacrop$today < as.Date("2023-03-01"))####Filtering just for 22B
       }
+      
+      
+      datacrop <- datacrop[which(datacrop$today >= input$datefinder[1] & datacrop$today <= input$datefinder[2]), ]
       
       
       rownames(datacrop) <- NULL
@@ -648,6 +669,7 @@ server <- function(input, output, session) {
       colnames(datable)[grepl('altitude',colnames(datable))] <- 'Altitude'
       colnames(datable)[grepl('precision',colnames(datable))] <- 'Precision'
       
+      #reorder
       datable <- datable %>% dplyr:: select("Date",  "Country","ProjectCode","District", "ENID", "HHID","FDID2", "TLID2", "expCode",everything() )
       output$tabledownload <- renderDataTable(datable)
       
@@ -707,10 +729,22 @@ server <- function(input, output, session) {
                   ),
                   columns = list(
                     today = colDef(show = FALSE),
-                    FDID2 = colDef(show = FALSE),
-                    TLID2 = colDef(filterable = TRUE),
-                    District = colDef(filterable = TRUE),
-                    expCode = colDef(filterable = TRUE),
+                    FDID2 = colDef(show = FALSE,
+                                   style  = function(value) {
+                                     list(background ="white")
+                                   }),
+                    TLID2 = colDef(filterable = TRUE,
+                                   style  = function(value) {
+                                     list(background ="white")
+                                   }),
+                    District = colDef(filterable = TRUE,
+                                      style  = function(value) {
+                                        list(background ="white")
+                                      }),
+                    expCode = colDef(filterable = TRUE,
+                                     style  = function(value) {
+                                       list(background ="white")
+                                     }),
                     TLID2 = colDef(
                       cell =    function(value,index) {
                         s2<-register_en[which(register_en$ENID==ak$ENID[index] ), ]
@@ -718,9 +752,13 @@ server <- function(input, output, session) {
                       },),
                     HHID = colDef(
                       cell =    function(value,index) {
-                        s2<-register_en[which(register_en$ENID==ak$ENID[index] ), ]
-                        tippy(value,tooltip = paste("NAME:", s2$detailsEN.firstName , s2$detailsEN.surName, "<br>", "CONTACT:", s2$detailsEN.phoneNr))
+                        s2<-register_hh[which(register_hh$HHID==ak$HHID[index] ), ]
+                        tippy(value,tooltip = paste("NAME:", s2$detailsHH.firstName , s2$detailsHH.surName))
                       },
+                      style  = function(value) {
+                        #color<-ifelse(value=="NA" ,"#BE93D4","#BFffa590")
+                        list(background ="white")
+                      }
                     ),
                     ENID = colDef(
                       html = TRUE,
@@ -731,86 +769,12 @@ server <- function(input, output, session) {
                         tippy(value,tooltip = paste("NAME:", s2$detailsEN.firstName , s2$detailsEN.surName, "<br>", "CONTACT:", s2$detailsEN.phoneNr))
                       },
                       header = function(value) {tippy(value,tooltip = paste("NAME:", "<br>", "CONTACT:"))},
-                      
-                    ),
-                    Register.Household = colDef(
                       style  = function(value) {
-                        color<-ifelse(value=="NA" ,"#ffa590","#BFffa590")
-                        list(background =color)
-                      }
-                    ),
-                    Register.Field = colDef(
-                      style  = function(value) {
-                        color<-ifelse(value=="NA" ,"#ffa590","#BFffa590")
-                        list(background =color)
-                      }
-                    ),
-                    Register.Trial.Plot = colDef(
-                      style  = function(value) {
-                        color<-ifelse(value=="NA" ,"#ffa590","#BFffa590")
-                        list(background =color)
-                      }
-                    ),
-                    Soil.Sampling = colDef(
-                      style  = function(value) {
-                        color<-ifelse(value=="NA" ,"#ffa590","#BFffa590")
-                        list(background =color)
-                      }
-                    ),
-                    Record.Crop.Variety = colDef(
-                      style  = function(value) {
-                        color<-ifelse(value=="NA" ,"#ffa590","#BFffa590")
-                        list(background =color)
-                      }
-                    ),
-                    Germination.Count = colDef(
-                      style  = function(value) {
-                        color<-ifelse(value=="NA" ,"#ffa590","#BFffa590")
-                        list(background =color)
-                      }
-                    ),
-                    Top.Dressing = colDef(
-                      style  = function(value) {
-                        color<-ifelse(value=="NA" ,"#ffa590","#BFffa590")
-                        list(background =color)
-                      }
-                    ),
-                    PD.Scoring = colDef(
-                      style  = function(value) {
-                        color<-ifelse(value=="NA" ,"#ffa590","#BFffa590")
-                        list(background =color)
-                      }
-                    ),
-                    Weeding = colDef(
-                      style  = function(value) {
-                        color<-ifelse(value=="NA" ,"#ffa590","#BFffa590")
-                        list(background =color)
-                      }
-                    ),
-                    Household.Survey = colDef(
-                      style  = function(value) {
-                        color<-ifelse(value=="NA" ,"#ffa590","#BFffa590")
-                        list(background =color)
-                      }
-                    ),
-                    Plant.Sampling = colDef(
-                      style  = function(value) {
-                        color<-ifelse(value=="NA" ,"#BE93D4","#BFffa590")
-                        list(background =color)
-                      }
-                    ),
-                    Field.Description = colDef(
-                      style  = function(value) {
-                        color<-ifelse(value=="NA" ,"#ffa590","#BFffa590")
-                        list(background =color)
-                      }
-                    ),
-                    Harvest = colDef(
-                      style  = function(value) {
-                        color<-ifelse(value=="NA" ,"#BE93D4","#BFffa590")
-                        list(background =color)
+                        #color<-ifelse(value=="NA" ,"#BE93D4","#BFffa590")
+                        list(background ="white")
                       }
                     )
+                    
                     
                   ),
                   defaultColDef = colDef(
@@ -824,7 +788,19 @@ server <- function(input, output, session) {
                       # `margin-bottom` = "0px"#,,
                       #borderColor = "#ffffff"
                       
-                    )
+                    ),
+                    style  = function(value) {
+                      if (input$seasonfinder== "2022B"){
+                        color<-ifelse(value=="NA" ,"#ffa590","#BFffa590")
+                      } else if (input$seasonfinder== "2022A"){
+                        color<-ifelse(value=="NA" ,"#BE93D4","#BFffa590")
+                      } else {
+                        color<-ifelse(value=="NA" ,"#ffa590","#BFffa590")
+                      }
+                      list(background =color)
+                    }
+                    
+                    
                   ),
                   bordered = TRUE
                   
@@ -953,9 +929,10 @@ server <- function(input, output, session) {
 #options(shiny.port = 8080)
 
 
-#shinyApp(ui = ui, server = server)
+shinyApp(ui = ui, server = server)
 
+#####for AUTH0 login page ##to update on deploy
 ##run on a browser if locaal
 ## if run locally- error, will require callback URL updated on Auth0 -
-auth0::shinyAppAuth0(ui, server)
+#auth0::shinyAppAuth0(ui, server)
 
