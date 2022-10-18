@@ -14,6 +14,7 @@ library(stringr)
 
 cl <- makeCluster(6)
 registerDoParallel(cl)
+f_import()
  #setwd("C:/Users/dell/Documents/WORK/EiA/EiA Rwanda2/EiA_Rwanda_Dashboard")
  #getwd()
 
