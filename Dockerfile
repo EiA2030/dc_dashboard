@@ -10,7 +10,7 @@ RUN apt-get install libgdal-dev -y
 
 # Necessary
 RUN apt-get install libharfbuzz-dev libfribidi-dev -y
-RUN apt-get install libsodium-dev, libudunits2-dev -y
+RUN apt-get install libsodium-dev libudunits2-dev -y
 
 WORKDIR /workdir
 COPY . /workdir/
