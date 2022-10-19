@@ -2,7 +2,7 @@ name: Deploy to Amazon ECS
 
 on:
   push:
-    branches: [ "pipeline-test" ]
+    branches: [ "pipeline-test", "release/development" ]
 
 env:
   AWS_REGION: MY_AWS_REGION                   # set this to your preferred AWS region, e.g. us-west-1
@@ -37,6 +37,16 @@ jobs:
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
+      
+    - name: Set branch-based environment variables
+      uses: iamtheyammer/branch-env-vars@v1.2.0
+      with:
+        STAGE_TAG: |
+          main:wedontreallyusethemainbranch
+          release/development:dev
+          release/production:prod
+          pipeline-test:dev
+          !default:defaultvalue
 
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
@@ -47,9 +57,9 @@ jobs:
         # Build a docker container and
         # push it to ECR so that it can
         # be deployed to ECS.
-        docker build -t ${{ secrets.IMAGE_NAME }}:dev .
-        docker push ${{ secrets.IMAGE_NAME }}:dev
-        echo "::set-output name=image::${{ secrets.IMAGE_NAME }}:dev"
+        docker build -t ${{ secrets.IMAGE_NAME }}:$STAGE_TAG .
+        docker push ${{ secrets.IMAGE_NAME }}:$STAGE_TAG
+        echo "::set-output name=image::${{ secrets.IMAGE_NAME }}:$STAGE_TAG"
     
     - name: Download task definition
       run: aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }} --query taskDefinition > task-definition.json
