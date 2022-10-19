@@ -50,14 +50,9 @@ jobs:
         docker build -t ${{ secrets.IMAGE_NAME }}:dev .
         docker push ${{ secrets.IMAGE_NAME }}:dev
         echo "::set-output name=image::${{ secrets.IMAGE_NAME }}:dev"
-        
-    - name: Get task-definition.json file    
-      id: get-tast-def-json
-      uses: unfor19/install-aws-cli-action@master
-      with:
-        version: 2        
-    - run: |
-        aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }} > task-definition.json
+    
+    - name: Download task definition
+      run: aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }} --query taskDefinition > task-definition.json
 
 #     - name: Fill in the new image ID in the Amazon ECS task definition
 #       id: task-def
@@ -69,9 +64,8 @@ jobs:
 
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-    - run: ls -alh
-#       with:
-#         task-definition: task-definition.json
-#         service: ${{ secrets.ECS_SERVICE }}
-#         cluster: ${{ secrets.ECS_CLUSTER }}
-#         wait-for-service-stability: true
+      with:
+        task-definition: task-definition.json
+        service: ${{ secrets.ECS_SERVICE }}
+        cluster: ${{ secrets.ECS_CLUSTER }}
+        wait-for-service-stability: true
