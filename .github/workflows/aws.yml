@@ -78,10 +78,10 @@ jobs:
         echo "::set-output name=image::${{ secrets.IMAGE_NAME }}:dev"
         
     - name: Get task-definition.json file    
-#       id: get-tast-def-json
-#       uses: unfor19/install-aws-cli-action@master
-#       with:
-#         version: 2        
+      id: get-tast-def-json
+      uses: unfor19/install-aws-cli-action@master
+      with:
+        version: 2        
     - run: |
         aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }} > task-definition.json
 
@@ -93,10 +93,10 @@ jobs:
 #         container-name: ${{ secrets.ECS_SERVICE }}
 #         image: ${{ steps.build-image.outputs.image }}
 
-#     - name: Deploy Amazon ECS task definition
-#       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-#       with:
-#         task-definition:  task-definition.json
-#         service: ${{ secrets.ECS_SERVICE }}
-#         cluster: ${{ secrets.ECS_CLUSTER }}
-#         wait-for-service-stability: true
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: task-definition.json
+        service: ${{ secrets.ECS_SERVICE }}
+        cluster: ${{ secrets.ECS_CLUSTER }}
+        wait-for-service-stability: true
