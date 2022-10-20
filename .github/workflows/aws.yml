@@ -58,7 +58,8 @@ jobs:
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
         task-definition: task-definition.json
-        container-name: ${{ secrets.ECS_SERVICE }}$STAGE_TAG
+#         container-name: ${{ secrets.ECS_SERVICE }}$STAGE_TAG
+        container-name: eia2030-dc-dashboard-dev
         image: ${{ steps.build-image.outputs.image }}
 
     - name: Deploy Amazon ECS task definition
