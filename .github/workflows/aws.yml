@@ -30,7 +30,7 @@ jobs:
 
 # If execution says "Warning: Unexpected input(s)", it's due to the way Github parses "with" data, ignore it.
     - name: Set branch-based environment variables
-      uses: iamtheyammer/branch-env-vars@v1
+      uses: iamtheyammer/branch-env-vars@v1.2.0
       with:
         STAGE_TAG: |
           main:wedontreallyusethemainbranch
