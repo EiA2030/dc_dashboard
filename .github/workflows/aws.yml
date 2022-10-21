@@ -54,7 +54,7 @@ jobs:
         echo "::set-output name=image::${{ secrets.IMAGE_NAME }}:$STAGE_TAG"
     
     - name: Download task definition
-      run: aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }}$STAGE_TAG --query taskDefinition > task-definition.json && echo "action_state=yellow" >> $GITHUB_ENV
+      run: aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }}$STAGE_TAG --query taskDefinition > task-definition.json && echo "action_state=yellow$STAGE_TAG" >> $GITHUB_ENV
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
