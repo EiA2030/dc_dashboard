@@ -54,7 +54,7 @@ jobs:
         echo "::set-output name=image::${{ secrets.IMAGE_NAME }}:$STAGE_TAG"
     
     - name: Download task definition
-      run: aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }}$STAGE_TAG --query taskDefinition > task-definition.json && echo "eia2030-dc-dashboard-dev" > servis.txt && cat servis.txt
+      run: aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }}$STAGE_TAG --query taskDefinition > task-definition.json && echo "action_state=yellow" >> $GITHUB_ENV
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
@@ -71,6 +71,6 @@ jobs:
         ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
       with:
         task-definition: task-definition.json
-        service: ${{ '$cat servis.txt' }}
+        service: ${{ env.action_state }}
         cluster: ${{ secrets.ECS_CLUSTER }}
         wait-for-service-stability: true
