@@ -39,18 +39,29 @@ jobs:
           pipeline-test:dev
           !default:defaultvalue
 
-    - name: Build, tag, and push image to Amazon ECR
-      id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ github.sha }}
-      run: |
-        # Build a docker container and push it to ECR so that it can be deployed to ECS.
-        docker build -t ${{ secrets.IMAGE_NAME }}:$STAGE_TAG .
-        docker push ${{ secrets.IMAGE_NAME }}:$STAGE_TAG
-        echo "image=${{ secrets.IMAGE_NAME }}:$STAGE_TAG" >> $GITHUB_OUTPUT
-#        echo "::set-output name=image::${{ secrets.IMAGE_NAME }}:$STAGE_TAG"
+#     - name: Build, tag, and push image to Amazon ECR
+#       id: build-image
+#       env:
+#         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+#         IMAGE_TAG: ${{ github.sha }}
+#       run: |
+#         # Build a docker container and push it to ECR so that it can be deployed to ECS.
+#         docker build -t ${{ secrets.IMAGE_NAME }}:$STAGE_TAG .
+#         docker push ${{ secrets.IMAGE_NAME }}:$STAGE_TAG
+#         echo "image=${{ secrets.IMAGE_NAME }}:$STAGE_TAG" >> $GITHUB_OUTPUT
+# #        echo "::set-output name=image::${{ secrets.IMAGE_NAME }}:$STAGE_TAG"
     
+    - name: Setup environment variable workaround for "with" 0
+      run: echo "DOCKER_IMAGE_TO_PUSH=${{ secrets.IMAGE_NAME }}$STAGE_TAG" >> $GITHUB_ENV
+    - name: Build and push
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        push: true
+        tags: ${{ env.DOCKER_IMAGE_TO_PUSH }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
     - name: Download task definition
       run: aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }}$STAGE_TAG --query taskDefinition > task-definition.json
     
@@ -63,7 +74,7 @@ jobs:
       with:
         task-definition: task-definition.json
         container-name: ${{ env.SERVICE_AND_CONTAINER_NAME_WORKAROUND }}
-        image: ${{ steps.build-image.outputs.image }}
+        image: ${{ env.DOCKER_IMAGE_TO_PUSH }}
 
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
