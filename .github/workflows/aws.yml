@@ -46,7 +46,7 @@ jobs:
 #         IMAGE_TAG: ${{ github.sha }}
       run: |
         # Build a docker container and push it to ECR so that it can be deployed to ECS.
-        docker build -t ${{ secrets.IMAGE_NAME }}:$STAGE_TAG .
+        docker buildx build -t ${{ secrets.IMAGE_NAME }}:$STAGE_TAG --cache-to type=gha,scope=$GITHUB_REF_NAME-image --cache-from type=gha,scope=$GITHUB_REF_NAME-image .
         docker push ${{ secrets.IMAGE_NAME }}:$STAGE_TAG
         echo "image=${{ secrets.IMAGE_NAME }}:$STAGE_TAG" >> $GITHUB_OUTPUT
 #        echo "::set-output name=image::${{ secrets.IMAGE_NAME }}:$STAGE_TAG"
