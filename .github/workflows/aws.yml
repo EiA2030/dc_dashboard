@@ -26,7 +26,7 @@ jobs:
 
     - name: Login to Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1.2
+      uses: aws-actions/amazon-ecr-login@v1.5.2
 
 # If execution says "Warning: Unexpected input(s)", it's due to the way Github parses "with" data, ignore it.
     - name: Set branch-based environment variables
