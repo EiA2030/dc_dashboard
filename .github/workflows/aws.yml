@@ -71,6 +71,6 @@ jobs:
         ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
       with:
         task-definition: task-definition.json
-        service: ${{ 'cat servis.txt' }}
+        service: ${{ $'$cat servis.txt' }}
         cluster: ${{ secrets.ECS_CLUSTER }}
         wait-for-service-stability: true
