@@ -69,6 +69,6 @@ jobs:
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
         task-definition: task-definition.json
-        service: $STAGE_TAG"
+        service: ${{ secrets.ECS_SERVICE }}${STAGE_TAG}
         cluster: ${{ secrets.ECS_CLUSTER }}
         wait-for-service-stability: true
