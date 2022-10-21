@@ -54,23 +54,26 @@ jobs:
         echo "::set-output name=image::${{ secrets.IMAGE_NAME }}:$STAGE_TAG"
     
     - name: Download task definition
-      run: aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }}$STAGE_TAG --query taskDefinition > task-definition.json && echo "action_state=${{ secrets.ECS_SERVICE }}$STAGE_TAG" >> $GITHUB_ENV
+      run: aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }}$STAGE_TAG --query taskDefinition > task-definition.json
+    
+    - name: Setup environment variable workaround for "with"
+      run: echo "SERVICE_AND_CONTAINER_NAME_WORKAROUND=${{ secrets.ECS_SERVICE }}$STAGE_TAG" >> $GITHUB_ENV
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
         task-definition: task-definition.json
-#         container-name: ${{ secrets.ECS_SERVICE }}$STAGE_TAG
-        container-name: eia2030-dc-dashboard-dev
+        container-name: ${{ env.SERVICE_AND_CONTAINER_NAME_WORKAROUND }}
+#         container-name: eia2030-dc-dashboard-dev
         image: ${{ steps.build-image.outputs.image }}
 
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      env:
-        ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
+#       env:
+#         ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
       with:
         task-definition: task-definition.json
-        service: ${{ env.action_state }}
+        service: ${{ env.SERVICE_AND_CONTAINER_NAME_WORKAROUND }}
         cluster: ${{ secrets.ECS_CLUSTER }}
         wait-for-service-stability: true
