@@ -3,7 +3,7 @@
 
 #ONA :: load data  R okapi package.
 library(okapi)
-remove.packages("okapi")
+
 ###SG
 ona_auth_token <- function(token) {
   Sys.setenv("ONA_TOKEN" = Sys.getenv("TOKEN1"))
