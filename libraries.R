@@ -6,4 +6,8 @@ install.packages(pkgs=c('shinydashboard', 'tidyr', 'ggplot2', 'sf', 'lubridate',
 	'tippy', 'shinyWidgets', 'auth0', 'data.table', 'dplyr', 'sp', 'future', 'future.apply', 'foreach',
 	'doParallel', 'wrapr', 'devtools'), dependencies=TRUE, repos='https://cran.rstudio.com/')
 
+
+install.packages(pkgs=c('devtools', 'remotes'), dependencies=TRUE, repos='https://cran.rstudio.com/')
+
 devtools::install_github('onaio/ona.R')
+remotes::install_github('rapidsurveys/odktools')
