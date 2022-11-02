@@ -16,6 +16,7 @@ RUN apt-get install libsodium-dev libudunits2-dev -y
 
 RUN apt-get install cron -y
 RUN apt-get install bzip2 -y
+RUN apt-get install libgit2-dev libssh2-1-dev -y
 
 WORKDIR /workdir
 COPY libraries.R /workdir/libraries.R
