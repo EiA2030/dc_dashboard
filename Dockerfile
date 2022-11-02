@@ -20,5 +20,8 @@ RUN Rscript /workdir/libraries.R
 
 COPY . /workdir/
 
+RUN apt-get install cron -y
+RUN R -e "install.packages('cronR',dependencies=TRUE, repos='http://cran.rstudio.com/')"
+
 EXPOSE 80
 CMD ["R", "-e", "shiny::runApp('/workdir/app.R', host='0.0.0.0', port=80)"]
