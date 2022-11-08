@@ -49,6 +49,9 @@ jobs:
     - name: Setup environment variable workaround for "with"
       run: echo "DOCKER_IMAGE_TO_PUSH=${{ secrets.IMAGE_NAME }}:$STAGE_TAG" >> $GITHUB_ENV
 
+    - name: Download env from S3 bucket
+      run: aws s3 cp s3://scio-project-envs/r/eia2030/_.env _.env
+
     - uses: docker/setup-buildx-action@v2
     - uses: docker/build-push-action@v3
       name: Build with cache
