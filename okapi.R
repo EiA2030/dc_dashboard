@@ -12,7 +12,7 @@ ona_auth_token <- function(token) {
 ona_auth_token(token = Sys.getenv("ONA_TOKEN"))
 Measure_Maize_SG<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id = 671033)
 Assign_FDTLPO_SG<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id = 668967)
-View(Register_PC)
+#View(Measure_Maize_SG)
 
 ###PO
 ona_auth_token <- function(token) {

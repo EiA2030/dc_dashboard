@@ -1,3 +1,6 @@
+source('cronfile.R')
+source('dataprocessing.R')
+
 # load packages
 library(shiny)
 library(shinyauthr)
@@ -30,6 +33,7 @@ library(dplyr)
 
 #source('get_users.R')
 ## load functions
+
 source('support_fun.R')
 
 jscode <- "
@@ -57,7 +61,7 @@ ui <-
 
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
-  
+ 
   #Authentication credentials  
   #getwd()
   credentials <- shinyauthr::loginServer(
@@ -621,7 +625,7 @@ server <- function(input, output, session) {
       # 
       # 
       #plot of submissions trend
-      Ir<-ggplot(wgroup, aes(x=date, y= n, group=1)) +
+      Ir<-ggplot(wgroup, aes(x=date, y= freq, group=1)) +
         geom_line(color="orange")+
         geom_point(color="orange")+
         #scale_x_discrete(labels= paste("Week", c(1:length(ff))))+
@@ -873,14 +877,15 @@ server <- function(input, output, session) {
         )
         
       })
-      
+     
       ranks<- a %>% 
         select(ENID,Register.Household, Register.Field, Register.Trial.Plot,Field.Description,
                Soil.Sampling, Record.Crop.Variety,Germination.Count,Top.Dressing,
                PD.Scoring, Weeding, Household.Survey, Plant.Sampling,Harvest) %>%
         group_by(ENID) %>%
         #summarise(n = n())
-        summarise(across(.fns = ~sum(!is.na(.))))
+        
+        dplyr::summarise(across(.fns = ~sum(!is.na(.))))
       
       output$ranking <- renderReactable({
         reactable(ranks,
