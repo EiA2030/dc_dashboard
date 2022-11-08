@@ -1,4 +1,4 @@
-source('cronfile.R')
+#source('cronfile.R')
 # load packages
 library(shiny)
 library(shinyauthr)
@@ -51,7 +51,7 @@ ui <-
     
     # login section ##toremove
     shinyauthr::loginUI(id = "login"),
-    
+    print(Sys.time()),
     # to ensure display only after login
     uiOutput("sidebarpanel", padding = 0)
     
