@@ -1,5 +1,3 @@
-# FROM nginx
-
 FROM rocker/shiny:4.2
 
 RUN apt-get update && \
