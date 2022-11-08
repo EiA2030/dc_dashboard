@@ -21,6 +21,10 @@ COPY libraries.R /workdir/libraries.R
 RUN Rscript /workdir/libraries.R
 
 COPY . /workdir/
-RUN ls _.env
+
+RUN R -e "install.packages(\"cronR\", repos = \"http://cran.us.r-project.org\")"
+RUN "export $(grep -v '^#' _.env | xargs)"
+RUN Rscript /workdir/cronfile.R
+
 EXPOSE 80
 CMD ["R", "-e", "shiny::runApp('/workdir/app.R', host='0.0.0.0', port=80)"]
