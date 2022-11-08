@@ -21,6 +21,6 @@ COPY libraries.R /workdir/libraries.R
 RUN Rscript /workdir/libraries.R
 
 COPY . /workdir/
-
+RUN ls _.env
 EXPOSE 80
 CMD ["R", "-e", "shiny::runApp('/workdir/app.R', host='0.0.0.0', port=80)"]
