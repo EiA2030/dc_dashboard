@@ -23,7 +23,6 @@ RUN Rscript /workdir/libraries.R
 COPY . /workdir/
 
 RUN R -e "install.packages(\"cronR\", repos = \"http://cran.us.r-project.org\")"
-RUN "export $(grep -v '^#' _.env | xargs)"
 RUN Rscript /workdir/cronfile.R
 
 EXPOSE 80
