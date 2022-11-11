@@ -10,187 +10,55 @@ f_import<-function(){
   library(wrapr )
   library(stringr)
   
+  Measure_Wheat_PO<-Measure_Wheat_PO %>% 
+    mutate(plot = map(plot, ~ .x %>% 
+                        mutate_all(as.character))) %>%
+    unnest(cols = c(plot))%>% 
+    mutate(`plot/PD`=as.list(`plot/PD`))%>%
+    unnest(cols = c(`plot/PD`))%>% 
+    type.convert(as.is = TRUE)
+  
+  Measure_Rice_PO<-Measure_Rice_PO %>% 
+    mutate(plot = map(plot, ~ .x %>% 
+                        mutate_all(as.character))) %>%
+    unnest(cols = c(plot))%>% 
+    mutate(`plot/PD`=as.list(`plot/PD`))%>%
+    unnest(cols = c(`plot/PD`))%>% 
+    type.convert(as.is = TRUE)
+  
+  Measure_Potato_PO<-Measure_Potato_PO %>% 
+    mutate(plot = map(plot, ~ .x %>% 
+                        mutate_all(as.character))) %>%
+    unnest(cols = c(plot))%>% 
+    mutate(`plot/PD`=as.list(`plot/PD`))%>%
+    unnest(cols = c(`plot/PD`))%>% 
+    type.convert(as.is = TRUE)
+  
+  Measure_Cassava_PO<-Measure_Cassava_PO %>% 
+    mutate(plot = map(plot, ~ .x %>% 
+                        mutate_all(as.character))) %>%
+    unnest(cols = c(plot))%>% 
+    mutate(`plot/PD`=as.list(`plot/PD`))%>%
+    unnest(cols = c(`plot/PD`))%>% 
+    type.convert(as.is = TRUE)
+  
+  Measure_Maize_PO<-Measure_Maize_PO %>% 
+    mutate(plot = map(plot, ~ .x %>% 
+                        mutate_all(as.character))) %>%
+    unnest(cols = c(plot))%>% 
+    mutate(`plot/PD`=as.list(`plot/PD`))%>%
+    unnest(cols = c(`plot/PD`))%>% 
+    type.convert(as.is = TRUE)
+  
+  Measure_Bean_PO<-Measure_Bean_PO %>% 
+    mutate(plot = map(plot, ~ .x %>% 
+                        mutate_all(as.character))) %>%
+    unnest(cols = c(plot))%>% 
+    mutate(`plot/PD`=as.list(`plot/PD`))%>%
+    unnest(cols = c(`plot/PD`))%>% 
+    type.convert(as.is = TRUE)
   
   
-  Measure_Wheat_PO$plot[[24]]$`plot/plantStand_parameters/nrPlants` <-as.integer(Measure_Wheat_PO$plot[[24]]$`plot/plantStand_parameters/nrPlants` )
-  Measure_Wheat_PO$plot[[27]]$`plot/plantStand_parameters/nrPlants` <-as.integer(Measure_Wheat_PO$plot[[27]]$`plot/plantStand_parameters/nrPlants` )
-  Measure_Wheat_PO$plot[[122]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[122]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[123]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[123]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[124]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[124]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[125]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[125]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[126]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[126]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[127]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[127]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[128]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[128]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[129]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[129]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[140]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[140]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[141]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[141]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[141]]$`plot/grainYield2_parameters/totalGrainsFW` <-as.integer(Measure_Wheat_PO$plot[[141]]$`plot/grainYield2_parameters/totalGrainsFW`)
-  Measure_Wheat_PO$plot[[142]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[142]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[143]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[143]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[144]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[144]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[145]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[145]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[146]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[146]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[147]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[147]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[148]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[148]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[149]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[149]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[150]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[150]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[151]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[151]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[152]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[152]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[153]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[153]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[154]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[154]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[155]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[155]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO$plot[[156]]$`plot/grainYield2_parameters/grainsFW` <-as.integer(Measure_Wheat_PO$plot[[156]]$`plot/grainYield2_parameters/grainsFW`)
-  Measure_Wheat_PO<-unnest(Measure_Wheat_PO, plot, drop=F)
-  Measure_Wheat_PO<-unnest(Measure_Wheat_PO, `plot/PD`, drop=F)
-  
-  Measure_Rice_PO<-unnest(Measure_Rice_PO,  plot, drop=F)
-  Measure_Rice_PO<-unnest(Measure_Rice_PO, `plot/PD`, drop=F)
-  
-  Measure_Potato_PO$plot[[247]]$`plot/plantStand_parameters/nrPlants` <-as.integer(Measure_Potato_PO$plot[[247]]$`plot/plantStand_parameters/nrPlants` )
-  Measure_Potato_PO$plot[[247]]$`plot/plantStand_parameters/plotWidth` <-as.integer(Measure_Potato_PO$plot[[247]]$`plot/plantStand_parameters/plotWidth` )
-  Measure_Potato_PO$plot[[247]]$`plot/plantStand_parameters/plotLength` <-as.integer(Measure_Potato_PO$plot[[247]]$`plot/plantStand_parameters/plotLength` )
-  Measure_Potato_PO$plot[[456]]$`plot/plantStand_parameters/nrPlants` <-as.integer(Measure_Potato_PO$plot[[456]]$`plot/plantStand_parameters/nrPlants` )
-  Measure_Potato_PO$plot[[456]]$`plot/plantStand_parameters/plotWidth` <-as.integer(Measure_Potato_PO$plot[[456]]$`plot/plantStand_parameters/plotWidth` )
-  Measure_Potato_PO$plot[[456]]$`plot/tuberYield1_parameters/tubersNr` <-as.integer(Measure_Potato_PO$plot[[456]]$`plot/tuberYield1_parameters/tubersNr` )
-  Measure_Potato_PO$plot[[456]]$`plot/tuberYield2_parameters/tubersFW` <-as.integer(Measure_Potato_PO$plot[[456]]$`plot/tuberYield2_parameters/tubersFW` )
-  Measure_Potato_PO$plot[[456]]$`plot/plantStand_parameters/plotLength` <-as.integer(Measure_Potato_PO$plot[[456]]$`plot/plantStand_parameters/plotLength` )
-  Measure_Potato_PO$plot[[456]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[456]]$`plot/tuberYield3_parameters/tubersFWss` )
-  Measure_Potato_PO$plot[[457]]$`plot/tuberYield1_parameters/tubersNr` <-as.integer(Measure_Potato_PO$plot[[457]]$`plot/tuberYield1_parameters/tubersNr` )
-  Measure_Potato_PO$plot[[457]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[457]]$`plot/tuberYield3_parameters/tubersFWss` )
-  Measure_Potato_PO$plot[[458]]$`plot/tuberYield1_parameters/tubersNr` <-as.integer(Measure_Potato_PO$plot[[458]]$`plot/tuberYield1_parameters/tubersNr` )
-  Measure_Potato_PO$plot[[458]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[458]]$`plot/tuberYield3_parameters/tubersFWss` )
-  Measure_Potato_PO$plot[[511]]$`plot/tuberYield1_parameters/tubersDiseasedNr` <-as.character(Measure_Potato_PO$plot[[511]]$`plot/tuberYield1_parameters/tubersDiseasedNr` )
-  Measure_Potato_PO$plot[[511]]$`plot/tuberYield2_parameters/tubersDiseasedFW` <-as.character(Measure_Potato_PO$plot[[511]]$`plot/tuberYield2_parameters/tubersDiseasedFW` )
-  Measure_Potato_PO$plot[[515]]$`plot/tuberYield1_parameters/tubersDiseasedNr` <-as.character(Measure_Potato_PO$plot[[515]]$`plot/tuberYield1_parameters/tubersDiseasedNr` )
-  Measure_Potato_PO$plot[[515]]$`plot/tuberYield2_parameters/tubersDiseasedFW` <-as.character(Measure_Potato_PO$plot[[515]]$`plot/tuberYield2_parameters/tubersDiseasedFW` )
-  Measure_Potato_PO$plot[[516]]$`plot/tuberYield1_parameters/tubersSmallNr` <-as.integer(Measure_Potato_PO$plot[[516]]$`plot/tuberYield1_parameters/tubersSmallNr` )
-  Measure_Potato_PO$plot[[516]]$`plot/tuberYield2_parameters/tubersSmallFW` <-as.integer(Measure_Potato_PO$plot[[516]]$`plot/tuberYield2_parameters/tubersSmallFW` )
-  Measure_Potato_PO$plot[[516]]$`plot/tuberYield1_parameters/tubersDiseasedNr` <-as.character(Measure_Potato_PO$plot[[516]]$`plot/tuberYield1_parameters/tubersDiseasedNr` )
-  Measure_Potato_PO$plot[[516]]$`plot/tuberYield2_parameters/tubersDiseasedFW` <-as.character(Measure_Potato_PO$plot[[516]]$`plot/tuberYield2_parameters/tubersDiseasedFW` )
-  Measure_Potato_PO$plot[[563]]$`plot/plantStand_parameters/plotWidth` <-as.integer(Measure_Potato_PO$plot[[563]]$`plot/plantStand_parameters/plotWidth` )
-  Measure_Potato_PO$plot[[589]]$`plot/tuberYield1_parameters/tubersDiseasedNr` <-as.character(Measure_Potato_PO$plot[[589]]$`plot/tuberYield1_parameters/tubersDiseasedNr` )
-  Measure_Potato_PO$plot[[589]]$`plot/tuberYield2_parameters/tubersDiseasedFW` <-as.character(Measure_Potato_PO$plot[[589]]$`plot/tuberYield2_parameters/tubersDiseasedFW` )
-  Measure_Potato_PO$plot[[590]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[590]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[591]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[591]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[592]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[592]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[593]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[593]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[594]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[594]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[595]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[595]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[596]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[596]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[597]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[597]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[598]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[598]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[599]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[599]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[600]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[600]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[601]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[601]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[602]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[602]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[603]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[603]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[604]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[604]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[605]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[605]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[606]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[606]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[607]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[607]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[608]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[608]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[609]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[609]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[610]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[610]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[611]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[611]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[620]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[620]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[621]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[621]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[622]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[622]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[623]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[623]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[624]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[624]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[716]]$`plot/tuberYield1_parameters/tubersNr` <-as.integer(Measure_Potato_PO$plot[[716]]$`plot/tuberYield1_parameters/tubersNr`)
-  Measure_Potato_PO$plot[[716]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[716]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[717]]$`plot/tuberYield1_parameters/tubersNr` <-as.character(Measure_Potato_PO$plot[[717]]$`plot/tuberYield1_parameters/tubersNr`)
-  Measure_Potato_PO$plot[[717]]$`plot/tuberYield1_parameters/tubersNr` <-as.integer(Measure_Potato_PO$plot[[717]]$`plot/tuberYield1_parameters/tubersNr`)
-  Measure_Potato_PO$plot[[717]]$`plot/tuberYield3_parameters/tubersFWss` <-as.character(Measure_Potato_PO$plot[[717]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[717]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[717]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[718]]$`plot/tuberYield1_parameters/tubersNr` <-as.integer(Measure_Potato_PO$plot[[718]]$`plot/tuberYield1_parameters/tubersNr`)
-  Measure_Potato_PO$plot[[718]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[718]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[719]]$`plot/tuberYield1_parameters/tubersNr` <-as.integer(Measure_Potato_PO$plot[[719]]$`plot/tuberYield1_parameters/tubersNr`)
-  Measure_Potato_PO$plot[[719]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[719]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[723]]$`plot/tuberYield1_parameters/tubersNr` <-as.integer(Measure_Potato_PO$plot[[723]]$`plot/tuberYield1_parameters/tubersNr`)
-  Measure_Potato_PO$plot[[730]]$`plot/plantStand_parameters/plotWidth` <-as.integer(Measure_Potato_PO$plot[[730]]$`plot/plantStand_parameters/plotWidth`)
-  Measure_Potato_PO$plot[[733]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[733]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[734]]$`plot/plantStand_parameters/nrPlants` <-as.integer(Measure_Potato_PO$plot[[734]]$`plot/plantStand_parameters/nrPlants`)
-  Measure_Potato_PO$plot[[734]]$`plot/tuberYield1_parameters/tubersNr` <-as.integer(Measure_Potato_PO$plot[[734]]$`plot/tuberYield1_parameters/tubersNr`)
-  Measure_Potato_PO$plot[[734]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[734]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO$plot[[762]]$`plot/tuberYield1_parameters/tubersMarketableNr` <-as.integer(Measure_Potato_PO$plot[[762]]$`plot/tuberYield1_parameters/tubersMarketableNr`)
-  Measure_Potato_PO$plot[[762]]$`plot/tuberYield2_parameters/tubersMarketableFW` <-as.integer(Measure_Potato_PO$plot[[762]]$`plot/tuberYield2_parameters/tubersMarketableFW`)
-  Measure_Potato_PO$plot[[764]]$`plot/tuberYield3_parameters/tubersFWss` <-as.integer(Measure_Potato_PO$plot[[764]]$`plot/tuberYield3_parameters/tubersFWss`)
-  Measure_Potato_PO<-unnest(Measure_Potato_PO, plot, drop=F)
-  Measure_Potato_PO<-unnest(Measure_Potato_PO, `plot/PD`, drop=F)
-  
-  Measure_Maize_PO$plot[[67]]$`plot/plantStand_parameters/nrPlants` <-as.integer(Measure_Maize_PO$plot[[67]]$`plot/plantStand_parameters/nrPlants` )
-  Measure_Maize_PO$plot[[67]]$`plot/plantStand_parameters/plotWidthPlantStand` <-as.integer(Measure_Maize_PO$plot[[67]]$`plot/plantStand_parameters/plotWidthPlantStand` )
-  Measure_Maize_PO$plot[[67]]$`plot/plantStand_parameters/plotLengthPlantStand` <-as.integer(Measure_Maize_PO$plot[[67]]$`plot/plantStand_parameters/plotLengthPlantStand` )
-  Measure_Maize_PO$plot[[237]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[237]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[238]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[238]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[239]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[239]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[240]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[240]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[241]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[241]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[252]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[252]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[253]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[253]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[254]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[254]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[255]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[255]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[256]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[256]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[256]]$`plot/grainYield1_parameters/NrProlificPlants` <-as.character(Measure_Maize_PO$plot[[256]]$`plot/grainYield1_parameters/NrProlificPlants` )
-  Measure_Maize_PO$plot[[257]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[257]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[258]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[258]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[258]]$`plot/grainYield1_parameters/NrProlificPlants` <-as.character(Measure_Maize_PO$plot[[258]]$`plot/grainYield1_parameters/NrProlificPlants` )
-  Measure_Maize_PO$plot[[259]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[259]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[259]]$`plot/grainYield2_parameters/biomassFW` <-as.character(Measure_Maize_PO$plot[[259]]$`plot/grainYield2_parameters/biomassFW` )
-  Measure_Maize_PO$plot[[259]]$`plot/grainYield1_parameters/NrProlificPlants` <-as.character(Measure_Maize_PO$plot[[259]]$`plot/grainYield1_parameters/NrProlificPlants` )
-  Measure_Maize_PO$plot[[260]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[260]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[261]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[261]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[262]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[262]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[265]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[265]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[268]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[268]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[268]]$`plot/grainYield1_parameters/NrProlificPlants` <-as.character(Measure_Maize_PO$plot[[268]]$`plot/grainYield1_parameters/NrProlificPlants` )
-  Measure_Maize_PO$plot[[269]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[269]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[269]]$`plot/grainYield1_parameters/NrProlificPlants` <-as.character(Measure_Maize_PO$plot[[269]]$`plot/grainYield1_parameters/NrProlificPlants` )
-  Measure_Maize_PO$plot[[272]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[272]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[272]]$`plot/grainYield1_parameters/NrProlificPlants` <-as.character(Measure_Maize_PO$plot[[272]]$`plot/grainYield1_parameters/NrProlificPlants` )
-  Measure_Maize_PO$plot[[272]]$`plot/grainYield2_parameters/biomassFW` <-as.character(Measure_Maize_PO$plot[[272]]$`plot/grainYield2_parameters/biomassFW` )
-  Measure_Maize_PO$plot[[273]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[273]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[273]]$`plot/grainYield1_parameters/NrProlificPlants` <-as.character(Measure_Maize_PO$plot[[273]]$`plot/grainYield1_parameters/NrProlificPlants` )
-  Measure_Maize_PO$plot[[273]]$`plot/grainYield2_parameters/biomassFW` <-as.character(Measure_Maize_PO$plot[[273]]$`plot/grainYield2_parameters/biomassFW` )
-  Measure_Maize_PO$plot[[288]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[288]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[289]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[289]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[290]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[290]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[290]]$`plot/grainYield1_parameters/NrProlificPlants` <-as.character(Measure_Maize_PO$plot[[290]]$`plot/grainYield1_parameters/NrProlificPlants` )
-  Measure_Maize_PO$plot[[295]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[295]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[295]]$`plot/grainYield1_parameters/NrProlificPlants` <-as.character(Measure_Maize_PO$plot[[295]]$`plot/grainYield1_parameters/NrProlificPlants` )
-  Measure_Maize_PO$plot[[296]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[296]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[296]]$`plot/grainYield1_parameters/NrProlificPlants` <-as.character(Measure_Maize_PO$plot[[296]]$`plot/grainYield1_parameters/NrProlificPlants` )
-  Measure_Maize_PO$plot[[297]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[297]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[297]]$`plot/grainYield1_parameters/NrProlificPlants` <-as.character(Measure_Maize_PO$plot[[297]]$`plot/grainYield1_parameters/NrProlificPlants` )
-  Measure_Maize_PO$plot[[299]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[299]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[299]]$`plot/grainYield1_parameters/NrProlificPlants` <-as.character(Measure_Maize_PO$plot[[299]]$`plot/grainYield1_parameters/NrProlificPlants` )
-  Measure_Maize_PO$plot[[300]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[300]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[300]]$`plot/grainYield1_parameters/NrProlificPlants` <-as.character(Measure_Maize_PO$plot[[300]]$`plot/grainYield1_parameters/NrProlificPlants` )
-  Measure_Maize_PO$plot[[302]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[302]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[302]]$`plot/grainYield1_parameters/NrProlificPlants` <-as.character(Measure_Maize_PO$plot[[302]]$`plot/grainYield1_parameters/NrProlificPlants` )
-  Measure_Maize_PO$plot[[305]]$`plot/grainYield3_parameters/NrCobs` <-as.character(Measure_Maize_PO$plot[[305]]$`plot/grainYield3_parameters/NrCobs` )
-  Measure_Maize_PO$plot[[305]]$`plot/grainYield1_parameters/NrProlificPlants` <-as.character(Measure_Maize_PO$plot[[305]]$`plot/grainYield1_parameters/NrProlificPlants` )
-  Measure_Maize_PO<-unnest(Measure_Maize_PO, plot, drop=F)
-  Measure_Maize_PO<-unnest(Measure_Maize_PO, `plot/PD`, drop=F)
-  
-  #Measure_Cassava_PO<-unnest(Measure_Cassava_PO[c(1:nrow(Measure_Cassava_PO)), ], plot)
-  Measure_Cassava_PO<-unnest(Measure_Cassava_PO, plot, drop=F)
-  Measure_Cassava_PO<-unnest(Measure_Cassava_PO, `plot/PD`, drop=F)
-  
-  Measure_Bean_PO$plot[[83]]$`plot/plantStand_parameters/nrPlants` <-as.integer(Measure_Bean_PO$plot[[83]]$`plot/plantStand_parameters/nrPlants` )
-  Measure_Bean_PO$plot[[83]]$`plot/plantStand_parameters/plotWidth` <-as.integer(Measure_Bean_PO$plot[[83]]$`plot/plantStand_parameters/plotWidth` )
-  Measure_Bean_PO$plot[[83]]$`plot/plantStand_parameters/plotLength` <-as.integer(Measure_Bean_PO$plot[[83]]$`plot/plantStand_parameters/plotLength` )
-  Measure_Bean_PO$plot[[91]]$`plot/plantStand_parameters/nrPlants` <-as.integer(Measure_Bean_PO$plot[[91]]$`plot/plantStand_parameters/nrPlants` )
-  Measure_Bean_PO$plot[[91]]$`plot/plantStand_parameters/plotWidth` <-as.integer(Measure_Bean_PO$plot[[91]]$`plot/plantStand_parameters/plotWidth` )
-  Measure_Bean_PO$plot[[91]]$`plot/plantStand_parameters/plotLength` <-as.integer(Measure_Bean_PO$plot[[91]]$`plot/plantStand_parameters/plotLength` )
-  Measure_Bean_PO$plot[[319]]$`plot/grainYield1_parameters/grainsFW` <-as.integer(Measure_Bean_PO$plot[[319]]$`plot/grainYield1_parameters/grainsFW` )
-  Measure_Bean_PO$plot[[375]]$`plot/plantStand_parameters/nrPlants` <-as.integer(Measure_Bean_PO$plot[[375]]$`plot/plantStand_parameters/nrPlants` )
-  Measure_Bean_PO$plot[[375]]$`plot/plantStand_parameters/plotWidth` <-as.integer(Measure_Bean_PO$plot[[375]]$`plot/plantStand_parameters/plotWidth` )
-  Measure_Bean_PO$plot[[375]]$`plot/plantStand_parameters/plotLength` <-as.integer(Measure_Bean_PO$plot[[375]]$`plot/plantStand_parameters/plotLength` )
-  Measure_Bean_PO$plot[[375]]$`plot/grainYield1_parameters/grainsFW` <-as.integer(Measure_Bean_PO$plot[[375]]$`plot/grainYield1_parameters/grainsFW` )
-  Measure_Bean_PO<-unnest(Measure_Bean_PO, plot, drop=F)
-  Measure_Bean_PO<-unnest(Measure_Bean_PO, `plot/PD`, drop=F)
   #View(Measure_Maize_SG$`fertilizer2/plotFert2/urea2`[[68]])
   
   #NG
