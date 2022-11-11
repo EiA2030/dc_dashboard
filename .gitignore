@@ -8,4 +8,6 @@ _auth0.yml
 auth0file
 data_import.R
 get_users.R
+.RData 
+.Renviron
 data
