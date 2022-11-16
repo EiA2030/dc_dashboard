@@ -1,6 +1,5 @@
 #to install okapi [package
 #remotes::install_github("rapidsurveys/odktools")
-source("f_type.R")
 #ONA :: load data  R okapi package.
 library(okapi)
 
@@ -37,5 +36,3 @@ Measure_Potato_PO<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "t
 Measure_Rice_PO<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id = 625030)
 Measure_Wheat_PO<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id = 627364)
 
-
-f_import()
