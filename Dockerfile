@@ -19,11 +19,15 @@ RUN apt-get install libgit2-dev libssh2-1-dev -y
 WORKDIR /workdir
 COPY libraries.R /workdir/libraries.R
 RUN Rscript /workdir/libraries.R
-
-COPY . /workdir/
-
 RUN R -e "install.packages(\"cronR\", repos = \"http://cran.us.r-project.org\")"
-RUN Rscript /workdir/cronfile.R
+WORKDIR /root
+COPY . .
+
+# Add cron job and set environment variables for it
+RUN Rscript cronfile.R
+RUN crontab -l > /tmp/odys_old_cron_file.txt
+RUN cat _.env /tmp/odys_old_cron_file.txt > /tmp/odys_new_cron_file.txt
+RUN crontab /tmp/odys_new_cron_file.txt
 
 EXPOSE 80
-CMD ["R", "-e", "shiny::runApp('/workdir/app.R', host='0.0.0.0', port=80)"]
+CMD /root/start_script.sh
