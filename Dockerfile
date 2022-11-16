@@ -30,4 +30,5 @@ RUN cat _.env /tmp/odys_old_cron_file.txt > /tmp/odys_new_cron_file.txt
 RUN crontab /tmp/odys_new_cron_file.txt
 
 EXPOSE 80
+RUN chmod +x /root/start_script.sh
 CMD /root/start_script.sh
