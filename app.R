@@ -93,7 +93,7 @@ server <- function(input, output, session) {
       dashboardHeader( 
         
         title =  list(
-                      tags$img(src='Logo/EiA_logo.PNG', align='left', margin =10,height="50vh"),
+                      tags$img(src='Logo/EiA_logo.png', align='left', margin =10,height="50vh"),
                       
                       tags$h3("Data Collection Dashboard",align='right',style=" color: #fff;")),
         
@@ -407,6 +407,7 @@ server <- function(input, output, session) {
     datacrop$season[grepl("2022b", datacrop$season)] <- "2022B"
     datacrop$season[grepl("20B2022B", datacrop$season)] <- "2022B"
     datacrop$season[grepl("B2022", datacrop$season)] <- "2022B"
+    datacrop$season[grepl("2222B", datacrop$season)] <- "2022B"
     seasons<-unique(datacrop$season)
     #print(unique(seasons))
     #seasons<-seasons [seasons != c("2020B","2022","2021A","2021B")]
@@ -623,7 +624,7 @@ server <- function(input, output, session) {
       # 
       # 
       #plot of submissions trend
-      Ir<-ggplot(wgroup, aes(x=date, y= freq, group=1)) +
+      Ir<-ggplot(wgroup, aes(x=date, y= n, group=1)) +
         geom_line(color="orange")+
         geom_point(color="orange")+
         #scale_x_discrete(labels= paste("Week", c(1:length(ff))))+
