@@ -11,3 +11,4 @@ install.packages(pkgs=c('devtools', 'remotes'), dependencies=TRUE, repos='https:
 
 devtools::install_github('onaio/ona.R')
 remotes::install_github('rapidsurveys/odktools')
+install.packages("cronR", repos = "http://cran.us.r-project.org")

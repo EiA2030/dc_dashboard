@@ -11,24 +11,20 @@ RUN apt-get install libgdal-dev -y
 # Necessary
 RUN apt-get install libharfbuzz-dev libfribidi-dev -y
 RUN apt-get install libsodium-dev libudunits2-dev -y
-
 RUN apt-get install cron -y
 RUN apt-get install bzip2 -y
 RUN apt-get install libgit2-dev libssh2-1-dev -y
 
-WORKDIR /workdir
-COPY libraries.R /workdir/libraries.R
-RUN Rscript /workdir/libraries.R
-RUN R -e "install.packages(\"cronR\", repos = \"http://cran.us.r-project.org\")"
+# This is because cron jobs run in root
 WORKDIR /root
+COPY libraries.R libraries.R
+RUN Rscript libraries.R
 COPY . .
 
-# Add cron job and set environment variables for it
+# Add cron job
 RUN Rscript cronfile.R
-RUN crontab -l > /tmp/odys_old_cron_file.txt
-RUN cat _.env /tmp/odys_old_cron_file.txt > /tmp/odys_new_cron_file.txt
-RUN crontab /tmp/odys_new_cron_file.txt
 
 EXPOSE 80
+# Script starts cron service, runs dataprocessing.R once, and starts shiny website.
 RUN chmod +x /root/start_script.sh
 CMD /root/start_script.sh

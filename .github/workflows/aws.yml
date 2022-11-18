@@ -2,7 +2,7 @@ name: Deploy to Amazon ECS
 
 on:
   push:
-    branches: [ "pipeline-test", "release/development", "release/production" ]
+    branches: [ "release/development", "release/production" ]
 
 permissions:
   contents: read
@@ -36,7 +36,6 @@ jobs:
           main:wedontreallyusethemainbranch
           release/development:dev
           release/production:prod
-          pipeline-test:dev
           !default:defaultvalue
 
 #     - name: Build, tag, and push image to Amazon ECR - WITHOUT CACHE
@@ -50,16 +49,11 @@ jobs:
       run: echo "DOCKER_IMAGE_TO_PUSH=${{ secrets.IMAGE_NAME }}:$STAGE_TAG" >> $GITHUB_ENV
 
     - name: Download env from S3 bucket
-      run:  |
-        aws s3 cp s3://scio-project-envs/r/eia2030/_.env _.env
-        aws s3 cp s3://scio-project-envs/r/eia2030/_.Renviron .Renviron
+      run: aws s3 cp s3://scio-project-envs/r/eia2030/_.Renviron .Renviron
 
     - uses: docker/setup-buildx-action@v2
     - uses: docker/build-push-action@v3
       name: Build with cache
-      env:
-        test_token: "FROM--GITHUB---ACTIONS"
-        env1: "11111111110"
       with:
         context: .
         push: true
