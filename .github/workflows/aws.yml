@@ -78,16 +78,16 @@ jobs:
 
     # - name: Deploy with rsync
     #   run: rsync -avz -e 'ssh -p 1412' --progress ./docker-compose.dev.yml ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }}:/var/lib/eia2030/
-
+# ssh ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} "docker pull ${{ env.DOCKER_IMAGE_TO_PUSH }}"
     - name: SSH to EC2 and run container
       run: |
-        ssh ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} "docker pull ${{ env.DOCKER_IMAGE_TO_PUSH }}"
-      # ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} sudo mkdir -p /var/lib/app/eia2030"
-      # ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} sudo chown -R ${{ secrets.SSH_USER }}:${{ secrets.SSH_USER }} /var/lib/app/eia2030"
-      # ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} docker rm -f app" // stop container if already running under the defined container name
-      # scp -P ${{ secrets.SSH_PORT }} docker-compose.dev.yml ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }}:/var/lib/app/eia2030"
-      # ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} docker-compose -f /var/lib/app/eia2030/docker-compose.dev.yml pull"
-      # ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} docker-compose -f /var/lib/app/eia2030/docker-compose.dev.yml up -d"
+        
+        ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} "sudo mkdir -p /var/lib/app/eia2030"
+        ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} "sudo chown -R ${{ secrets.SSH_USER }}:${{ secrets.SSH_USER }} /var/lib/app/eia2030"
+        ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} "docker rm -f app" // stop container if already running under the defined container name
+        scp -P ${{ secrets.SSH_PORT }} docker-compose.dev.yml ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }}:/var/lib/app/eia2030
+        ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} "docker-compose -f /var/lib/app/eia2030/docker-compose.dev.yml pull"
+        ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} "docker-compose -f /var/lib/app/eia2030/docker-compose.dev.yml up -d"
 
     # - name: Download task definition
     #   run: aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }}$STAGE_TAG --query taskDefinition > task-definition.json
