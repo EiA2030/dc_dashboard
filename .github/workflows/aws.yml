@@ -73,8 +73,8 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         known_hosts: 'just-a-placeholder-so-we-dont-get-errors'
 
-    - name: Adding Known Hosts
-      run: ssh-keyscan -p ${{ secrets.SSH_PORT }} -T 15 -H ${{ secrets.DEV_DEPLOYMENT_INSTANCE }} >> ~/.ssh/known_hosts
+    # - name: Adding Known Hosts
+    #   run: ssh-keyscan -p ${{ secrets.SSH_PORT }} -T 15 -H ${{ secrets.DEV_DEPLOYMENT_INSTANCE }} >> ~/.ssh/known_hosts
 
     # - name: Deploy with rsync
     #   run: rsync -avz -e 'ssh -p 1412' --progress ./docker-compose.dev.yml ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }}:/var/lib/eia2030/
