@@ -74,7 +74,7 @@ jobs:
       run: ssh scio@dev2.dc.eia.scio.services -p1412
 
     - name: Deploy with rsync
-      run: rsync --port ${{ secrets.SSH_PORT }} -avz ./ ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }}:/var/lib/eia2030/
+      run: rsync --port=${{ secrets.SSH_PORT }} -avz ./ ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }}:/var/lib/eia2030/
     # - name: Download task definition
     #   run: aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }}$STAGE_TAG --query taskDefinition > task-definition.json
     
