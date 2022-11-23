@@ -76,9 +76,8 @@ jobs:
 
     - name: SSH to EC2 and run container
       run: |
-        ssh scio@dev2.dc.eia.scio.services -p1412
-        pwd
-        ls
+        ssh scio@dev2.dc.eia.scio.services -p1412 "docker ps -a"
+        ssh scio@dev2.dc.eia.scio.services -p1412 "docker ps -a"
 
     # - name: Download task definition
     #   run: aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }}$STAGE_TAG --query taskDefinition > task-definition.json
