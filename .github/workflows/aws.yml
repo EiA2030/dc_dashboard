@@ -2,7 +2,7 @@ name: Deploy to Amazon ECS
 
 on:
   push:
-    branches: [ "release/development", "release/production" ]
+    branches: [ "ec2-deployment-test" ]
 
 permissions:
   contents: read
@@ -61,24 +61,36 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
-    - name: Download task definition
-      run: aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }}$STAGE_TAG --query taskDefinition > task-definition.json
+    - name: Install SSH Key
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        known_hosts: 'just-a-placeholder-so-we-dont-get-errors'
+
+    - name: Adding Known Hosts
+      run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+    - name: SSH to EC2 and run container
+      run: ssh scio@dev2.dc.eia.scio.services -p1412
+
+    # - name: Download task definition
+    #   run: aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }}$STAGE_TAG --query taskDefinition > task-definition.json
     
-    - name: Setup environment variable workaround for "with"
-      run: echo "SERVICE_AND_CONTAINER_NAME_WORKAROUND=${{ secrets.ECS_SERVICE }}$STAGE_TAG" >> $GITHUB_ENV
+    # - name: Setup environment variable workaround for "with"
+    #   run: echo "SERVICE_AND_CONTAINER_NAME_WORKAROUND=${{ secrets.ECS_SERVICE }}$STAGE_TAG" >> $GITHUB_ENV
 
-    - name: Fill in the new image ID in the Amazon ECS task definition
-      id: task-def
-      uses: aws-actions/amazon-ecs-render-task-definition@v1
-      with:
-        task-definition: task-definition.json
-        container-name: ${{ env.SERVICE_AND_CONTAINER_NAME_WORKAROUND }}
-        image: ${{ env.DOCKER_IMAGE_TO_PUSH }}
+    # - name: Fill in the new image ID in the Amazon ECS task definition
+    #   id: task-def
+    #   uses: aws-actions/amazon-ecs-render-task-definition@v1
+    #   with:
+    #     task-definition: task-definition.json
+    #     container-name: ${{ env.SERVICE_AND_CONTAINER_NAME_WORKAROUND }}
+    #     image: ${{ env.DOCKER_IMAGE_TO_PUSH }}
 
-    - name: Deploy Amazon ECS task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      with:
-        task-definition: task-definition.json
-        service: ${{ env.SERVICE_AND_CONTAINER_NAME_WORKAROUND }}
-        cluster: ${{ secrets.ECS_CLUSTER }}
-        wait-for-service-stability: true
+    # - name: Deploy Amazon ECS task definition
+    #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+    #   with:
+    #     task-definition: task-definition.json
+    #     service: ${{ env.SERVICE_AND_CONTAINER_NAME_WORKAROUND }}
+    #     cluster: ${{ secrets.ECS_CLUSTER }}
+    #     wait-for-service-stability: true

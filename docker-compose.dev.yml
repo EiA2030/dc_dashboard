@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  app:
+    image: sciohub/era-ui:dev
+    container_name: react-app
+    restart: unless-stopped
+    ports:
+      - 50300:80
+    networks:
+      - default
+
+networks:
+  default:
+    name: app
