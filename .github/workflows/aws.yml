@@ -84,6 +84,9 @@ jobs:
         ssh ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} "docker pull ${{ env.DOCKER_IMAGE_TO_PUSH }}"
         ssh ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} "sudo mkdir -p /var/lib/app/eia2030"
         ssh ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} "sudo chown -R ${{ secrets.SSH_USER }}:${{ secrets.SSH_USER }} /var/lib/app/eia2030"
+        scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no docker-compose.dev.yml ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }}:/var/lib/app/eia2030"
+        ssh ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} "docker-compose -f /var/lib/app/eia2030/docker-compose.dev.yml pull"
+        ssh ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} "docker-compose -f /var/lib/app/eia2030/docker-compose.dev.yml up -d"
       # ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} sudo mkdir -p /var/lib/app/eia2030"
       # ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} sudo chown -R ${{ secrets.SSH_USER }}:${{ secrets.SSH_USER }} /var/lib/app/eia2030"
       # ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} docker rm -f app" // stop container if already running under the defined container name
