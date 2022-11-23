@@ -81,12 +81,7 @@ jobs:
 
     - name: SSH to EC2 and run container
       run: |
-        ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} sudo mkdir -p /var/lib/app/eia2030"
-        ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} sudo chown -R ${{ secrets.SSH_USER }}:${{ secrets.SSH_USER }} /var/lib/app/eia2030"
-        ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} docker rm -f app" // stop container if already running under the defined container name
-        scp -P ${{ secrets.SSH_PORT }} docker-compose.dev.yml ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }}:/var/lib/app/eia2030"
-        ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} docker-compose -f /var/lib/app/eia2030/docker-compose.dev.yml pull"
-        ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} docker-compose -f /var/lib/app/eia2030/docker-compose.dev.yml up -d"
+        ssh scio@dev2.dc.eia.scio.services -p1412 "docker pull ${{ env.DOCKER_IMAGE_TO_PUSH }}"
 
     # - name: Download task definition
     #   run: aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }}$STAGE_TAG --query taskDefinition > task-definition.json
