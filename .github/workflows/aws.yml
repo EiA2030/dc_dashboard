@@ -44,12 +44,18 @@ jobs:
 #         docker buildx build -t ${{ secrets.IMAGE_NAME }}:$STAGE_TAG --cache-to type=gha,scope=$GITHUB_REF_NAME-image --cache-from type=gha,scope=$GITHUB_REF_NAME-image .
 #         docker push ${{ secrets.IMAGE_NAME }}:$STAGE_TAG
 #         echo "image=${{ secrets.IMAGE_NAME }}:$STAGE_TAG" >> $GITHUB_OUTPUT
-    
+
     - name: Setup environment variable workaround for "with"
-      run: echo "DOCKER_IMAGE_TO_PUSH=${{ secrets.IMAGE_NAME }}:$STAGE_TAG" >> $GITHUB_ENV
+      run: echo "DOCKER_IMAGE_TO_PUSH=${{ secrets.IMAGE_NAME_DOCKERHUB }}:$STAGE_TAG" >> $GITHUB_ENV
 
     - name: Download env from S3 bucket
       run: aws s3 cp s3://scio-project-envs/r/eia2030/_.Renviron .Renviron
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - uses: docker/setup-buildx-action@v2
     - uses: docker/build-push-action@v3
@@ -71,13 +77,11 @@ jobs:
       run: ssh-keyscan -p ${{ secrets.SSH_PORT }} -T 15 -H ${{ secrets.DEV_DEPLOYMENT_INSTANCE }} >> ~/.ssh/known_hosts
 
     - name: Deploy with rsync
-      # run: rsync --port=${{ secrets.SSH_PORT }} -avz ./ ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }}:/var/lib/eia2030/
-      run: rsync -avz -e 'ssh -p 1412' --progress ./ ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }}:/var/lib/eia2030/
+      run: rsync -avz -e 'ssh -p 1412' --progress ./docker-compose.dev.yml ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }}:/var/lib/eia2030/
 
     - name: SSH to EC2 and run container
       run: |
-        ssh scio@dev2.dc.eia.scio.services -p1412 "docker ps -a"
-        ssh scio@dev2.dc.eia.scio.services -p1412 "docker ps -a"
+        ssh scio@dev2.dc.eia.scio.services -p1412 "docker pull ${{ env.DOCKER_IMAGE_TO_PUSH }}"
 
     # - name: Download task definition
     #   run: aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }}$STAGE_TAG --query taskDefinition > task-definition.json
