@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  app:
+    image: sciohub/eia2030-dc-dashboard:dev
+    container_name: app
+    restart: unless-stopped
+    ports:
+      - 22350:80 # HOST:CONTAINER
+    networks:
+      - default
+
+networks:
+  default:
+    name: app

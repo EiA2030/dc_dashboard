@@ -1,3 +1,4 @@
+
 # load packages
 library(shiny)
 library(shinyauthr)
@@ -30,6 +31,7 @@ library(dplyr)
 
 #source('get_users.R')
 ## load functions
+
 source('support_fun.R')
 
 jscode <- "
@@ -57,7 +59,7 @@ ui <-
 
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
-  
+ 
   #Authentication credentials  
   #getwd()
   credentials <- shinyauthr::loginServer(
@@ -91,7 +93,7 @@ server <- function(input, output, session) {
       dashboardHeader( 
         
         title =  list(
-                      tags$img(src='Logo/EiA_logo.PNG', align='left', margin =10,height="50vh"),
+                      tags$img(src='Logo/EiA_logo.png', align='left', margin =10,height="50vh"),
                       
                       tags$h3("Data Collection Dashboard",align='right',style=" color: #fff;")),
         
@@ -405,6 +407,7 @@ server <- function(input, output, session) {
     datacrop$season[grepl("2022b", datacrop$season)] <- "2022B"
     datacrop$season[grepl("20B2022B", datacrop$season)] <- "2022B"
     datacrop$season[grepl("B2022", datacrop$season)] <- "2022B"
+    datacrop$season[grepl("2222B", datacrop$season)] <- "2022B"
     seasons<-unique(datacrop$season)
     #print(unique(seasons))
     #seasons<-seasons [seasons != c("2020B","2022","2021A","2021B")]
@@ -873,14 +876,15 @@ server <- function(input, output, session) {
         )
         
       })
-      
+     
       ranks<- a %>% 
         select(ENID,Register.Household, Register.Field, Register.Trial.Plot,Field.Description,
                Soil.Sampling, Record.Crop.Variety,Germination.Count,Top.Dressing,
                PD.Scoring, Weeding, Household.Survey, Plant.Sampling,Harvest) %>%
         group_by(ENID) %>%
         #summarise(n = n())
-        summarise(across(.fns = ~sum(!is.na(.))))
+        
+        dplyr::summarise(across(.fns = ~sum(!is.na(.))))
       
       output$ranking <- renderReactable({
         reactable(ranks,

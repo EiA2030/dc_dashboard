@@ -1,20 +1,23 @@
 #scheduled daily run on server for processed data
 ## Script scheduled to run daily at 00:00 to avoid expensive computation within the app.
 ### 
-library(tidyr)
-library(magrittr)
-library(sp)
-library(dplyr)
-library(future)
-library(future.apply)
-library(foreach)
-library(doParallel)
-library(wrapr )
-library(stringr)
+if(!require(tidyr)) install.packages("tidyr", repos = "http://cran.us.r-project.org")
+if(!require(magrittr)) install.packages("magrittr", repos = "http://cran.us.r-project.org")
+if(!require(sp)) install.packages("sp", repos = "http://cran.us.r-project.org")
+if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.org")
+if(!require(future)) install.packages("future", repos = "http://cran.us.r-project.org")
+if(!require(future.apply)) install.packages("future.apply", repos = "http://cran.us.r-project.org")
+if(!require(foreach)) install.packages("foreach", repos = "http://cran.us.r-project.org")
+if(!require(doParallel)) install.packages("doParallel", repos = "http://cran.us.r-project.org")
+if(!require(wrapr)) install.packages("wrapr", repos = "http://cran.us.r-project.org")
+if(!require(stringr)) install.packages("stringr", repos = "http://cran.us.r-project.org")
+if(!require(purrr)) install.packages("purrr", repos = "http://cran.us.r-project.org")
+
+source("okapi.R")
 
 cl <- makeCluster(6)
 registerDoParallel(cl)
-f_import()
+
  #setwd("C:/Users/dell/Documents/WORK/EiA/EiA Rwanda2/EiA_Rwanda_Dashboard")
  #getwd()
 
@@ -22,6 +25,80 @@ f_import()
 # ## Read data (also updated daily)-json- consistent naming
 # #RW
 ##NOT APPLICABLE
+Measure_Wheat_PO<-Measure_Wheat_PO %>% 
+  mutate(plot = map(plot, ~ .x %>% 
+                      mutate_all(as.list))) %>%
+  unnest(cols = c(plot))%>% 
+  unnest(`plot/PD`, keep_empty = TRUE)%>% 
+  type.convert(as.is = TRUE)
+
+Measure_Rice_PO<-Measure_Rice_PO %>% 
+  mutate(plot = map(plot, ~ .x %>% 
+                      mutate_all(as.list))) %>%
+  unnest(cols = c(plot))%>% 
+  unnest(`plot/PD`, keep_empty = TRUE)%>% 
+  type.convert(as.is = TRUE)
+
+Measure_Potato_PO<-Measure_Potato_PO %>% 
+  mutate(plot = map(plot, ~ .x %>% 
+                      mutate_all(as.list))) %>%
+  unnest(cols = c(plot))%>% 
+  unnest(`plot/PD`, keep_empty = TRUE)%>% 
+  type.convert(as.is = TRUE)
+
+Measure_Cassava_PO<-Measure_Cassava_PO %>% 
+  mutate(plot = map(plot, ~ .x %>% 
+                      mutate_all(as.list))) %>%
+  unnest(cols = c(plot))%>% 
+  unnest(`plot/PD`, keep_empty = TRUE)%>% 
+  type.convert(as.is = TRUE)
+
+Measure_Maize_PO<-Measure_Maize_PO %>% 
+  mutate(plot = map(plot, ~ .x %>% 
+                      mutate_all(as.list))) %>%
+  unnest(cols = c(plot))%>% 
+  unnest(`plot/PD`, keep_empty = TRUE)%>% 
+  type.convert(as.is = TRUE)
+
+Measure_Bean_PO<-Measure_Bean_PO %>% 
+  mutate(plot = map(plot, ~ .x %>% 
+                      mutate_all(as.list))) %>%
+  unnest(cols = c(plot))%>% 
+  unnest(`plot/PD`, keep_empty = TRUE)%>% 
+  type.convert(as.is = TRUE)
+
+Register_EN <- apply(Register_EN,2,as.character) %>%  as_tibble()
+write.csv(Register_EN, file = "./data/dpath1/Register_EN.csv")
+RegisterVerify_HH <- apply(RegisterVerify_HH,2,as.character) %>%  as_tibble()
+write.csv(RegisterVerify_HH, file = "./data/dpath1/RegisterVerify_HH.csv")
+RecordMgt_TL <- apply(RecordMgt_TL,2,as.character) %>%  as_tibble()
+write.csv(RecordMgt_TL, file = "./data/dpath1/RecordMgt_TL.csv")
+Process_PS <- apply(Process_PS,2,as.character) %>%  as_tibble()
+write.csv(Process_PS, file = "./data/dpath1/Process_PS.csv")
+Measure_Wheat_PO <- apply(Measure_Wheat_PO,2,as.character) %>%  as_tibble()
+write.csv(Measure_Wheat_PO, file = "./data/dpath1/Measure_Wheat_PO.csv")
+Measure_Rice_PO <- apply(Measure_Rice_PO,2,as.character) %>%  as_tibble()
+write.csv(Measure_Rice_PO, file = "./data/dpath1/Measure_Rice_PO.csv")
+Measure_Potato_PO <- apply(Measure_Potato_PO,2,as.character) %>%  as_tibble()
+write.csv(Measure_Potato_PO, file = "./data/dpath1/Measure_Potato_PO.csv")
+Measure_Maize_PO <- apply(Measure_Maize_PO,2,as.character) %>%  as_tibble()
+write.csv(Measure_Maize_PO, file = "./data/dpath1/Measure_Maize_PO.csv")
+Measure_Cassava_PO <- apply(Measure_Cassava_PO,2,as.character) %>%  as_tibble()
+write.csv(Measure_Cassava_PO, file = "./data/dpath1/Measure_Cassava_PO.csv")
+Measure_Bean_PO <- apply(Measure_Bean_PO,2,as.character) %>%  as_tibble()
+write.csv(Measure_Bean_PO, file = "./data/dpath1/Measure_Bean_PO.csv")
+Describe_Household <- apply(Describe_Household,2,as.character) %>%  as_tibble()
+write.csv(Describe_Household, file = "./data/dpath1/Describe_Household.csv")
+Describe_FD <- apply(Describe_FD,2,as.character) %>%  as_tibble()
+write.csv(Describe_FD, file = "./data/dpath1/Describe_FD.csv")
+Collect_SS <- apply(Collect_SS,2,as.character) %>%  as_tibble()
+write.csv(Collect_SS, file = "./data/dpath1/Collect_SS.csv")
+Assign_FDTLPO <- apply(Assign_FDTLPO,2,as.character) %>%  as_tibble()
+write.csv(Assign_FDTLPO, file = "./data/dpath1/Assign_FDTLPO.csv")
+Assign_FDTLPO_SG <- apply(Assign_FDTLPO_SG,2,as.character) %>%  as_tibble()
+write.csv(Assign_FDTLPO_SG, file = "./data/dpath2/Assign_FDTLPO_SG.csv")
+Measure_Maize_SG <- apply(Measure_Maize_SG,2,as.character) %>%  as_tibble()
+write.csv(Measure_Maize_SG, file = "./data/dpath2/Measure_Maize_SG.csv")
 
 #Set paths of saved converted files
 #list of paths additional projects to be added 
@@ -190,42 +267,30 @@ for (pl in pathslist){
       .combine = 'c'
     ) %dopar%  {
       if (p == "Register.Household") {
-        #ss<-register_hh[which(register_hh$ENID==cropdata$ENID[i] ), ]
+        
         ss<-register_hh[which(register_hh$HHID==cropdata$HHID[i] ), ]
-        #clist<-c(clist,(rev(ss$today)[1]))
+        
       } else               if ("Household.Survey"  %in% p) {
-        #ss<-d_HH[which(d_HH$startGroup.barcodeenumerator==cropdata$ENID[i] ), ]
+        
         ss<-d_HH[which(d_HH$survey.barcodehousehold==cropdata$HHID[i] ), ]
         colnames(ss)[grepl('today',colnames(ss))] <- 'today'
-        #clist<-c(clist,(rev(ss$today)[1]))
+        
       }else if ("Register.Field"  %in% p || "Register.Trial.Plot"  %in% p)  {
-        #ss<-assign_ftp[which(assign_ftp$ENID==cropdata$ENID[i] ), ]
         ss<-assign_ftp[which(assign_ftp$HHID==cropdata$HHID[i] ), ]
         ss<-ss[which(ss$FDID2_new==cropdata$FDID2[i] ), ]
-        #clist<-c(clist,(rev(ss$today)[1]))
       }else               if ("Field.Description"  %in% p) {
-        #ss<-d_field[which(d_field$ENID==cropdata$ENID[i] ), ]
         ss<-d_field[which(d_field$HHID==cropdata$HHID[i] ), ]
         ss<-ss[which(ss$FDID2==cropdata$FDID2[i] ), ]
-        #clist<-c(clist,(rev(ss$today)[1]))
       }else               if ("Soil.Sampling"  %in% p) {
         ss<-soilsample[which(soilsample$ENID==cropdata$ENID[i] ), ]
-        #clist<-c(clist,(rev(ss$today)[1]))
       }              else  if ("Record.Crop.Variety"  %in% p || "Top.Dressing"  %in% p || "Weeding"  %in% p) {
-        #ss<-trial_management[which(trial_management$ENID==cropdata$ENID[i] ), ]
-        #ss<-ss[which(ss$TLID2==cropdata$TLID2[i] ), ]
-        ss<-trial_management[which(trial_management$FDID2==cropdata$FDID2[i] ), ]
+        ss<-trial_management[which(trial_management$ENID==cropdata$ENID[i] ), ]
         if ( "Record.Crop.Variety"  %in% p){
           #clist<-c(clist,(rev(ss$today)[1]))
         } else if ("Top.Dressing"  %in% p){
           ss<-ss[stringr::str_detect(ss$fieldbookSectionDetails, "fertilizer2"), ]
-          
-          #ss<-ss[which(ss$fieldbookSectionDetails.1..activities.fertilizer2 =="True" ), ]
-          #clist<-c(clist,(rev(ss$today)[1]))
         }else if ("Weeding"  %in% p){
           ss<-ss[stringr::str_detect(ss$fieldbookSections, "weeding"), ]
-          #ss<-ss[which(ss$fieldbookSections.weeding =="True" ), ]
-          #clist<-c(clist,(rev(ss$today)[1]))
         }
       }else if ("Germination.Count"  %in% p || "PD.Scoring"  %in% p || "Plant.Sampling"  %in% p || "Harvest"  %in% p) {
         ss<-measure_plot[which(measure_plot$ENID==cropdata$ENID[i] ), ]
@@ -233,50 +298,26 @@ for (pl in pathslist){
         ss<-ss[which(ss$FDID2==cropdata$FDID2[i] ), ]
         if ("Germination.Count"  %in% p){
           ss<-ss[stringr::str_detect(ss$parameters, "plantStand"), ]
-          #clist<-c(clist,(rev(ss$today)[1]))
         } else if ("PD.Scoring"  %in% p){
           ss<-ss[stringr::str_detect(ss$parameters, "PD"), ]
-          #clist<-c(clist,(rev(ss$today)[1]))
         }else if ("Plant.Sampling"  %in% p){
-          #ss<-ss[which(ss$parameters.plantSampling =="True" ), ]
           ss<-ss[stringr::str_detect(ss$parameters, "plantSampling"), ]
-          #clist<-c(clist,(rev(ss$today)[1]))
         }else if ("Harvest"  %in% p){
           if ("Wheat" %in% cr ){
-            ss<-ss[stringr::str_detect(ss$parameters, "plantHeight"), ]
-            ss<-ss[stringr::str_detect(ss$parameters, "tillerNumber"), ]
-            ss<-ss[stringr::str_detect(ss$parameters, "grainYield"), ]
-            # ss<-ss[which(ss$parameters.plantHeight=="True" ), ]
-            # ss<-ss[which(ss$parameters.tillerNumber=="True" ), ]
-            # ss<-ss[which(ss$parameters.grainYield =="True" ), ]
-            #clist<-c(clist,(rev(ss$today)[1]))
+            ss<-ss[stringr::str_detect(ss$parameters, "plantHeight") 
+                   | stringr::str_detect(ss$parameters, "tillerNumber" ), ]
           } else if ("Cassava" %in% cr){
-            ss<-ss[stringr::str_detect(ss$parameters, "branching"), ]
-            ss<-ss[stringr::str_detect(ss$parameters, "rootYield"), ]
-            # ss<-ss[which(ss$parameters.branching =="True" ), ]
-            # ss<-ss[which(ss$parameters.rootYield =="True" ), ]
-            #clist<-c(clist,(rev(ss$today)[1]))
+            ss<-ss[which(ss$parameters=="branching" | ss$parameters=="rootYield"), ]
           }else if ("Potato" %in% cr){
-            ss<-ss[which(ss$tuberYield_parDetails.tuberQuality =="yes" ), ]
-            ss<-ss[which(ss$tuberYield_parDetails.tuberSampling =="yes" ), ]
-            #clist<-c(clist,(rev(ss$today)[1]))
-          }else if ("Beans" %in% cr){
+            ss<-ss[stringr::str_detect(ss$tuberYield_parDetails.tuberQuality, "yes"), ]
+          }else if ("Bean" %in% cr){
             ss<-ss[stringr::str_detect(ss$parameters, "grainYield"), ]
-            #ss<-ss[which(ss$parameters.grainYield =="True" ), ]
-            #clist<-c(clist,(rev(ss$today)[1]))
           }else if ("Rice" %in% cr){
-            ss<-ss[stringr::str_detect(ss$parameters, "plantHeight"), ]
-            ss<-ss[stringr::str_detect(ss$parameters, "tillerNumber"), ]
-            ss<-ss[stringr::str_detect(ss$parameters, "grainYield"), ]
-            
-            # ss<-ss[which(ss$parameters.plantHeight=="True" ), ]
-            # ss<-ss[which(ss$parameters.tillerNumber=="True" ), ]
-            # ss<-ss[which(ss$parameters.grainYield =="True" ), ]
-            #clist<-c(clist,(rev(ss$today)[1]))
+            ss<-ss[stringr::str_detect(ss$parameters, "plantHeight") 
+                   | stringr::str_detect(ss$parameters, "tillerNumber" ), ]
           }else if ("Maize" %in% cr){
             ss<-ss[stringr::str_detect(ss$parameters, "grainYield"), ]
-            #ss<-ss[which(ss$parameters.grainYield =="True" ), ]
-            #clist<-c(clist,(rev(ss$today)[1]))
+            
           }
         }
       }

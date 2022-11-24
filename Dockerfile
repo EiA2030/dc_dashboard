@@ -1,24 +1,30 @@
-# FROM nginx
-
 FROM rocker/shiny:4.2
 
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get clean
 
-RUN apt-get update
+# Could be unnecessary
 RUN apt-get install libmysqlclient-dev -y
-RUN apt-get install libgdal-dev -y
 
 # Necessary
+RUN apt-get install libgdal-dev -y
 RUN apt-get install libharfbuzz-dev libfribidi-dev -y
 RUN apt-get install libsodium-dev libudunits2-dev -y
+RUN apt-get install cron -y
+RUN apt-get install bzip2 -y
+RUN apt-get install libgit2-dev libssh2-1-dev -y
 
-WORKDIR /workdir
-COPY libraries.R /workdir/libraries.R
-RUN Rscript /workdir/libraries.R
+# This is because cron jobs run in root
+WORKDIR /root
+COPY libraries.R libraries.R
+RUN Rscript libraries.R
+COPY . .
 
-COPY . /workdir/
+# Add cron job
+RUN Rscript cronfile.R
 
 EXPOSE 80
-CMD ["R", "-e", "shiny::runApp('/workdir/app.R', host='0.0.0.0', port=80)"]
+# Script starts cron service, runs dataprocessing.R once, and starts shiny website.
+RUN chmod +x /root/start_script.sh
+CMD /root/start_script.sh
