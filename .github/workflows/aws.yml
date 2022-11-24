@@ -17,17 +17,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
-
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-
 # If execution says "Warning: Unexpected input(s)", it's due to the way Github parses "with" data, ignore it.
     - name: Set branch-based environment variables
       uses: iamtheyammer/branch-env-vars@v1.2.0
@@ -38,12 +27,12 @@ jobs:
           release/production:prod
           !default:dev
 
-#     - name: Build, tag, and push image to Amazon ECR - WITHOUT CACHE
-#       run: |
-#         # Build a docker container and push it to ECR so that it can be deployed to ECS.
-#         docker buildx build -t ${{ secrets.IMAGE_NAME }}:$STAGE_TAG --cache-to type=gha,scope=$GITHUB_REF_NAME-image --cache-from type=gha,scope=$GITHUB_REF_NAME-image .
-#         docker push ${{ secrets.IMAGE_NAME }}:$STAGE_TAG
-#         echo "image=${{ secrets.IMAGE_NAME }}:$STAGE_TAG" >> $GITHUB_OUTPUT
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Setup environment variable workaround for "with"
       run: echo "DOCKER_IMAGE_TO_PUSH=${{ secrets.IMAGE_NAME_DOCKERHUB }}:$STAGE_TAG" >> $GITHUB_ENV
