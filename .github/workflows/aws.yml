@@ -31,9 +31,7 @@ jobs:
       run: echo "DOCKER_IMAGE_TO_PUSH=${{ secrets.IMAGE_NAME_DOCKERHUB }}:$STAGE_TAG" >> $GITHUB_ENV
 
     - name: Setup environment variable workaround for deployment instance
-      run: |
-        if [ "$STAGE_TAG" = "dev" ];then FINAL_DEPLOYMENT_INSTANCE_0=$STAGE_TAG.${{ secrets.DEPLOYMENT_INSTANCE }};else FINAL_DEPLOYMENT_INSTANCE_0=${{ secrets.DEPLOYMENT_INSTANCE }};fi
-        echo "FINAL_DEPLOYMENT_INSTANCE=$FINAL_DEPLOYMENT_INSTANCE_0" >> $GITHUB_ENV
+      run: if [ "$STAGE_TAG" = "dev" ];then echo "FINAL_DEPLOYMENT_INSTANCE=$STAGE_TAG.${{ secrets.DEPLOYMENT_INSTANCE }}" >> $GITHUB_ENV;else echo "FINAL_DEPLOYMENT_INSTANCE=${{ secrets.DEPLOYMENT_INSTANCE }}" >> $GITHUB_ENV;fi
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
