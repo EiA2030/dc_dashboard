@@ -50,7 +50,7 @@ jobs:
 
     - name: Setup environment variable workaround for deployment instance
       run: |
-        if [ "$STAGE_TAG" = "dev" ];then FINAL_DEPLOYMENT_INSTANCE_0=$STAGE_TAG.$DEPLOYMENT_INSTANCE;else FINAL_DEPLOYMENT_INSTANCE_0=$DEPLOYMENT_INSTANCE;fi
+        if [ "$STAGE_TAG" = "dev" ];then FINAL_DEPLOYMENT_INSTANCE_0=$STAGE_TAG.${{ secrets.DEPLOYMENT_INSTANCE }};else FINAL_DEPLOYMENT_INSTANCE_0=${{ secrets.DEPLOYMENT_INSTANCE }};fi
         echo "FINAL_DEPLOYMENT_INSTANCE=$FINAL_DEPLOYMENT_INSTANCE_0" >> $GITHUB_ENV
 
     - name: Download env from S3 bucket
