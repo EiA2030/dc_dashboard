@@ -38,6 +38,13 @@ jobs:
           release/production:prod
           !default:dev
 
+#     - name: Build, tag, and push image to Amazon ECR - WITHOUT CACHE
+#       run: |
+#         # Build a docker container and push it to ECR so that it can be deployed to ECS.
+#         docker buildx build -t ${{ secrets.IMAGE_NAME }}:$STAGE_TAG --cache-to type=gha,scope=$GITHUB_REF_NAME-image --cache-from type=gha,scope=$GITHUB_REF_NAME-image .
+#         docker push ${{ secrets.IMAGE_NAME }}:$STAGE_TAG
+#         echo "image=${{ secrets.IMAGE_NAME }}:$STAGE_TAG" >> $GITHUB_OUTPUT
+
     - name: Setup environment variable workaround for "with"
       run: echo "DOCKER_IMAGE_TO_PUSH=${{ secrets.IMAGE_NAME_DOCKERHUB }}:$STAGE_TAG" >> $GITHUB_ENV
 
