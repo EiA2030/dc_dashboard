@@ -75,6 +75,7 @@ jobs:
 
     - name: SSH to EC2 and run container
       run: |
+        ssh ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} "docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}"
         ssh ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} "sudo mkdir -p /var/lib/app/eia2030"
         ssh ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} "sudo chown -R ${{ secrets.SSH_USER }}:${{ secrets.SSH_USER }} /var/lib/app/eia2030"
         ssh ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} "docker rm -f app"
