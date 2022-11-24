@@ -49,7 +49,9 @@ jobs:
       run: echo "DOCKER_IMAGE_TO_PUSH=${{ secrets.IMAGE_NAME_DOCKERHUB }}:$STAGE_TAG" >> $GITHUB_ENV
 
     - name: Setup environment variable workaround for deployment instance
-      run: if [ "$STAGE_TAG" = "dev" ];then FINAL_DEPLOYMENT_INSTANSE=$STAGE_TAG.$DEPLOYMENT_INSTANCE;else FINAL_DEPLOYMENT_INSTANSE=$DEPLOYMENT_INSTANCE;fi
+      run: |
+        if [ "$STAGE_TAG" = "dev" ];then FINAL_DEPLOYMENT_INSTANCE_0=$STAGE_TAG.$DEPLOYMENT_INSTANCE;else FINAL_DEPLOYMENT_INSTANCE_0=$DEPLOYMENT_INSTANCE;fi
+        echo "FINAL_DEPLOYMENT_INSTANCE=$FINAL_DEPLOYMENT_INSTANCE_0" >> $GITHUB_ENV
 
     - name: Download env from S3 bucket
       run: aws s3 cp s3://scio-project-envs/r/eia2030/_.Renviron .Renviron
