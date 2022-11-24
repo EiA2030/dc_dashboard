@@ -2,7 +2,7 @@ name: Deploy to Amazon ECS
 
 on:
   push:
-    branches: [ "ec2-deployment-test", "release/development", "release/production" ]
+    branches: [ "release/development", "release/production" ]
 
 permissions:
   contents: read
@@ -22,10 +22,9 @@ jobs:
       uses: iamtheyammer/branch-env-vars@v1.2.0
       with:
         STAGE_TAG: |
-          main:wedontreallyusethemainbranch
           release/development:dev
           release/production:prod
-          !default:dev
+          !default:defaulttag
 
     - name: Setup environment variable workaround for "with"
       run: echo "DOCKER_IMAGE_TO_PUSH=${{ secrets.IMAGE_NAME_DOCKERHUB }}:$STAGE_TAG" >> $GITHUB_ENV
