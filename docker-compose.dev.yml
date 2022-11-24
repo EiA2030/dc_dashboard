@@ -6,7 +6,7 @@ services:
     container_name: react-app
     restart: unless-stopped
     ports:
-      - 80:22350
+      - 22350:80 # HOST:CONTAINER
     networks:
       - default
 
