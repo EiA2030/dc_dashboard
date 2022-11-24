@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    image: sciohub/eia2030-dc-dashboard:dev
+    image: sciohub/eia2030-dc-dashboard:prod
     container_name: app
     restart: unless-stopped
     ports:
