@@ -36,7 +36,7 @@ jobs:
           main:wedontreallyusethemainbranch
           release/development:dev
           release/production:prod
-          !default:prod
+          !default:dev
 
 #     - name: Build, tag, and push image to Amazon ECR - WITHOUT CACHE
 #       run: |
