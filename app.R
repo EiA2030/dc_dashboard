@@ -925,6 +925,12 @@ server <- function(input, output, session) {
   
   session$allowReconnect(TRUE)
   
+  autoInvalidate <- reactiveTimer(10000)
+  observe({
+    autoInvalidate()
+    cat(".")
+  })
+  
 }
 
 
