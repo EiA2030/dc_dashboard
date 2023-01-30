@@ -41,6 +41,9 @@ shinyjs.hrefAuto = function(url) { window.location.href = url;};
 
 # Define UI for application 
 ui <- 
+  # tags$head(
+  #   tags$script(JS("setTimeout(function(){history.pushState({}, 'Page Title', '');},2000);")))
+
   bootstrapPage(
     
     shinyjs::useShinyjs(),
@@ -50,7 +53,7 @@ ui <-
     #div(class = "pull-right", shinyauthr::logoutUI(id = "logout")),
     
     # login section ##toremove
-    shinyauthr::loginUI(id = "login"),
+    #shinyauthr::loginUI(id = "login"),
     
     # to ensure display only after login
     uiOutput("sidebarpanel", padding = 0)
@@ -62,15 +65,15 @@ server <- function(input, output, session) {
  
   #Authentication credentials  
   #getwd()
-  credentials <- shinyauthr::loginServer(
-    id = "login",
-    data = user_base,
-    user_col = user,
-    pwd_col = password,
-    sodium_hashed = TRUE,
-    cookie_getter = TRUE
-    #log_out = reactive(logout_init())
-  )##toremove
+  # credentials <- shinyauthr::loginServer(
+  #   id = "login",
+  #   data = user_base,
+  #   user_col = user,
+  #   pwd_col = password,
+  #   sodium_hashed = TRUE
+  #   cookie_getter = TRUE
+  #   #log_out = reactive(logout_init())
+  # )##toremove
   
   # logout_init <- shinyauthr::logoutServer(
   #                           id = "logout",
@@ -84,7 +87,7 @@ server <- function(input, output, session) {
   output$sidebarpanel <- renderUI({
     
     # Show only when authenticated
-    req(credentials()$user_auth)  ##toremove
+    #req(credentials()$user_auth)  ##toremove
     ## 1. Header ------------------------------
     
     dashboardPage(
@@ -109,8 +112,10 @@ server <- function(input, output, session) {
                             ),
                             icon = icon('comment')
         ),
-        tags$li(class = "dropdown", actionButton("logoutt", "LOGOUT", style="color: #fff; background-color: #012514; border-color: #012514"),align='right')
-        
+        #tags$li(class = "dropdown", actionButton("logoutt", "LOGOUT", style="color: #fff; 
+        #background-color: #012514; border-color: #012514"),align='right')
+        tags$li(class = "dropdown",auth0::logoutButton(style="color: #fff; 
+        background-color: #012514; border-color: #012514"))
         
       ),
       
@@ -364,21 +369,23 @@ server <- function(input, output, session) {
     
   })
   
-  observeEvent(input$logoutt, {
-    session$reload() ##toremove
-    #auth0:: logoutButton()
-  })
-  
+  # observeEvent(input$logoutt, {
+  #   #session$reload() ##toremove
+  #   auth0::logoutButton()
+  #   
+  #   #auth0:: logoutButton()
+  # })
+
   ##toremove
-  observeEvent((credentials()$info)$user, {
+  #observeEvent((credentials()$info)$user, {
     
     ##toremove
-    if ( any(c(list1) %in%  (credentials()$info)$user)){
+    #if ( any(c(list1) %in%  (credentials()$info)$user)){
   
-  # observeEvent(session$userData$auth0_info$nickname, {
+   observeEvent(session$userData$auth0_info$nickname, {
   #   
   #   #read processed data based on project:: user designated
-  # if (any(c(PO_list) %in%  session$userData$auth0_info$nickname )){
+   #if (any(c(PO_list) %in%  session$userData$auth0_info$nickname )){
     
     path<-file.path("./data/dpath1/Processed")
     Bean <- read.csv(file.path(path,"/Bean .csv"))
@@ -416,34 +423,34 @@ server <- function(input, output, session) {
     
     
     ##toremove
-    }else if (any(c(list2) %in%  (credentials()$info)$user)) {
+    #}else if (any(c(list2) %in%  (credentials()$info)$user)) {
       
-    #}else if (any(c(SG_list) %in% session$userData$auth0_info$nickname)) {
-      path<-file.path('./data/dpath2/Processed')
-      Maize <- read.csv(file.path(path,"/Maize .csv"))
-      assign_ftp<-read.csv("./data/dpath2/Assign_FDTLPO_SG.csv")
-      register_en<-read.csv("./data/dpath1/Register_EN.csv")
-      register_hh<-read.csv("./data/dpath1/RegisterVerify_HH.csv")
-
-    #
-
-      datacrop<-Maize
-      datacrop<-datacrop[datacrop$projectCode=="SG",]
-      register_en<-register_en[register_en$projectCode=="SG",]
-      assign_ftp<-assign_ftp[assign_ftp$projectCode=="SG",]
-      register_hh<-register_hh[register_hh$projectCode=="SG",]
-
-      datacrop$season[grepl("NOT2022", datacrop$season)] <- "2022"
-      seasons<-unique(datacrop$season)
+    # }else if (any(c(SG_list) %in% session$userData$auth0_info$nickname)) {
+    #   path<-file.path('./data/dpath2/Processed')
+    #   Maize <- read.csv(file.path(path,"/Maize .csv"))
+    #   assign_ftp<-read.csv("./data/dpath2/Assign_FDTLPO_SG.csv")
+    #   register_en<-read.csv("./data/dpath1/Register_EN.csv")
+    #   register_hh<-read.csv("./data/dpath1/RegisterVerify_HH.csv")
+    # 
+    # #
+    # 
+    #   datacrop<-Maize
+    #   datacrop<-datacrop[datacrop$projectCode=="SG",]
+    #   register_en<-register_en[register_en$projectCode=="SG",]
+    #   assign_ftp<-assign_ftp[assign_ftp$projectCode=="SG",]
+    #   register_hh<-register_hh[register_hh$projectCode=="SG",]
+    # 
+    #   datacrop$season[grepl("NOT2022", datacrop$season)] <- "2022"
+    #   seasons<-unique(datacrop$season)
 
     # #
     # #
-    }else {
-      session$reload()
-      # output$selected_var <- renderText({
-      #   "Wait to be confirmed by the administrator"
-      # })
-     }
+    # }else {
+    #   session$reload()
+    #   # output$selected_var <- renderText({
+    #   #   "Wait to be confirmed by the administrator"
+    #   # })
+    #  }
     
     #print(session$userData$auth0_info$name)
     #print(session$userData$auth0_info)
@@ -937,9 +944,9 @@ server <- function(input, output, session) {
 
 # Run the application
 #options(shiny.port = 8080)
+shinyAppAuth0(ui, server,options = list(port = 8000))
 
-
-shinyApp(ui = ui, server = server)
+#shinyApp(ui = ui, server = server,options = list(port = 8000))
 
 #####for AUTH0 login page ##to update on deploy
 ##run on a browser if locaal
