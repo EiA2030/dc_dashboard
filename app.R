@@ -41,11 +41,11 @@ shinyjs.hrefAuto = function(url) { window.location.href = url;};
 
 # Define UI for application 
 ui <- 
-  #fillPage(
+  fillPage(
     #fix refresh/reload error by removing the token from URL, (also sets timeout)
-  # tags$head(
-  #   tags$script(JS("setTimeout(function(){history.pushState({}, 'Page Title', '/');},2000);"))),
-  bootstrapPage(
+  tags$head(
+    tags$script(JS("setTimeout(function(){history.pushState({}, 'Page Title', '/');},2000);"))),
+  #bootstrapPage(
     
     
     
@@ -950,8 +950,9 @@ server <- function(input, output, session) {
 
 # Run the application
 #options(shiny.port = 8080)
-shinyAppAuth0(ui, server,options = list(port = 8000))
-
+#shinyAppAuth0(ui, server,options = list(port = 8000))
+shinyAppAuth0(ui, server)
+#shinyApp(ui, server)
 #shinyApp(ui = ui, server = server,options = list(port = 8000))
 
 #####for AUTH0 login page ##to update on deploy
