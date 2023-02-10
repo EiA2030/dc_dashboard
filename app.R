@@ -41,10 +41,13 @@ shinyjs.hrefAuto = function(url) { window.location.href = url;};
 
 # Define UI for application 
 ui <- 
-  # tags$head(
-  #   tags$script(JS("setTimeout(function(){history.pushState({}, 'Page Title', '');},2000);")))
-
-  bootstrapPage(
+  fillPage(
+    #fix refresh/reload error by removing the token from URL, (also sets timeout)
+  tags$head(
+    tags$script(JS("setTimeout(function(){history.pushState({}, 'Page Title', '/');},2000);"))),
+  #bootstrapPage(
+    
+    
     
     shinyjs::useShinyjs(),
     extendShinyjs(text = jscode, functions = "hrefAuto"),
@@ -209,6 +212,7 @@ server <- function(input, output, session) {
                        }
                        .sidebar-menu a {
                        color:#ae755b;
+                       background-color: #014725;
                        }
                        a {
                        color:#ae755b;
@@ -928,15 +932,17 @@ server <- function(input, output, session) {
     
     #
   })
-
-  
+   #print(session$userData$auth0_info)
+   #print(session$userData$auth0_credentials)
+   #print(session$userData$info)
   session$allowReconnect(TRUE)
   
-  autoInvalidate <- reactiveTimer(10000)
-  observe({
-    autoInvalidate()
-    cat(".")
-  })
+  #removed...sol:to update timeout in the ui js file
+  # autoInvalidate <- reactiveTimer(10000)
+  # observe({
+  #   autoInvalidate()
+  #   cat(".")
+  # })
   
 }
 
