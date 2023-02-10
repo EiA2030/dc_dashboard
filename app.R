@@ -41,7 +41,7 @@ shinyjs.hrefAuto = function(url) { window.location.href = url;};
 
 # Define UI for application 
 ui <- 
-  fillPage(
+  fluidPage(
     #fix refresh/reload error by removing the token from URL, (also sets timeout)
   tags$head(
     tags$script(JS("setTimeout(function(){history.pushState({}, 'Page Title', '/');},2000);"))),
