@@ -24,6 +24,9 @@ COPY . .
 # Add cron job
 RUN Rscript cronfile.R
 
+# TEST
+RUN Rscript -e "install.packages('shinythemes', repos='https://cran.rstudio.com/')"
+
 EXPOSE 80
 # Script starts cron service, runs dataprocessing.R once, and starts shiny website.
 RUN chmod +x /root/start_script.sh
