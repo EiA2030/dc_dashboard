@@ -1,0 +1,172 @@
+.navbar {
+  position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+  min-height: 60px;
+  margin-bottom: 0px;
+  border: 1px solid transparent;
+}
+
+.navbar + .container-fluid {
+      padding-top: 60px; /* Adjust this value as needed */
+    }
+
+.container-fluid {
+  margin-right: auto;
+  margin-left: auto;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+
+/* logo */
+        .logo {
+        background-color: #012514;
+        }
+        .main-header {
+        background-color: #012514;height:60px;
+        }
+        /* logo when hovered */
+        .logo:hover {
+        background-color: #012514;
+        }
+        /* navbar (rest of the header) */
+        .navbar {
+        background-color: #012514;
+        }
+        /* sidebar */
+        .sidebar {
+        background-color:#02371d ;
+        }
+        /* sidebar */
+        .main-sidebar {
+        background-color: #02371d;
+        }
+        .main-sidebar, .skin-blue .wrapper {
+  background-color: #02371d;
+}
+        .sidebar-menu a {
+        color:#ae755b;
+        background-color: #014725;
+        }
+        a {
+        color:#ae755b;
+        }
+        .info-box-icon {
+        color:#ae755b;
+        }
+        .main-header .sidebar-toggle {
+          float: right;
+        color:transparent;
+        }
+        .fa-comment {
+        color:white;
+        }
+        .a {
+        color:white;
+        }
+        /* active selected tab in the sidebarmenu */
+        .main-sidebar .sidebar .sidebar-menu .active a{
+        background-color: #27674b;
+        }
+        
+        
+/* change size of icons in sub-menu items */
+        .sidebar .sidebar-menu .treeview-menu>li>a>.fa {
+        font-size: 15px;
+        }
+        .sidebar .sidebar-menu .treeview-menu>li>a>.glyphicon {
+        font-size: 13px;
+        }
+        /* Hide icons in sub-menu items */
+        .sidebar .sidebar-menu .treeview>a>.fa-angle-left {
+        display: none;
+        }
+        
+        .box.box-solid.box-primary>.box-header {
+        color:#00FFFFFF;
+        background:#00FFFFFF
+        }
+        
+        .downloadData { vertical-align: left; height: 40px; font-size: 10px;}
+        .shiny-output-error { visibility: hidden; }
+        .shiny-output-error:before { visibility: hidden; }
+        .navbar-custom-menu>.navbar-nav>li:last-child>.dropdown-menu { width:10px; font-size:10px; padding:1px; margin:1px;}
+        .navbar-custom-menu> .navbar-nav> li:last-child > .dropdown-menu > h4 {width:0px; font-size:0px; padding:0px; margin:0px;}
+        .navbar-custom-menu> .navbar-nav> li:last-child > .dropdown-menu > p {width:0px; font-size:0px; padding:0px; margin:0px;}
+        
+        hr {border-top: 1px solid #000000;}
+        
+        
+        
+        
+.navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:focus, .navbar-default .navbar-nav > .active > a:hover {
+  color: white;
+  background-color: #012514;
+}        
+        
+        
+ .wrapper {
+  height: 100%;
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: #ecf0f5;
+}       
+        
+        
+.dropdown-menu > .active > a{
+  color: #ffc84f !important;
+  background-color:#011c13 !important;
+}   
+        
+        
+.main-header .logo {
+  
+  height: 0px;
+}
+        
+.main-sidebar {
+   position: fixed;
+   top: 60px; /* Height of the fixed header */
+  bottom: 0;
+  left: 0;
+  padding-top: 0;
+  min-height: 100%;
+  width: 230px;
+  z-index: 1000;
+  overflow-y: auto;
+  -webkit-transition: -webkit-transform .3s ease-in-out,width .3s ease-in-out;
+  -moz-transition: -moz-transform .3s ease-in-out,width .3s ease-in-out;
+  -o-transition: -o-transform .3s ease-in-out,width .3s ease-in-out;
+  transition: transform .3s ease-in-out,width .3s ease-in-out;
+}       
+        
+        
+        
+.main-header {
+  background-color: #012514;
+  height: 0;
+}        
+        
+.account  {
+  z-index: 55550;
+}    
+        
+.main-header .navbar {
+  -webkit-transition: margin-left .3s ease-in-out;
+  -o-transition: margin-left .3s ease-in-out;
+  transition: margin-left .3s ease-in-out;
+  margin-bottom: 0;
+  margin-left: 230px;
+  border: none;
+  min-height: 0;
+  border-radius: 0;
+  height: 0;
+}
+
+.plot-container {
+      background-color: #f2f2f2; /* Set your desired background color here */
+    }
