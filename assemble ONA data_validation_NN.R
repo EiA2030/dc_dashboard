@@ -1,7 +1,7 @@
 
 #setwd("D:/IITA")
 #wd<-getwd()
-source('okapi.R')
+
 # Load required libraries
 library(httr)
 library(jsonlite)
@@ -11,6 +11,8 @@ library(dplyr)
 library(readr)
 library(stringr)
 
+
+source('okapi2.R')
 # Define the ONA server URL, username, password, and form ID
 url <- "https://api.ona.io/api/v1"
 
@@ -18,13 +20,11 @@ url <- "https://api.ona.io/api/v1"
 # username <- creds[1]
 # passwo   <- creds[2]
 
-form_id <- "752967" #cassava
+#form_id <- "752967" #cassava
 
 #752966    register en
 #752965    register hh
 
-
-dff<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id = 752967)
 
 # # Create the authentication token
 # token <- paste0(username, ":", passwo)
@@ -124,5 +124,5 @@ datacrop_rwa <- datacrop_rwa%>%
 datacropSUB <- datacrop_rwa %>%
   distinct(start,today,ENID,HHID, .keep_all = TRUE)
 
-datacropSUB$ENID
+
 
