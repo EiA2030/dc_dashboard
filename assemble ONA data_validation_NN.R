@@ -33,11 +33,11 @@ url <- "https://api.ona.io/api/v1"
 # # Make the API request to retrieve data
 # response <- httr::GET(
 #   url = paste0(url, "/data/", form_id),
-#   httr::add_headers(Authorization = paste0("Basic ", auth_token)),
-#   query = list(format = "json")
+#   httr::add_headers(Authorization = paste0("Basic ", auth_token)),752967
+#   query = list(format = "json")752552
 # )
 
-data<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id = 752967)
+data<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id =752967 )
 
 # Parse the JSON response into a data frame with the nesting in list
 # data <- jsonlite::fromJSON(httr::content(response, "text"), flatten = TRUE)
@@ -54,17 +54,19 @@ data<- data %>%
 
 dataAll_RW<-data
 dataAll_RW<-dataAll_RW %>% 
-  select(-c("start"))
+  select(-any_of(c("start")))
 #------------------------------------------------------------------------------------------
   #data cleaning
 
 # plant stand data
 Plant_stand_data<- data %>% 
-  dplyr::select(start,today,`intro/country` ,`intro/event`,`intro/latitude`,`intro/longitude`,`intro/altitude`,`intro/enumerator_ID`,`intro/barcodehousehold`,crop,grep("planting.*", names(data), value = TRUE))
+  dplyr::select(any_of(c("start","today","intro/country","intro/event","intro/latitude","intro/longitude","intro/altitude","intro/enumerator_ID","intro/barcodehousehold","crop",grep("planting.*", names(data), value = TRUE))))
 
 #Plot data
 plot_data<- data %>% 
-  dplyr::select(start,today,`intro/country` ,`intro/event`,`intro/latitude`,`intro/longitude`,`intro/altitude`,crop,`intro/enumerator_ID`,`intro/barcodehousehold`,crop,grep("plotDescription.*", names(data), value = TRUE))
+  dplyr::select(any_of(c("start","today","intro/country" ,"intro/event","intro/latitude","intro/longitude","intro/altitude","intro/enumerator_ID","intro/barcodehousehold","crop",grep("plotDescription.*", names(data), value = TRUE))))
+
+#data_processed <- if (ncol(data_processed) > 0) data_processed else data_processed[0,]
 
 plot1<- plot_data %>% 
   gather(v, value, 12:33) %>% 
@@ -123,6 +125,37 @@ datacrop_rwa <- datacrop_rwa%>%
 
 datacropSUB <- datacrop_rwa %>%
   distinct(start,today,ENID,HHID, .keep_all = TRUE)
+
+
+#################################################################################################################
+#merge enum +household registration data
+
+Register_EN <- Register_EN%>%
+  rename(
+    ENID = `purpose/enumerator_ID`,
+    ENSurname = `purpose/surname`,
+    ENphoneNo = `purpose/phone_number`,
+    ENfirstName= `purpose/first_name`
+  )
+
+RegisterVerify_HH <- RegisterVerify_HH%>%
+  rename(
+    ENID = enumerator_ID_dataSCRIBEcode_a1e28af2b2a745b6bb29467aa015164c_ENDDS,
+    HHID = `new_barcode_dataSCRIBEcode_02c9e5d2f2504f57ae636de562b9f837_ENDDS/household_ID_dataSCRIBEcode_85e11f6972e14bd0bfc5282a6d6b226f_ENDDS`,
+  geopoint = `new_barcode_dataSCRIBEcode_02c9e5d2f2504f57ae636de562b9f837_ENDDS/household_geopoint_dataSCRIBEcode_46dd9da06bc541a0a2917f8b4fcf0bd8_ENDDS`,
+    Country =country_ID_dataSCRIBEcode_95be8089f5c845e183a371095d44a55e_ENDDS
+  )
+
+RegisterVerify_HH <- tidyr::separate(RegisterVerify_HH, col = geopoint,  c("LAT", "LON", "ALT", "ERR"), " ")
+
+Register_EN.Ids<-Register_EN%>% 
+  dplyr::select(any_of(c("ENID","ENfirstName","ENSurname","ENphoneNo")))
+RegisterVerify_HH.Ids<-RegisterVerify_HH%>% 
+  dplyr::select(any_of(c("today","ENID","HHID","LAT", "LON","Country")))
+
+RegisterVerify_HH.Ids <- RegisterVerify_HH.Ids[!duplicated(RegisterVerify_HH.Ids[c("HHID")], fromLast = TRUE), ] # Keep last entry by date in duplicated records
+
+joined_data<-left_join(Register_EN.Ids,RegisterVerify_HH.Ids, by="ENID")
 
 
 
