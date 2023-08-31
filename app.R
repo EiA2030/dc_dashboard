@@ -591,7 +591,9 @@ observe({
             outputOptions(output, paste0("trials_map_",i), suspendWhenHidden = FALSE)
             outputOptions(output, paste0("submission_trend_",i), suspendWhenHidden = FALSE)
             outputOptions(output, paste0("tabledownload_",i), suspendWhenHidden = FALSE)
-         
+            outputOptions(output, paste0("tableR_",i), suspendWhenHidden = FALSE)
+            outputOptions(output, paste0("ranking_",i), suspendWhenHidden = FALSE)
+            
         })
       })
     })
