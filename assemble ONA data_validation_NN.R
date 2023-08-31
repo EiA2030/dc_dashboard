@@ -154,6 +154,7 @@ RegisterVerify_HH.Ids<-RegisterVerify_HH%>%
   dplyr::select(any_of(c("today","ENID","HHID","LAT", "LON","Country")))
 
 RegisterVerify_HH.Ids <- RegisterVerify_HH.Ids[!duplicated(RegisterVerify_HH.Ids[c("HHID")], fromLast = TRUE), ] # Keep last entry by date in duplicated records
+Register_EN.Ids <- Register_EN.Ids[!duplicated(Register_EN.Ids[c("ENID")], fromLast = TRUE), ] # Keep last entry by date in duplicated records
 
 joined_data<-left_join(Register_EN.Ids,RegisterVerify_HH.Ids, by="ENID")
 

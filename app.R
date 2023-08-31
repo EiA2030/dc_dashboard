@@ -285,6 +285,7 @@ observe({
               # datacrop <- datacrop_rwa
               # datacropO<-dataAll_RW
               datacrop <- joined_data
+              datacrop1 <- joined_data
             }else{
               datacrop <- data.frame()
             }
@@ -293,7 +294,7 @@ observe({
           #CORRECT TO-
           #subset_df <- df[df$category %in% selected_categories, ]
           
-          
+       
           tryCatch(
           if ("All" %in% experimentUsecase){
             datacrop<-datacrop
@@ -358,10 +359,10 @@ observe({
           
           
           ##Enumerator Ranking
-          
-          if ("intro/event" %in% colnames(datacrop)) {
+         
+          if ("intro/event" %in% colnames(datacrop1)) {
             # Pivot wider based on "Category" column
-            datacroptable<-datacrop %>% 
+            datacroptable<-datacrop1 %>% 
               dplyr::select(today,`intro/event`,crop,treat,ENID,HHID)
             
             datacroptable <- datacroptable %>%
@@ -378,8 +379,7 @@ observe({
           datacroptable<-as.data.frame(datacroptable)
           columns_to_append <- c("ENID", "HHID", "crop","treat","SiteSelection", "event1", "event2", "event3", "event4", "event5", "event6","event7")
           
-          
-          
+         
           # # Check if columns exist in the dataframe
            missing_columns <- setdiff(columns_to_append, colnames(datacroptable))
           # 
@@ -391,16 +391,20 @@ observe({
            datacroptable$ENID<-as.character(datacroptable$ENID)
            datacroptable$HHID<-as.character(datacroptable$HHID)
            
-           if(ncol(datacrop)==0){
-             datacrop<-datacrop%>%
+           if(ncol(datacrop1)==0){
+             datacrop1<-datacrop1%>%
                tibble::add_column(ENID= NA) %>%
                tibble::add_column(HHID= NA) 
-             datacrop$ENID<-as.character(datacrop$ENID)
-             datacrop$HHID<-as.character(datacrop$HHID)
+             datacrop1$ENID<-as.character(datacrop1$ENID)
+             datacrop1$HHID<-as.character(datacrop1$HHID)
            }
            
-           datacroptable<-left_join(datacrop,datacroptable, by=c("ENID","HHID"))
+           datacroptable<-left_join(datacrop1,datacroptable, by=c("ENID","HHID"))
            datacroptable$SiteSelection<-datacroptable$today
+           
+           datacroptable <- datacroptable %>%
+             mutate(SiteSelection = ifelse(is.na(HHID), NA, SiteSelection))
+           
             
            datacroptable<-  tryCatch(  datacroptable %>%
                                  select(any_of(c("ENID", "HHID", "crop","treat","SiteSelection", "event1", "event2", "event3", "event4", "event5", "event6","event7") ))
@@ -482,6 +486,10 @@ observe({
                                      style  = function(value) {
                                        list(background ="white")
                                      }),
+                      # SiteSelection = colDef(
+                      #   style  = function(value) {
+                      #     color<-ifelse(is.null(value) ,"orange","#BFffa590")
+                      #   }),
                       #   # TLID2 = colDef(
                       #   #   cell =    function(value,index) {
                       #   #     s2<-register_en[which(register_en$ENID==ak$ENID[index] ), ]
