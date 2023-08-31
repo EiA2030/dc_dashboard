@@ -286,8 +286,11 @@ observe({
               # datacropO<-dataAll_RW
               datacrop <- joined_data
               datacrop1 <- joined_data
+              dataAll<-dataAll_RW
             }else{
               datacrop <- data.frame()
+              datacrop1 <- data.frame()
+              dataAll<-data.frame()
             }
             ,error = function(e) NULL)
           
@@ -571,7 +574,7 @@ observe({
           })
           
           ##Data Download
-          datacropdown<-dataAll_RW%>%
+          datacropdown<-dataAll%>%
             dplyr::rename(any_of(c(Date = "today",Country = "intro/country",      Crop = "crop")
 
             ))
@@ -583,7 +586,7 @@ observe({
               paste("data_",gsub("-", "",Sys.Date()), ".csv", sep = "")
             },
             content = function(file) {
-              write.csv(dataAll_RW, file, row.names = FALSE)
+              write.csv(dataAll, file, row.names = FALSE)
             }
           )
           
