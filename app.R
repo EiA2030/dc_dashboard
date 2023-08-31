@@ -154,12 +154,12 @@ server <- function(input, output, session) {
 ##Define data for each usecase
 observe({
       tryCatch( 
-      if (input$nav== " ex-iSDA-Rwanda"){
+      if (input$nav== " SNS-Rwanda"){
         # datacrop <- datacrop_rwa
         # datacropO <- dataAll_RW 
         datacrop <- joined_data
         
-        print(as.character(unique(datacrop$Country)))
+        
       }else{
         datacrop <- data.frame()
       },
@@ -200,15 +200,15 @@ observe({
          paste0("experimentfinder_",i),
          label = "Experiment",
          multiple=TRUE,
-         #choices =c("All", sort(unique(datacrop$crop))),
-         choices =c("All", "Potato", "Rice"),
+         choices =c("All", sort(unique(datacrop$crops))),
+        # choices =c("All", "Potato", "Rice"),
          selected= "All")
      })
 
      output[[paste0("datefinderr_",i)]] <-renderUI({
        dateRangeInput(paste0("datefinder_",i),
                       "DATE:",
-                      start = min(na.omit(joined_data$today)),
+                      start = min(na.omit(datacrop$Date)),
                       end   =  Sys.time())
      })
 
@@ -247,7 +247,7 @@ observe({
 
      output[[paste0("country_",i)]] <-renderUI({
        infoBox(
-         "Country", as.character(unique(joined_data$Country))[1] , icon = icon("globe"),
+         "Country", as.character(unique(datacrop$Country))[1] , icon = icon("globe"),
          color = "olive",width = "100%"       )
 
      })
@@ -281,28 +281,32 @@ observe({
         observeEvent(reactive_expr(), {
           
           tryCatch(
-            if (input$nav== " ex-iSDA-Rwanda"){
+            if (input$nav== " SNS-Rwanda"){
               # datacrop <- datacrop_rwa
               # datacropO<-dataAll_RW
               datacrop <- joined_data
-              datacrop1 <- joined_data
               dataAll<-dataAll_RW
             }else{
               datacrop <- data.frame()
-              datacrop1 <- data.frame()
               dataAll<-data.frame()
             }
             ,error = function(e) NULL)
           
           #CORRECT TO-
           #subset_df <- df[df$category %in% selected_categories, ]
-          
+          tryCatch(
+            if ("Validation" %in% stageUsecase ){
+              datacrop<-datacrop[datacrop$Stage %in% stageUsecase, ]
+            }else if ("Piloting" %in% stageUsecase ) {
+              datacrop<-datacrop[datacrop$Stage %in% stageUsecase, ]
+            }
+          )
        
           tryCatch(
           if ("All" %in% experimentUsecase){
             datacrop<-datacrop
           }else {
-            datacrop<-datacrop[datacrop$crop %in% experimentUsecase, ]
+            datacrop<-datacrop[datacrop$crops %in% experimentUsecase, ]
           }
           ,error = function(e) NULL)
 
@@ -324,7 +328,7 @@ observe({
             
          
           tryCatch(
-            datacrop <- datacrop[which(datacrop$today >= dateUsecase[1] & datacrop$today <= dateUsecase[2]), ]
+            datacrop <- datacrop[which(datacrop$Date >= dateUsecase[1] & datacrop$Date <= dateUsecase[2]), ]
             ,error = function(e) NULL)
           #Summary map
           output[[paste0("trials_map_",i)]] <-renderLeaflet({
@@ -363,9 +367,9 @@ observe({
           
           ##Enumerator Ranking
          
-          if ("intro/event" %in% colnames(datacrop1)) {
+          if ("intro/event" %in% colnames(datacrop)) {
             # Pivot wider based on "Category" column
-            datacroptable<-datacrop1 %>% 
+            datacroptable<-datacrop %>% 
               dplyr::select(today,`intro/event`,crop,treat,ENID,HHID)
             
             datacroptable <- datacroptable %>%
@@ -394,16 +398,20 @@ observe({
            datacroptable$ENID<-as.character(datacroptable$ENID)
            datacroptable$HHID<-as.character(datacroptable$HHID)
            
-           if(ncol(datacrop1)==0){
-             datacrop1<-datacrop1%>%
+           
+           if(ncol(datacrop)==0){
+             datacrop<-datacrop%>%
                tibble::add_column(ENID= NA) %>%
                tibble::add_column(HHID= NA) 
-             datacrop1$ENID<-as.character(datacrop1$ENID)
-             datacrop1$HHID<-as.character(datacrop1$HHID)
+             datacrop$ENID<-as.character(datacrop$ENID)
+             datacrop$HHID<-as.character(datacrop$HHID)
            }
            
-           datacroptable<-left_join(datacrop1,datacroptable, by=c("ENID","HHID"))
+           datacroptable<-left_join(datacrop,datacroptable, by=c("ENID","HHID"))
            datacroptable$SiteSelection<-datacroptable$today
+           
+           if ("crops" %in% colnames(datacroptable) ){
+           datacroptable$crop<-datacroptable$crops}
            
            datacroptable <- datacroptable %>%
              mutate(SiteSelection = ifelse(is.na(HHID), NA, SiteSelection))

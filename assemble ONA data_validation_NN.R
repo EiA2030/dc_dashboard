@@ -135,8 +135,10 @@ Register_EN <- Register_EN%>%
     ENID = `purpose/enumerator_ID`,
     ENSurname = `purpose/surname`,
     ENphoneNo = `purpose/phone_number`,
-    ENfirstName= `purpose/first_name`
+    ENfirstName= `purpose/first_name`,
+    ENtoday = today
   )
+
 
 RegisterVerify_HH <- RegisterVerify_HH%>%
   rename(
@@ -149,14 +151,24 @@ RegisterVerify_HH <- RegisterVerify_HH%>%
 RegisterVerify_HH <- tidyr::separate(RegisterVerify_HH, col = geopoint,  c("LAT", "LON", "ALT", "ERR"), " ")
 
 Register_EN.Ids<-Register_EN%>% 
-  dplyr::select(any_of(c("ENID","ENfirstName","ENSurname","ENphoneNo")))
+  dplyr::select(any_of(c("ENtoday","ENID","ENfirstName","ENSurname","ENphoneNo")))
 RegisterVerify_HH.Ids<-RegisterVerify_HH%>% 
   dplyr::select(any_of(c("today","ENID","HHID","LAT", "LON","Country")))
 
 RegisterVerify_HH.Ids <- RegisterVerify_HH.Ids[!duplicated(RegisterVerify_HH.Ids[c("HHID")], fromLast = TRUE), ] # Keep last entry by date in duplicated records
 Register_EN.Ids <- Register_EN.Ids[!duplicated(Register_EN.Ids[c("ENID")], fromLast = TRUE), ] # Keep last entry by date in duplicated records
 
-joined_data<-left_join(Register_EN.Ids,RegisterVerify_HH.Ids, by="ENID")
+joined_data<-left_join(Register_EN.Ids,RegisterVerify_HH.Ids, by="ENID")   #join data household and enumerator data while keeping all enumerators
+
+joined_data <- joined_data[which(joined_data$ENID!="RSENRW000001"),]  #leave out the enumerator registered for testing and monitoring the tool and is not expected to collect data
+
+joined_data$Date <- joined_data$today
+joined_data <- joined_data %>%
+  mutate(Date = ifelse(is.na(Date), ENtoday, Date))%>% #date col for filter
+tibble::add_column(Stage= "Validation") %>%
+  tibble::add_column(crops= NA)  #  for filter purpose....to update with validation data column once submissions available
+
+
 
 
 

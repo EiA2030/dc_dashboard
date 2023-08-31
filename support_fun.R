@@ -119,7 +119,7 @@ jscode <- "
 shinyjs.hrefAuto = function(url) { window.location.href = url;};
 "
 # Function to create a tab panel
-usecases.index<-c(  " SAA-Nigeria"  =1           , " DigGreen-Ethiopia"  =2  ," Fert-Ethiopia"     =3    , " ex-iSDA-Rwanda"  =4  ,  " ex-iSDA-Ghana"    =5      , " ex-Wcover-Ghana" =6     ,
+usecases.index<-c(  " SAA-Nigeria"  =1           , " DigGreen-Ethiopia"  =2  ," Fert-Ethiopia"     =3    , " SNS-Rwanda"  =4  ,  " ex-iSDA-Ghana"    =5      , " ex-Wcover-Ghana" =6     ,
                     " Planting-S-Asia" =7     ," DSRC-SE-Asia" =8       ,   " Govt-Egypt"     =9    ," Govt-LatAm"  =10     ,   " Cocoa Soils"  =11   ,   " Rainforest Alliance" =12  ,
                     " One Acre Fund"    =13     ,  " DRC Coffee OLAM"  =14       ,   " Solidaridad Soy Advisory" =15 , " DSR Extension Vietnam" =16  , " Morocco CA" =17          ,  " Mercy Corps SPROUT"  =18,
                     " BAYGAP (BAYER)" =19  )
