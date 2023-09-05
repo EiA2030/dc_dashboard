@@ -10,3 +10,7 @@ shinytest::installDependencies()
 devtools::install_github('onaio/ona.R')
 remotes::install_github('rapidsurveys/odktools')
 install.packages("cronR", repos = "http://cran.us.r-project.org")
+
+install.packages('shinythemes', repos='https://cran.rstudio.com/')
+install.packages('rmarkdown', repos='https://cran.rstudio.com/')
+tinytex::install_tinytex()
