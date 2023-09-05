@@ -168,7 +168,3 @@ joined_data <- joined_data %>%
 tibble::add_column(Stage= "Validation") %>%
   tibble::add_column(crops= NA)  #  for filter purpose....to update with validation data column once submissions available
 
-
-
-
-
