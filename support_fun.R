@@ -157,7 +157,9 @@ create_tab_panel <- function(tab_name) {
                                      uiOutput(paste0('experimentfinderr_',uc)), #experiment code
                                      uiOutput(paste0('datefinderr_',uc)),
                                      uiOutput(paste0('enumeratorfinderr_',uc)), #enumerators
-                                     uiOutput(paste0('householdfinderr_',uc))  #households
+                                     uiOutput(paste0('householdfinderr_',uc))#,  #households
+                                     #actionButton(paste0('apply_filters_',uc), "Apply Filters")
+                                     
                            )
                            ## 'Glossary' tab
                            #menuItem( "GLOSSARY", tabName = 'glossary', icon = icon('bell') )
@@ -170,19 +172,29 @@ create_tab_panel <- function(tab_name) {
                  id = paste0("tabss-", uc),  # Unique id for each tabPanel
                  type = "tabs",
                  tabPanel(tabName="Summary"  ,"SUMMARY",
-                          HTML('<h3>  Welcome! </h3>'),
+                         # HTML('<h3>  Welcome! </h3>'),
                           #textOutput("selected_var"),
-                          HTML('<h5>  This data monitoring dashboards helps you track enumerator submissions for various trials and check whether various quality checks are adhered to.</h5>'),
+                          HTML('<h5>  This data monitoring dashboards helps you track enumerator submissions for various trials.</h5>'),
                           HTML('<br>'),
                           fluidRow( column( width = 12,  align = 'left', infoBoxOutput(  paste0("project_",uc) ) , infoBoxOutput(paste0("country_",uc) ),infoBoxOutput(paste0("Totsub_box_",uc) ))
                                     #column( width = 6,  align = 'right', uiOutput("Totsub_box"))trials_map submission_trend
                           ),
+                         #fluidRow( column( width = 12,  align = 'left', infoBoxOutput(  paste0("summaryevents_",uc) ) )),
                           fluidRow( column( width = 6,h4("Trials by Location", align = 'center'), leafletOutput(paste0('trials_map_',uc),height = "50vh"),style = "background-color: #f2f2f2;"),
                                     column( width = 6,h4("Trend of Submissions", align = 'center'), plotlyOutput(paste0('submission_trend_',uc), height = "50vh"),style = "background-color: #f2f2f2;")
                           ),
                           HTML('<br>'),
-                          fluidRow( column( width = 12,h4("Summary of Complete Submissions", align = 'center'), reactableOutput(paste0("ranking_",uc)) )
-                          ),
+                         fluidRow(
+                           column(width = 10, h4("Summary of Complete Submissions", align = 'center')),
+                           column(width = 1, downloadButton(paste0("downloadsummary_", uc), "Download Summary", style = "color: green")),
+                           column(width = 1)
+                         ),
+                         fluidRow( column( width = 12,h4("", align = 'center'),  reactableOutput(paste0("rankingevents_", uc)) )
+                         ),
+                        
+                          fluidRow( column( width = 12,h4("", align = 'center'), reactableOutput(paste0("ranking_",uc)) )
+                          )
+                         
                  ),
 
                  tabPanel(tabName="Enumerators","ENUMERATORS",

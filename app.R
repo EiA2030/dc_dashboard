@@ -25,6 +25,12 @@ library(data.table)
 library(dplyr)
 library(shinydashboardPlus)
 library(shinythemes)
+if(!'tools' %in% installed.packages()[, 'Package']) {install.packages('tools', repos = 'http://cran.us.r-project.org')}
+if(!'rmarkdown' %in% installed.packages()[, 'Package']) {install.packages('rmarkdown', repos = 'http://cran.us.r-project.org')}
+suppressMessages(suppressWarnings(library(tools)))
+suppressMessages(suppressWarnings(library(rmarkdown)))
+
+#tinytex::install_tinytex()
 
 source("assemble ONA data_validation_NN.R")
 #source('ona.R')
@@ -257,6 +263,11 @@ observe({
          "Usecase", as.character(input$nav), icon = icon("barcode"),
          color = "olive",width = "100%"       )
      })
+     # output[[paste0("summaryevents_",i)]] <-renderUI({
+     #   infoBox(
+     #     "Usecase", as.character(input$nav), icon = icon("barcode"),
+     #     color = "olive",width = "100%"       )
+     # })
     })
 
 
@@ -272,11 +283,18 @@ observe({
         dateUsecase <- input[[paste0("datefinder_", i)]]
         enumeratorUsecase <- input[[paste0("enumeratorfinder_", i)]]
         householdUsecase <- input[[paste0("householdfinder_", i)]]
+        applyfilter<-input[[paste0("apply_filters", i)]]
         
         reactive_expr <- reactive({
           req(input_nav,experimentUsecase, stageUsecase, dateUsecase, enumeratorUsecase, householdUsecase)
           
         })
+        # reactive_expr_filter <- reactive({
+        #   req(applyfilter)
+        #   
+        # })
+        # 
+       # observeEvent(reactive_expr_filter()  , {
         
         observeEvent(reactive_expr(), {
           
@@ -285,7 +303,7 @@ observe({
               # datacrop <- datacrop_rwa
               # datacropO<-dataAll_RW
               datacrop <- joined_data
-              dataAll<-dataAll_RW
+              dataAll<-valTest
             }else{
               datacrop <- data.frame()
               dataAll<-data.frame()
@@ -378,13 +396,13 @@ observe({
           } else {
             # Keep the data as-is
             #datacroptable <- data.frame()
-            column_names <- c("ENID", "HHID", "crop","treat","SiteSelection", "event1", "event2", "event3", "event4", "event5", "event6","event7")
+            column_names <- c("ENID", "HHID", "crop","treat","Site Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7")
             datacroptable <- data.frame(matrix(nrow = 0, ncol = length(column_names)))
             colnames(datacroptable) <- column_names
           }
           # Columns to append
           datacroptable<-as.data.frame(datacroptable)
-          columns_to_append <- c("ENID", "HHID", "crop","treat","SiteSelection", "event1", "event2", "event3", "event4", "event5", "event6","event7")
+          columns_to_append <- c("ENID", "HHID", "crop","treat","Site Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7")
           
          
           # # Check if columns exist in the dataframe
@@ -408,26 +426,42 @@ observe({
            }
            
            datacroptable<-left_join(datacrop,datacroptable, by=c("ENID","HHID"))
-           datacroptable$SiteSelection<-datacroptable$today
+           datacroptable$`Site Selection`<-datacroptable$today
            
            if ("crops" %in% colnames(datacroptable) ){
            datacroptable$crop<-datacroptable$crops}
            
            datacroptable <- datacroptable %>%
-             mutate(SiteSelection = ifelse(is.na(HHID), NA, SiteSelection))
+             mutate(`Site Selection` = ifelse(is.na(HHID), NA, `Site Selection`))
            
             
            datacroptable<-  tryCatch(  datacroptable %>%
-                                 select(any_of(c("ENID", "HHID", "crop","treat","SiteSelection", "event1", "event2", "event3", "event4", "event5", "event6","event7") ))
+                                 select(any_of(c("ENID", "HHID", "crop","treat","Site Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7") ))
            )
+           
+           colnames(datacroptable) <- toTitleCase(colnames(datacroptable)) #Title case for table headers
+           
+           ranks.events<-  tryCatch(  datacroptable %>%
+                                 select(any_of(c( "Site Selection", "Event1", "Event2", "Event3", "Event4", "Event5", "Event6","Event7"))) %>%
+                                 dplyr::summarise(across(.fns = ~sum(!is.na(.)))) ,error = function(e) NULL)  #total submissions for each event
            
            
             ranks<-  tryCatch(  datacroptable %>%
-                                  select(any_of(c("ENID", "SiteSelection", "event1", "event2", "event3", "event4", "event5", "event6","event7"))) %>%
+                                  select(any_of(c("ENID", "Site Selection", "Event1", "Event2", "Event3", "Event4", "Event5", "Event6","Event7"))) %>%
               group_by(ENID) %>%
-              #summarise(n = n())
-
-              dplyr::summarise(across(.fns = ~sum(!is.na(.)))) ,error = function(e) NULL)
+              dplyr::summarise(across(.fns = ~sum(!is.na(.)))) ,error = function(e) NULL)  #total submissions,  for each event per enumerator
+            
+           
+            
+            output[[paste0("rankingevents_",i)]]  <- renderReactable({
+              reactable(ranks.events,
+                        pagination = FALSE,
+                        showPagination = TRUE,
+                        paginateSubRows = FALSE,
+                        
+              )
+            })
+            
 
             output[[paste0("ranking_",i)]]  <- renderReactable({
               reactable(ranks,
@@ -447,10 +481,9 @@ observe({
               )
             })
 
-          
-          
+            # Convert the date string to a Date object
+            datacroptable$`Site Selection` <- as.Date( datacroptable$`Site Selection` , format = "%Y-%m-%d")
           ##Enumerator Tracker Table
-          
           output[[paste0("tableR_",i)]] <- renderReactable({
             #output$tableR <- renderReactable({
             reactable(datacroptable,
@@ -485,11 +518,11 @@ observe({
                       #                     style  = function(value) {
                       #                       list(background ="white")
                       #                     }),
-                      crop= colDef(filterable = TRUE,
+                      Crop= colDef(filterable = TRUE,
                                          style  = function(value) {
                                            list(background ="white")
                                          }),
-                      treat = colDef(filterable = TRUE,
+                      Treat = colDef(filterable = TRUE,
                                     style  = function(value) {
                                       list(background ="white")
                                     }),
@@ -497,10 +530,126 @@ observe({
                                      style  = function(value) {
                                        list(background ="white")
                                      }),
-                      # SiteSelection = colDef(
-                      #   style  = function(value) {
-                      #     color<-ifelse(is.null(value) ,"orange","#BFffa590")
-                      #   }),
+                      `Site Selection` = colDef(
+                        #style  = function(value) {
+                          
+                        style = function(value) {
+                          
+                          # Check if the value is missing or not in the expected date format
+                          if (is.na(value) ) {
+                            list(background = "orange")  # Set default background color for missing or invalid values
+                          } else {
+                            # Convert the date string to a Date object
+                            date_value <- as.Date(value, format ="%Y-%m-%d")
+                            
+                            # Calculate the target date (16/08/2023 + 2 weeks)
+                            target_date <- as.Date("2023-08-16", format ="%Y-%m-%d") + 14
+                            
+                            if (date_value > target_date) {
+                              list(background = "#BFffa590") #WONT SET OVERDUE... NOT Necessary? 16/08/2023 -is just training date
+                            } else {
+                              list(background = "#BFffa590")
+                            }
+                          }
+                        }
+                          # 
+                          # color<-ifelse(is.na(value) ,"orange","#BFffa590")
+                          # 
+                          # # if (value <= format((format('16/8/2023',"%d/%m/%Y"))+weeks(2), "%d/%m/%Y") ){
+                          # #   color<-ifelse(is.na(value) ,"orange","#BFffa590")
+                          # #   list(background =color)
+                          # # } 
+                           #ist(background =color)
+                          
+                        #}
+                        ),
+                      Event1 = colDef(
+                        # style = function(value, index) {
+                        #   # Get the current system date
+                        #   current_date <-as.Date(Sys.Date() , format = "%Y-%m-%d")   
+                        #   
+                        #   if (is.na(value)) {
+                        #     list(background = "orange")
+                        #     # If Event1 is NA and current date is more than Site Selection + 4 weeks, color is red
+                        #     # if (current_date > (as.Date(datacroptable$`Site Selection`, format = "%Y-%m-%d") + 28)) {
+                        #     #   list(background = "red")
+                        #     # } else {
+                        #     #   # If Event1 is NA and current date is less than Site Selection + 4 weeks, color is orange
+                        #     #   list(background = "orange")
+                        #     # }
+                        #   } 
+                          # else {
+                          #   # Convert Event1 value to Date
+                          #   event1_date <- as.Date(value, format = "%Y-%m-%d")
+                          #   
+                          #   # Calculate target dates
+                          #   target_date_2_weeks <- as.Date(datacroptable$`Site Selection`, format = "%Y-%m-%d") + 14
+                          #   target_date_4_weeks <- as.Date(datacroptable$`Site Selection`, format = "%Y-%m-%d") + 28
+                          #   
+                          #   if (current_date < target_date_2_weeks) {
+                          #     # If current date is less than Site Selection + 2 weeks, color is purple
+                          #     list(background = "purple")
+                          #   } else if (current_date < target_date_4_weeks) {
+                          #     # If current date is less than Site Selection + 4 weeks but >= 2 weeks, color is green
+                          #     list(background = "green")
+                          #   } else {
+                          #     # If current date is greater than or equal to Site Selection + 4 weeks, color is red
+                          #     list(background = "red")
+                          #   }
+                          # }
+                        #}
+                        style  = function(value) {
+                          color<-ifelse(is.na(value) ,"#BE93D4","#BFffa590")
+                          list(background =color)
+                        }
+                      ),
+                      Event2 = colDef(
+                        style  = function(value) {
+                          color<-ifelse(is.na(value) ,"#BE93D4","#BFffa590")
+                          list(background =color)
+                        }
+                      ),
+                      Event3 = colDef(
+                        style  = function(value) {
+                          color<-ifelse(is.na(value) ,"#BE93D4","#BFffa590")
+                          list(background =color)
+                        }
+                      ),
+                      Event4 = colDef(
+                        style  = function(value) {
+                          color<-ifelse(is.na(value) ,"#BE93D4","#BFffa590")
+                          list(background =color)
+                        }
+                      ), 
+                      Event5 = colDef(
+                        style  = function(value) {
+                          color<-ifelse(is.na(value) ,"#BE93D4","#BFffa590")
+                          list(background =color)
+                        }
+                      ), 
+                      Event6 = colDef(
+                        style  = function(value) {
+                          color<-ifelse(is.na(value) ,"#BE93D4","#BFffa590")
+                          list(background =color)
+                        }
+                      ), 
+                      Event7 = colDef(
+                        style  = function(value) {
+                          color<-ifelse(is.na(value) ,"#BE93D4","#BFffa590")
+                          list(background =color)
+                        }
+                      ),
+                      # Event1 = colDef(
+                      #   
+                      #   style  = function(value, index) {
+                      #     otherColumnValue <- value$`Site Selection`[index]
+                      #     
+                      #     if (){}
+                      #     
+                      #     color<-ifelse(is.na(value) ,"#BE93D4","#BFffa590")
+                      #     list(background =color)
+                      #   }
+                      # ),
                       #   # TLID2 = colDef(
                       #   #   cell =    function(value,index) {
                       #   #     s2<-register_en[which(register_en$ENID==ak$ENID[index] ), ]
@@ -546,8 +695,11 @@ observe({
                           
                         ),
                         style  = function(value) {
-                          
-                          color<-ifelse(is.na(value) ,"#BE93D4","#BFffa590")
+                         # if (name=="Site Selection"){
+                         #   color<-ifelse(is.na(value) ,"orange","#BFffa590")
+                         # }
+
+                           color<-ifelse(is.na(value) ,"#BE93D4","#BFffa590")
                           # if (input[[paste0("seasonfinder_",i)]]== "2022B"){
                           #   color<-ifelse(value=="NA" ,"#ffa590","#BFffa590")
                           # } else if (input[[paste0("seasonfinder_",i)]]== "2022A"){
@@ -555,7 +707,7 @@ observe({
                           # } else {
                           #   color<-ifelse(value=="NA" ,"#ffa590","#BFffa590")
                           # }
-                          list(background =color)
+                          #list(background =color)
                         }
                         # 
                         
@@ -581,6 +733,26 @@ observe({
             
           })
           
+         
+          
+          output[[paste0("downloadsummary_",i)]] <- downloadHandler(
+            filename = function() {
+              paste("summary_",gsub("-", "",Sys.Date()), ".pdf", sep = "")
+              #paste("summary.pdf", sep = "")
+            },
+            content = function(file) {
+              withProgress(message = "Downloading...", {
+              # Create an R Markdown document
+              rmarkdown::render(
+                "./www/Scripts/Summary.Rmd",
+                output_file = file,
+                params = list(df1 = ranks.events, df2 = ranks)
+              )
+              })
+            }
+            
+          )
+          
           ##Data Download
           datacropdown<-dataAll%>%
             dplyr::rename(any_of(c(Date = "today",Country = "intro/country",      Crop = "crop")
@@ -604,8 +776,11 @@ observe({
             outputOptions(output, paste0("tabledownload_",i), suspendWhenHidden = FALSE)
             outputOptions(output, paste0("tableR_",i), suspendWhenHidden = FALSE)
             outputOptions(output, paste0("ranking_",i), suspendWhenHidden = FALSE)
+            outputOptions(output, paste0("rankingevents_",i), suspendWhenHidden = FALSE)
             
         })
+        #})
+          
       })
     })
     
