@@ -31,7 +31,7 @@ suppressMessages(suppressWarnings(library(tools)))
 suppressMessages(suppressWarnings(library(rmarkdown)))
 
 #tinytex::install_tinytex()
-
+source('dataprocessing.R')
 
 ## load functions+files
 source('support_fun.R')
@@ -58,6 +58,7 @@ ui <-
     
     # to ensure display only after login
     uiOutput("sidebarpanel", padding = 0)
+  
     
   )
 
@@ -355,7 +356,7 @@ observe({
           output[[paste0("trials_map_",i)]] <-renderLeaflet({
             leaflet() %>%
               addProviderTiles(providers$CartoDB.Positron) %>%
-            addCircles(data = datacrop ,lng = as.numeric(datacrop$LON), lat = as.numeric(datacrop$LAT),color = "orange") #%>%
+            addCircles(data = datacrop ,lng = as.numeric(datacrop$LON), lat = as.numeric(datacrop$LAT),color = "orange") %>%suppressWarnings()
             #fitBounds(max(as.numeric(datacrop$`intro/longitude`)), max(as.numeric(datacrop$`intro/latitude`)),min(as.numeric(datacrop$`intro/longitude`)), min(as.numeric(datacrop$`intro/latitude`)))
           })
           
@@ -451,13 +452,14 @@ observe({
            
            ranks.events<-  tryCatch(  datacroptable %>%
                                  select(any_of(c( "Site.Selection", "Event1", "Event2", "Event3", "Event4", "Event5", "Event6","Event7"))) %>%
-                                 dplyr::summarise(across(.fns = ~sum(!is.na(.)))) ,error = function(e) NULL)  #total submissions for each event
-           
+                                 dplyr::summarise(across(.fns = ~sum(!is.na(.)))) %>%  suppressWarnings() ,error = function(e) NULL)  #total submissions for each event
+                                
+             
            
             ranks<-  tryCatch(  datacroptable %>%
                                   select(any_of(c("ENID", "Site.Selection", "Event1", "Event2", "Event3", "Event4", "Event5", "Event6","Event7"))) %>%
               group_by(ENID) %>%
-              dplyr::summarise(across(.fns = ~sum(!is.na(.))))
+              dplyr::summarise(across(.fns = ~sum(!is.na(.))))%>%  suppressWarnings()
               ,error = function(e) NULL)  #total submissions,  for each event per enumerator
             
       
@@ -548,17 +550,18 @@ observe({
                           if (is.na(value) ) {
                             list(background = "orange")  # Set default background color for missing or invalid values
                           } else {
-                            # Convert the date string to a Date object
-                            date_value <- as.Date(value, format ="%Y-%m-%d")
-                            
-                            # Calculate the target date (16/08/2023 + 2 weeks)
-                            target_date <- as.Date("2023-08-16", format ="%Y-%m-%d") + 14
-                            
-                            if (date_value > target_date) {
-                              list(background = "#BFffa590") #WONT SET OVERDUE... NOT Necessary? 16/08/2023 -is just training date
-                            } else {
-                              list(background = "#BFffa590")
-                            }
+                            list(background = "#BFffa590")
+                            # # Convert the date string to a Date object
+                            # date_value <- as.Date(value, format ="%Y-%m-%d")
+                            # 
+                            # # Calculate the target date (16/08/2023 + 2 weeks)
+                            # target_date <- as.Date("2023-08-16", format ="%Y-%m-%d") + 14
+                            # 
+                            # if (date_value > target_date) {
+                            #   list(background = "#BFffa590") #WONT SET OVERDUE... NOT Necessary? 16/08/2023 -is just training date
+                            # } else {
+                            #   list(background = "#BFffa590")
+                            # }
                           }
                         }
                           # 
