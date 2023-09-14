@@ -32,16 +32,9 @@ suppressMessages(suppressWarnings(library(rmarkdown)))
 
 #tinytex::install_tinytex()
 
-source("assemble ONA data_validation_NN.R")
-#source('ona.R')
-#load script with data import and dataprep
-#source('Sandbox.R')
 
-#source('get_users.R')
-## load functions
-
+## load functions+files
 source('support_fun.R')
-
 
 
 # Define UI for application 
@@ -161,13 +154,15 @@ server <- function(input, output, session) {
 observe({
       tryCatch( 
       if (input$nav== " SNS-Rwanda"){
-        # datacrop <- datacrop_rwa
-        # datacropO <- dataAll_RW 
-        datacrop <- joined_data
+        datacrop <- SNS.Rwanda.SUM_data
+        #datasum <- SNS.Rwanda.SUM_data
+        rawdata <- SNS.Rwanda.O_data
         
         
       }else{
         datacrop <- data.frame()
+        #datasum <- data.frame()
+        rawdata <- data.frame()
       },
       error = function(e) NULL)
   
@@ -206,7 +201,7 @@ observe({
          paste0("experimentfinder_",i),
          label = "Experiment",
          multiple=TRUE,
-         choices =c("All", sort(unique(datacrop$crops))),
+         choices =c("All", sort(unique(datacrop$crop))),
         # choices =c("All", "Potato", "Rice"),
          selected= "All")
      })
@@ -247,7 +242,7 @@ observe({
 
      output[[paste0("Totsub_box_",i)]] <-renderUI({
        infoBox(
-         "Total submissions", nrow(datacrop), icon = icon("list"),
+         "Total submissions", nrow(rawdata), icon = icon("list"),
          color = "olive", width = "100%"       )
      })
 
@@ -300,13 +295,13 @@ observe({
           
           tryCatch(
             if (input$nav== " SNS-Rwanda"){
-              # datacrop <- datacrop_rwa
-              # datacropO<-dataAll_RW
-              datacrop <- joined_data
-              dataAll<-valTest
+              datacrop <- SNS.Rwanda.SUM_data
+              #datasum <- SNS.Rwanda.SUM_data
+              rawdata <- SNS.Rwanda.O_data
             }else{
               datacrop <- data.frame()
-              dataAll<-data.frame()
+              #datasum <- data.frame()
+              rawdata <- data.frame()
             }
             ,error = function(e) NULL)
           
@@ -315,23 +310,29 @@ observe({
           tryCatch(
             if ("Validation" %in% stageUsecase ){
               datacrop<-datacrop[datacrop$Stage %in% stageUsecase, ]
+              #datasum<-datasum[datasum$Stage %in% stageUsecase, ]
             }else if ("Piloting" %in% stageUsecase ) {
               datacrop<-datacrop[datacrop$Stage %in% stageUsecase, ]
+              #datasum<-datasum[datasum$Stage %in% stageUsecase, ]
             }
           )
        
           tryCatch(
           if ("All" %in% experimentUsecase){
             datacrop<-datacrop
+            #datasum<-datasum
           }else {
-            datacrop<-datacrop[datacrop$crops %in% experimentUsecase, ]
+            datacrop<-datacrop[datacrop$crop %in% experimentUsecase, ]
+            #datasum<-datasum[datasum$crop %in% experimentUsecase, ]
           }
           ,error = function(e) NULL)
 
           tryCatch(
             if ("All" %in% enumeratorUsecase ){
               datacrop<-datacrop
+              #datasum<-datasum
             }else {
+              #datasum<-datasum[datasum$ENID %in% enumeratorUsecase, ]
               datacrop<-datacrop[datacrop$ENID %in% enumeratorUsecase, ]
             }
              ,error = function(e) NULL)
@@ -339,8 +340,10 @@ observe({
             tryCatch(
             if ("All" %in% householdUsecase){
               datacrop<-datacrop
+              #datasum<-datasum
             }else{
               datacrop<-datacrop[which(datacrop$HHID %in%  householdUsecase), ]
+              #datasum<-datasum[which(datasum$HHID %in%  householdUsecase), ]
             }
             ,error = function(e) NULL)
             
@@ -360,7 +363,7 @@ observe({
           #group by date
           wgroup <-tryCatch( 
             datacrop %>%
-            mutate(date = as.Date(today)) %>%
+            mutate(date = as.Date(Date)) %>%
             select(date) %>%
             group_by(date) %>%
             count() %>%
@@ -385,73 +388,79 @@ observe({
           
           ##Enumerator Ranking
          
-          if ("intro/event" %in% colnames(datacrop)) {
-            # Pivot wider based on "Category" column
-            datacroptable<-datacrop %>% 
-              dplyr::select(today,`intro/event`,crop,treat,ENID,HHID)
-            
-            datacroptable <- datacroptable %>%
-              pivot_wider(names_from = `intro/event`, values_from = today)%>%
-              arrange(ENID,HHID, crop,treat) 
-          } else {
-            # Keep the data as-is
-            #datacroptable <- data.frame()
-            column_names <- c("ENID", "HHID", "crop","treat","Site Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7")
-            datacroptable <- data.frame(matrix(nrow = 0, ncol = length(column_names)))
-            colnames(datacroptable) <- column_names
-          }
+          # if (ncol(datacrop) != 0) {
+          # if (  ncol(datacrop)==0 ) {
+          #   # Keep the data as-is
+          #   column_names <- c("ENID", "HHID", "crop","treat","Site Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7")
+          #   datacroptable <- data.frame(matrix(nrow = 0, ncol = length(column_names)))
+          #   colnames(datacroptable) <- column_names
+          #   datacroptablev <- data.frame(matrix(nrow = 0, ncol = length(column_names)))
+          #   colnames(datacroptablev) <- column_names
+          #   
+          #   # datacrop<-datacrop%>%
+          #   #   tibble::add_column(ENID= NA) %>%
+          #   #   tibble::add_column(HHID= NA) 
+          #   # datacrop$ENID<-as.character(datacrop$ENID)
+          #   # datacrop$HHID<-as.character(datacrop$HHID)
+          #     #   
+          # } else {
+            datacroptable<-datacrop 
+            #datacroptablev <- datasum 
+          #}
+      
           # Columns to append
           datacroptable<-as.data.frame(datacroptable)
-          columns_to_append <- c("ENID", "HHID", "crop","treat","Site Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7")
+          columns_to_append <- c("ENID", "HHID", "crop",#"treat",
+                                 "Site.Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7")
           
-         
+      
           # # Check if columns exist in the dataframe
            missing_columns <- setdiff(columns_to_append, colnames(datacroptable))
+           #missing_columns2 <- setdiff(columns_to_append, colnames(datacroptablev))
+           
           # 
           # # Append missing columns only
            tryCatch(  if (length(missing_columns) > 0) {
             datacroptable[, missing_columns] <- NA
           } ,error = function(e) NULL)
-          # 
-           datacroptable$ENID<-as.character(datacroptable$ENID)
-           datacroptable$HHID<-as.character(datacroptable$HHID)
+          #  tryCatch(  if (length(missing_columns2) > 0) {
+          #    datacroptablev[, missing_columns2] <- NA
+          #  } ,error = function(e) NULL)
+          # # 
+         
+           # datacroptable$ENID<-as.character(datacroptable$ENID)
+           # datacroptable$HHID<-as.character(datacroptable$HHID)
+           # 
+           # 
+           # datacroptable<-left_join(datacrop,datacroptable, by=c("ENID","HHID"), .keep_all = TRUE)
+           #datacroptable$`Site Selection` <- datacroptable$today
            
+           # if ("crop" %in% colnames(datacroptable) ){
+           # datacroptable$crop<-datacroptable$crop}
            
-           if(ncol(datacrop)==0){
-             datacrop<-datacrop%>%
-               tibble::add_column(ENID= NA) %>%
-               tibble::add_column(HHID= NA) 
-             datacrop$ENID<-as.character(datacrop$ENID)
-             datacrop$HHID<-as.character(datacrop$HHID)
-           }
-           
-           datacroptable<-left_join(datacrop,datacroptable, by=c("ENID","HHID"))
-           datacroptable$`Site Selection`<-datacroptable$today
-           
-           if ("crops" %in% colnames(datacroptable) ){
-           datacroptable$crop<-datacroptable$crops}
-           
-           datacroptable <- datacroptable %>%
-             mutate(`Site Selection` = ifelse(is.na(HHID), NA, `Site Selection`))
+           #datacroptable$`Site Selection` <- ifelse(is.na(datacroptable$HHID), NA, datacroptable$`Site Selection`)
            
             
            datacroptable<-  tryCatch(  datacroptable %>%
-                                 select(any_of(c("ENID", "HHID", "crop","treat","Site Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7") ))
+                                 select(any_of(c("ENID", "HHID", "crop",#"treat",
+                                                 "Site.Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7") ))
            )
-           
            colnames(datacroptable) <- toTitleCase(colnames(datacroptable)) #Title case for table headers
+           # datacroptablev<-left_join(datasum,datacroptable, by=c("ENID","HHID"))
+           #colnames(datacroptablev) <- toTitleCase(colnames(datacroptablev)) #Title case for table headers
            
            ranks.events<-  tryCatch(  datacroptable %>%
-                                 select(any_of(c( "Site Selection", "Event1", "Event2", "Event3", "Event4", "Event5", "Event6","Event7"))) %>%
+                                 select(any_of(c( "Site.Selection", "Event1", "Event2", "Event3", "Event4", "Event5", "Event6","Event7"))) %>%
                                  dplyr::summarise(across(.fns = ~sum(!is.na(.)))) ,error = function(e) NULL)  #total submissions for each event
            
            
             ranks<-  tryCatch(  datacroptable %>%
-                                  select(any_of(c("ENID", "Site Selection", "Event1", "Event2", "Event3", "Event4", "Event5", "Event6","Event7"))) %>%
+                                  select(any_of(c("ENID", "Site.Selection", "Event1", "Event2", "Event3", "Event4", "Event5", "Event6","Event7"))) %>%
               group_by(ENID) %>%
-              dplyr::summarise(across(.fns = ~sum(!is.na(.)))) ,error = function(e) NULL)  #total submissions,  for each event per enumerator
+              dplyr::summarise(across(.fns = ~sum(!is.na(.))))
+              ,error = function(e) NULL)  #total submissions,  for each event per enumerator
             
-           
+      
             
             output[[paste0("rankingevents_",i)]]  <- renderReactable({
               reactable(ranks.events,
@@ -473,7 +482,7 @@ observe({
                             html = TRUE,
                             show = TRUE,
                             cell =    function(value,index) {
-                              s2<-Register_EN[which(Register_EN$ENID==value ), ]
+                              s2<-datacrop[which(datacrop$ENID==value ), ]
                               tippy(value,tooltip = paste("NAME:", s2$ENfirstName , s2$ENSurname, "<br>", "CONTACT:", s2$ENphoneNo))
                             },
                           )
@@ -482,7 +491,7 @@ observe({
             })
 
             # Convert the date string to a Date object
-            datacroptable$`Site Selection` <- as.Date( datacroptable$`Site Selection` , format = "%Y-%m-%d")
+            #datacroptable$`Site Selection` <- as.Date( datacroptable$`Site Selection` , format = "%Y-%m-%d")
           ##Enumerator Tracker Table
           output[[paste0("tableR_",i)]] <- renderReactable({
             #output$tableR <- renderReactable({
@@ -522,15 +531,15 @@ observe({
                                          style  = function(value) {
                                            list(background ="white")
                                          }),
-                      Treat = colDef(filterable = TRUE,
-                                    style  = function(value) {
-                                      list(background ="white")
-                                    }),
+                      # Treat = colDef(filterable = TRUE,
+                      #               style  = function(value) {
+                      #                 list(background ="white")
+                      #               }),
                       HHID = colDef(
                                      style  = function(value) {
                                        list(background ="white")
                                      }),
-                      `Site Selection` = colDef(
+                      Site.Selection = colDef(
                         #style  = function(value) {
                           
                         style = function(value) {
@@ -670,7 +679,7 @@ observe({
                           #filterable = TRUE,
                           show = TRUE,
                           cell =    function(value,index) {
-                            s2<-Register_EN[which(Register_EN$ENID==value ), ]
+                            s2<-datacrop[which(datacrop$ENID==value ), ]
                             tippy(value,tooltip = paste("NAME:", s2$ENfirstName , s2$ENSurname, "<br>", "CONTACT:", s2$ENphoneNo))
                           },
                           header = function(value) {tippy(value,tooltip = paste("NAME:", "<br>", "CONTACT:"))},
@@ -754,7 +763,7 @@ observe({
           )
           
           ##Data Download
-          datacropdown<-dataAll%>%
+          datacropdown<-rawdata%>%
             dplyr::rename(any_of(c(Date = "today",Country = "intro/country",      Crop = "crop")
 
             ))
@@ -766,7 +775,7 @@ observe({
               paste("data_",gsub("-", "",Sys.Date()), ".csv", sep = "")
             },
             content = function(file) {
-              write.csv(dataAll, file, row.names = FALSE)
+              write.csv(rawdata, file, row.names = FALSE)
             }
           )
           

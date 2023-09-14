@@ -1,4 +1,7 @@
-
+#load data(updated daily)
+SNS.Rwanda.VAL_data<-read.csv("./data/Usecases/SNS-Rwanda/SNS-Rwanda.VAL_data.csv") 
+SNS.Rwanda.SUM_data<-read.csv("./data/Usecases/SNS-Rwanda/SNS-Rwanda.SUM_data.csv") 
+SNS.Rwanda.O_data<-read.csv("./data/Usecases/SNS-Rwanda/SNS-Rwanda.O_data.csv") 
 usersdata<-read.csv('./data/usecases_updated.csv')
 userList<-as.data.frame(strsplit((paste0(usersdata$users, collapse=",")), ','))[,1]
 passList<-as.data.frame(strsplit((paste0(usersdata$password, collapse=",")), ','))[,1]
