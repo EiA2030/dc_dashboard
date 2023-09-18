@@ -1,4 +1,7 @@
-
+#load data(updated daily)
+SNS.Rwanda.VAL_data<-read.csv("./data/Usecases/SNS-Rwanda/SNS-Rwanda.VAL_data.csv") 
+SNS.Rwanda.SUM_data<-read.csv("./data/Usecases/SNS-Rwanda/SNS-Rwanda.SUM_data.csv") 
+SNS.Rwanda.O_data<-read.csv("./data/Usecases/SNS-Rwanda/SNS-Rwanda.O_data.csv") 
 usersdata<-read.csv('./data/usecases_updated.csv')
 userList<-as.data.frame(strsplit((paste0(usersdata$users, collapse=",")), ','))[,1]
 passList<-as.data.frame(strsplit((paste0(usersdata$password, collapse=",")), ','))[,1]
@@ -119,7 +122,7 @@ jscode <- "
 shinyjs.hrefAuto = function(url) { window.location.href = url;};
 "
 # Function to create a tab panel
-usecases.index<-c(  " SAA-Nigeria"  =1           , " DigGreen-Ethiopia"  =2  ," Fert-Ethiopia"     =3    , " ex-iSDA-Rwanda"  =4  ,  " ex-iSDA-Ghana"    =5      , " ex-Wcover-Ghana" =6     ,
+usecases.index<-c(  " SAA-Nigeria"  =1           , " DigGreen-Ethiopia"  =2  ," Fert-Ethiopia"     =3    , " SNS-Rwanda"  =4  ,  " ex-iSDA-Ghana"    =5      , " ex-Wcover-Ghana" =6     ,
                     " Planting-S-Asia" =7     ," DSRC-SE-Asia" =8       ,   " Govt-Egypt"     =9    ," Govt-LatAm"  =10     ,   " Cocoa Soils"  =11   ,   " Rainforest Alliance" =12  ,
                     " One Acre Fund"    =13     ,  " DRC Coffee OLAM"  =14       ,   " Solidaridad Soy Advisory" =15 , " DSR Extension Vietnam" =16  , " Morocco CA" =17          ,  " Mercy Corps SPROUT"  =18,
                     " BAYGAP (BAYER)" =19  )
@@ -157,7 +160,9 @@ create_tab_panel <- function(tab_name) {
                                      uiOutput(paste0('experimentfinderr_',uc)), #experiment code
                                      uiOutput(paste0('datefinderr_',uc)),
                                      uiOutput(paste0('enumeratorfinderr_',uc)), #enumerators
-                                     uiOutput(paste0('householdfinderr_',uc))  #households
+                                     uiOutput(paste0('householdfinderr_',uc))#,  #households
+                                     #actionButton(paste0('apply_filters_',uc), "Apply Filters")
+                                     
                            )
                            ## 'Glossary' tab
                            #menuItem( "GLOSSARY", tabName = 'glossary', icon = icon('bell') )
@@ -170,19 +175,29 @@ create_tab_panel <- function(tab_name) {
                  id = paste0("tabss-", uc),  # Unique id for each tabPanel
                  type = "tabs",
                  tabPanel(tabName="Summary"  ,"SUMMARY",
-                          HTML('<h3>  Welcome! </h3>'),
+                         # HTML('<h3>  Welcome! </h3>'),
                           #textOutput("selected_var"),
-                          HTML('<h5>  This data monitoring dashboards helps you track enumerator submissions for various trials and check whether various quality checks are adhered to.</h5>'),
+                          HTML('<h5>  This data monitoring dashboards helps you track enumerator submissions for various trials.</h5>'),
                           HTML('<br>'),
                           fluidRow( column( width = 12,  align = 'left', infoBoxOutput(  paste0("project_",uc) ) , infoBoxOutput(paste0("country_",uc) ),infoBoxOutput(paste0("Totsub_box_",uc) ))
                                     #column( width = 6,  align = 'right', uiOutput("Totsub_box"))trials_map submission_trend
                           ),
+                         #fluidRow( column( width = 12,  align = 'left', infoBoxOutput(  paste0("summaryevents_",uc) ) )),
                           fluidRow( column( width = 6,h4("Trials by Location", align = 'center'), leafletOutput(paste0('trials_map_',uc),height = "50vh"),style = "background-color: #f2f2f2;"),
                                     column( width = 6,h4("Trend of Submissions", align = 'center'), plotlyOutput(paste0('submission_trend_',uc), height = "50vh"),style = "background-color: #f2f2f2;")
                           ),
                           HTML('<br>'),
-                          fluidRow( column( width = 12,h4("Summary of Complete Submissions", align = 'center'), reactableOutput(paste0("ranking_",uc)) )
-                          ),
+                         fluidRow(
+                           column(width = 9, h4("Summary of Complete Submissions", align = 'center')),
+                           column(width = 1, downloadButton(paste0("downloadsummary_", uc), "Download Summary", style = "color: green")),
+                           column(width = 2)
+                         ),
+                         fluidRow( column( width = 12,h4("", align = 'center'),  reactableOutput(paste0("rankingevents_", uc)) )
+                         ),
+                        
+                          fluidRow( column( width = 12,h4("", align = 'center'), reactableOutput(paste0("ranking_",uc)) )
+                          )
+                         
                  ),
 
                  tabPanel(tabName="Enumerators","ENUMERATORS",

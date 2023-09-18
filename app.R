@@ -1,41 +1,42 @@
 
 # load packages
-library(shiny)
-library(shinyauthr)
-library(shinydashboard)
-library(tidyr)
-library(ggplot2)
-library(sf)
-library(lubridate)
-library(stringr)
-library(plotly)
-library(shinyBS)
-library(shinyjs)
-library(leaflet)
-library(shinyalert)
-library(magrittr)
-library(shinycssloaders)
+suppressMessages(suppressWarnings(library("shiny",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("shinyauthr",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("shinydashboard",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("tidyr",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("ggplot2",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("sf",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("lubridate",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("stringr",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("plotly",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("shinyBS",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("shinyjs",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("leaflet",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("shinyalert",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("magrittr",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("shinycssloaders",character.only = TRUE)))
 #library(ona)
-library(magrittr)
-library(reactable)
-library(tippy)
-library(shinyWidgets)
-library(auth0)
-library(data.table)
-library(dplyr)
-library(shinydashboardPlus)
-library(shinythemes)
+suppressMessages(suppressWarnings(library("magrittr",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("reactable",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("tippy",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("shinyWidgets",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("auth0",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("data.table",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("dplyr",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("shinydashboardPlus",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("shinythemes",character.only = TRUE)))
+# if(!'tools' %in% installed.packages()[, 'Package']) {install.packages('tools', repos = 'http://cran.us.r-project.org')}
+# if(!'rmarkdown' %in% installed.packages()[, 'Package']) {install.packages('rmarkdown', repos = 'http://cran.us.r-project.org')}
+#if(!'memoise' %in% installed.packages()[, 'Package']) {install.packages('memoise', repos = 'http://cran.us.r-project.org')}
+suppressMessages(suppressWarnings(library("tools",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("rmarkdown",character.only = TRUE)))
+#suppressMessages(suppressWarnings(library("memoise",character.only = TRUE)))
 
-source("assemble ONA data_validation_NN.R")
-#source('ona.R')
-#load script with data import and dataprep
-#source('Sandbox.R')
+#tinytex::install_tinytex()
+source('dataprocessing.R')
 
-#source('get_users.R')
-## load functions
-
+## load functions+files
 source('support_fun.R')
-
 
 
 # Define UI for application 
@@ -59,6 +60,7 @@ ui <-
     
     # to ensure display only after login
     uiOutput("sidebarpanel", padding = 0)
+  
     
   )
 
@@ -154,14 +156,16 @@ server <- function(input, output, session) {
 ##Define data for each usecase
 observe({
       tryCatch( 
-      if (input$nav== " ex-iSDA-Rwanda"){
-        # datacrop <- datacrop_rwa
-        # datacropO <- dataAll_RW 
-        datacrop <- joined_data
+      if (input$nav== " SNS-Rwanda"){
+        datacrop <- SNS.Rwanda.SUM_data
+        #datasum <- SNS.Rwanda.SUM_data
+        rawdata <- SNS.Rwanda.O_data
         
-        print(as.character(unique(datacrop$Country)))
+        
       }else{
         datacrop <- data.frame()
+        #datasum <- data.frame()
+        rawdata <- data.frame()
       },
       error = function(e) NULL)
   
@@ -200,15 +204,15 @@ observe({
          paste0("experimentfinder_",i),
          label = "Experiment",
          multiple=TRUE,
-         #choices =c("All", sort(unique(datacrop$crop))),
-         choices =c("All", "Potato", "Rice"),
+         choices =c("All", sort(unique(datacrop$crop))),
+        # choices =c("All", "Potato", "Rice"),
          selected= "All")
      })
 
      output[[paste0("datefinderr_",i)]] <-renderUI({
        dateRangeInput(paste0("datefinder_",i),
                       "DATE:",
-                      start = min(na.omit(joined_data$today)),
+                      start = min(na.omit(datacrop$Date)),
                       end   =  Sys.time())
      })
 
@@ -241,13 +245,13 @@ observe({
 
      output[[paste0("Totsub_box_",i)]] <-renderUI({
        infoBox(
-         "Total submissions", nrow(datacrop), icon = icon("list"),
+         "Total submissions", nrow(rawdata), icon = icon("list"),
          color = "olive", width = "100%"       )
      })
 
      output[[paste0("country_",i)]] <-renderUI({
        infoBox(
-         "Country", as.character(unique(joined_data$Country))[1] , icon = icon("globe"),
+         "Country", as.character(unique(datacrop$Country))[1] , icon = icon("globe"),
          color = "olive",width = "100%"       )
 
      })
@@ -257,6 +261,11 @@ observe({
          "Usecase", as.character(input$nav), icon = icon("barcode"),
          color = "olive",width = "100%"       )
      })
+     # output[[paste0("summaryevents_",i)]] <-renderUI({
+     #   infoBox(
+     #     "Usecase", as.character(input$nav), icon = icon("barcode"),
+     #     color = "olive",width = "100%"       )
+     # })
     })
 
 
@@ -272,44 +281,61 @@ observe({
         dateUsecase <- input[[paste0("datefinder_", i)]]
         enumeratorUsecase <- input[[paste0("enumeratorfinder_", i)]]
         householdUsecase <- input[[paste0("householdfinder_", i)]]
+        applyfilter<-input[[paste0("apply_filters", i)]]
         
         reactive_expr <- reactive({
           req(input_nav,experimentUsecase, stageUsecase, dateUsecase, enumeratorUsecase, householdUsecase)
           
         })
+        # reactive_expr_filter <- reactive({
+        #   req(applyfilter)
+        #   
+        # })
+        # 
+       # observeEvent(reactive_expr_filter()  , {
         
         observeEvent(reactive_expr(), {
           
           tryCatch(
-            if (input$nav== " ex-iSDA-Rwanda"){
-              # datacrop <- datacrop_rwa
-              # datacropO<-dataAll_RW
-              datacrop <- joined_data
-              datacrop1 <- joined_data
-              dataAll<-dataAll_RW
+            if (input$nav== " SNS-Rwanda"){
+              datacrop <- SNS.Rwanda.SUM_data
+              #datasum <- SNS.Rwanda.SUM_data
+              rawdata <- SNS.Rwanda.O_data
             }else{
               datacrop <- data.frame()
-              datacrop1 <- data.frame()
-              dataAll<-data.frame()
+              #datasum <- data.frame()
+              rawdata <- data.frame()
             }
             ,error = function(e) NULL)
           
           #CORRECT TO-
           #subset_df <- df[df$category %in% selected_categories, ]
-          
+          tryCatch(
+            if ("Validation" %in% stageUsecase ){
+              datacrop<-datacrop[datacrop$Stage %in% stageUsecase, ]
+              #datasum<-datasum[datasum$Stage %in% stageUsecase, ]
+            }else if ("Piloting" %in% stageUsecase ) {
+              datacrop<-datacrop[datacrop$Stage %in% stageUsecase, ]
+              #datasum<-datasum[datasum$Stage %in% stageUsecase, ]
+            }
+          )
        
           tryCatch(
           if ("All" %in% experimentUsecase){
             datacrop<-datacrop
+            #datasum<-datasum
           }else {
             datacrop<-datacrop[datacrop$crop %in% experimentUsecase, ]
+            #datasum<-datasum[datasum$crop %in% experimentUsecase, ]
           }
           ,error = function(e) NULL)
 
           tryCatch(
             if ("All" %in% enumeratorUsecase ){
               datacrop<-datacrop
+              #datasum<-datasum
             }else {
+              #datasum<-datasum[datasum$ENID %in% enumeratorUsecase, ]
               datacrop<-datacrop[datacrop$ENID %in% enumeratorUsecase, ]
             }
              ,error = function(e) NULL)
@@ -317,20 +343,22 @@ observe({
             tryCatch(
             if ("All" %in% householdUsecase){
               datacrop<-datacrop
+              #datasum<-datasum
             }else{
               datacrop<-datacrop[which(datacrop$HHID %in%  householdUsecase), ]
+              #datasum<-datasum[which(datasum$HHID %in%  householdUsecase), ]
             }
             ,error = function(e) NULL)
             
          
           tryCatch(
-            datacrop <- datacrop[which(datacrop$today >= dateUsecase[1] & datacrop$today <= dateUsecase[2]), ]
+            datacrop <- datacrop[which(datacrop$Date >= dateUsecase[1] & datacrop$Date <= dateUsecase[2]), ]
             ,error = function(e) NULL)
           #Summary map
           output[[paste0("trials_map_",i)]] <-renderLeaflet({
             leaflet() %>%
               addProviderTiles(providers$CartoDB.Positron) %>%
-            addCircles(data = datacrop ,lng = as.numeric(datacrop$LON), lat = as.numeric(datacrop$LAT),color = "orange") #%>%
+            addCircles(data = datacrop ,lng = as.numeric(datacrop$LON), lat = as.numeric(datacrop$LAT),color = "orange") %>%suppressWarnings()
             #fitBounds(max(as.numeric(datacrop$`intro/longitude`)), max(as.numeric(datacrop$`intro/latitude`)),min(as.numeric(datacrop$`intro/longitude`)), min(as.numeric(datacrop$`intro/latitude`)))
           })
           
@@ -338,7 +366,7 @@ observe({
           #group by date
           wgroup <-tryCatch( 
             datacrop %>%
-            mutate(date = as.Date(today)) %>%
+            mutate(date = as.Date(Date)) %>%
             select(date) %>%
             group_by(date) %>%
             count() %>%
@@ -363,63 +391,90 @@ observe({
           
           ##Enumerator Ranking
          
-          if ("intro/event" %in% colnames(datacrop1)) {
-            # Pivot wider based on "Category" column
-            datacroptable<-datacrop1 %>% 
-              dplyr::select(today,`intro/event`,crop,treat,ENID,HHID)
-            
-            datacroptable <- datacroptable %>%
-              pivot_wider(names_from = `intro/event`, values_from = today)%>%
-              arrange(ENID,HHID, crop,treat) 
-          } else {
-            # Keep the data as-is
-            #datacroptable <- data.frame()
-            column_names <- c("ENID", "HHID", "crop","treat","SiteSelection", "event1", "event2", "event3", "event4", "event5", "event6","event7")
-            datacroptable <- data.frame(matrix(nrow = 0, ncol = length(column_names)))
-            colnames(datacroptable) <- column_names
-          }
+          # if (ncol(datacrop) != 0) {
+          # if (  ncol(datacrop)==0 ) {
+          #   # Keep the data as-is
+          #   column_names <- c("ENID", "HHID", "crop","treat","Site Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7")
+          #   datacroptable <- data.frame(matrix(nrow = 0, ncol = length(column_names)))
+          #   colnames(datacroptable) <- column_names
+          #   datacroptablev <- data.frame(matrix(nrow = 0, ncol = length(column_names)))
+          #   colnames(datacroptablev) <- column_names
+          #   
+          #   # datacrop<-datacrop%>%
+          #   #   tibble::add_column(ENID= NA) %>%
+          #   #   tibble::add_column(HHID= NA) 
+          #   # datacrop$ENID<-as.character(datacrop$ENID)
+          #   # datacrop$HHID<-as.character(datacrop$HHID)
+          #     #   
+          # } else {
+            datacroptable<-datacrop 
+            #datacroptablev <- datasum 
+          #}
+      
           # Columns to append
           datacroptable<-as.data.frame(datacroptable)
-          columns_to_append <- c("ENID", "HHID", "crop","treat","SiteSelection", "event1", "event2", "event3", "event4", "event5", "event6","event7")
+          columns_to_append <- c("ENID", "HHID", "crop",#"treat",
+                                 "Site.Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7")
           
-         
+      
           # # Check if columns exist in the dataframe
            missing_columns <- setdiff(columns_to_append, colnames(datacroptable))
+           #missing_columns2 <- setdiff(columns_to_append, colnames(datacroptablev))
+           
           # 
           # # Append missing columns only
            tryCatch(  if (length(missing_columns) > 0) {
             datacroptable[, missing_columns] <- NA
           } ,error = function(e) NULL)
-          # 
-           datacroptable$ENID<-as.character(datacroptable$ENID)
-           datacroptable$HHID<-as.character(datacroptable$HHID)
+          #  tryCatch(  if (length(missing_columns2) > 0) {
+          #    datacroptablev[, missing_columns2] <- NA
+          #  } ,error = function(e) NULL)
+          # # 
+         
+           # datacroptable$ENID<-as.character(datacroptable$ENID)
+           # datacroptable$HHID<-as.character(datacroptable$HHID)
+           # 
+           # 
+           # datacroptable<-left_join(datacrop,datacroptable, by=c("ENID","HHID"), .keep_all = TRUE)
+           #datacroptable$`Site Selection` <- datacroptable$today
            
-           if(ncol(datacrop1)==0){
-             datacrop1<-datacrop1%>%
-               tibble::add_column(ENID= NA) %>%
-               tibble::add_column(HHID= NA) 
-             datacrop1$ENID<-as.character(datacrop1$ENID)
-             datacrop1$HHID<-as.character(datacrop1$HHID)
-           }
+           # if ("crop" %in% colnames(datacroptable) ){
+           # datacroptable$crop<-datacroptable$crop}
            
-           datacroptable<-left_join(datacrop1,datacroptable, by=c("ENID","HHID"))
-           datacroptable$SiteSelection<-datacroptable$today
-           
-           datacroptable <- datacroptable %>%
-             mutate(SiteSelection = ifelse(is.na(HHID), NA, SiteSelection))
+           #datacroptable$`Site Selection` <- ifelse(is.na(datacroptable$HHID), NA, datacroptable$`Site Selection`)
            
             
            datacroptable<-  tryCatch(  datacroptable %>%
-                                 select(any_of(c("ENID", "HHID", "crop","treat","SiteSelection", "event1", "event2", "event3", "event4", "event5", "event6","event7") ))
+                                 select(any_of(c("ENID", "HHID", "crop",#"treat",
+                                                 "Site.Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7") ))
            )
+           colnames(datacroptable) <- toTitleCase(colnames(datacroptable)) #Title case for table headers
+           # datacroptablev<-left_join(datasum,datacroptable, by=c("ENID","HHID"))
+           #colnames(datacroptablev) <- toTitleCase(colnames(datacroptablev)) #Title case for table headers
            
+           ranks.events<-  tryCatch(  datacroptable %>%
+                                 select(any_of(c( "Site.Selection", "Event1", "Event2", "Event3", "Event4", "Event5", "Event6","Event7"))) %>%
+                                 dplyr::summarise(across(.fns = ~sum(!is.na(.)))) %>%  suppressWarnings() ,error = function(e) NULL)  #total submissions for each event
+                                
+             
            
             ranks<-  tryCatch(  datacroptable %>%
-                                  select(any_of(c("ENID", "SiteSelection", "event1", "event2", "event3", "event4", "event5", "event6","event7"))) %>%
+                                  select(any_of(c("ENID", "Site.Selection", "Event1", "Event2", "Event3", "Event4", "Event5", "Event6","Event7"))) %>%
               group_by(ENID) %>%
-              #summarise(n = n())
-
-              dplyr::summarise(across(.fns = ~sum(!is.na(.)))) ,error = function(e) NULL)
+              dplyr::summarise(across(.fns = ~sum(!is.na(.))))%>%  suppressWarnings()
+              ,error = function(e) NULL)  #total submissions,  for each event per enumerator
+            
+      
+            
+            output[[paste0("rankingevents_",i)]]  <- renderReactable({
+              reactable(ranks.events,
+                        pagination = FALSE,
+                        showPagination = TRUE,
+                        paginateSubRows = FALSE,
+                        
+              )
+            })
+            
 
             output[[paste0("ranking_",i)]]  <- renderReactable({
               reactable(ranks,
@@ -431,18 +486,17 @@ observe({
                             html = TRUE,
                             show = TRUE,
                             cell =    function(value,index) {
-                              s2<-Register_EN[which(Register_EN$ENID==value ), ]
-                              tippy(value,tooltip = paste("NAME:", s2$ENfirstName , s2$ENSurname, "<br>", "CONTACT:", s2$ENphoneNo))
+                              s2<-datacrop[which(datacrop$ENID==value ), ]
+                              tippy(value,tooltip = paste("NAME:", unique(s2$ENfirstName) , unique(s2$ENSurname), "<br>", "CONTACT:", unique(s2$ENphoneNo)))
                             },
                           )
                         )
               )
             })
 
-          
-          
+            # Convert the date string to a Date object
+            #datacroptable$`Site Selection` <- as.Date( datacroptable$`Site Selection` , format = "%Y-%m-%d")
           ##Enumerator Tracker Table
-          
           output[[paste0("tableR_",i)]] <- renderReactable({
             #output$tableR <- renderReactable({
             reactable(datacroptable,
@@ -477,22 +531,139 @@ observe({
                       #                     style  = function(value) {
                       #                       list(background ="white")
                       #                     }),
-                      crop= colDef(filterable = TRUE,
+                      Crop= colDef(filterable = TRUE,
                                          style  = function(value) {
                                            list(background ="white")
                                          }),
-                      treat = colDef(filterable = TRUE,
-                                    style  = function(value) {
-                                      list(background ="white")
-                                    }),
+                      # Treat = colDef(filterable = TRUE,
+                      #               style  = function(value) {
+                      #                 list(background ="white")
+                      #               }),
                       HHID = colDef(
                                      style  = function(value) {
                                        list(background ="white")
                                      }),
-                      # SiteSelection = colDef(
-                      #   style  = function(value) {
-                      #     color<-ifelse(is.null(value) ,"orange","#BFffa590")
-                      #   }),
+                      Site.Selection = colDef(
+                        #style  = function(value) {
+                          
+                        style = function(value) {
+                          
+                          # Check if the value is missing or not in the expected date format
+                          if (is.na(value) ) {
+                            list(background = "#ffc457")  # Set default background color for missing or invalid values
+                          } else {
+                            list(background = "#BFffa590")
+                            # # Convert the date string to a Date object
+                            # date_value <- as.Date(value, format ="%Y-%m-%d")
+                            # 
+                            # # Calculate the target date (16/08/2023 + 2 weeks)
+                            # target_date <- as.Date("2023-08-16", format ="%Y-%m-%d") + 14
+                            # 
+                            # if (date_value > target_date) {
+                            #   list(background = "#BFffa590") #WONT SET OVERDUE... NOT Necessary? 16/08/2023 -is just training date
+                            # } else {
+                            #   list(background = "#BFffa590")
+                            # }
+                          }
+                        }
+                          # 
+                          # color<-ifelse(is.na(value) ,"orange","#BFffa590")
+                          # 
+                          # # if (value <= format((format('16/8/2023',"%d/%m/%Y"))+weeks(2), "%d/%m/%Y") ){
+                          # #   color<-ifelse(is.na(value) ,"orange","#BFffa590")
+                          # #   list(background =color)
+                          # # } 
+                           #ist(background =color)
+                          
+                        #}
+                        ),
+                      Event1 = colDef(
+                        # style = function(value, index) {
+                        #   # Get the current system date
+                        #   current_date <-as.Date(Sys.Date() , format = "%Y-%m-%d")   
+                        #   
+                        #   if (is.na(value)) {
+                        #     list(background = "orange")
+                        #     # If Event1 is NA and current date is more than Site Selection + 4 weeks, color is red
+                        #     # if (current_date > (as.Date(datacroptable$`Site Selection`, format = "%Y-%m-%d") + 28)) {
+                        #     #   list(background = "red")
+                        #     # } else {
+                        #     #   # If Event1 is NA and current date is less than Site Selection + 4 weeks, color is orange
+                        #     #   list(background = "orange")
+                        #     # }
+                        #   } 
+                          # else {
+                          #   # Convert Event1 value to Date
+                          #   event1_date <- as.Date(value, format = "%Y-%m-%d")
+                          #   
+                          #   # Calculate target dates
+                          #   target_date_2_weeks <- as.Date(datacroptable$`Site Selection`, format = "%Y-%m-%d") + 14
+                          #   target_date_4_weeks <- as.Date(datacroptable$`Site Selection`, format = "%Y-%m-%d") + 28
+                          #   
+                          #   if (current_date < target_date_2_weeks) {
+                          #     # If current date is less than Site Selection + 2 weeks, color is purple
+                          #     list(background = "purple")
+                          #   } else if (current_date < target_date_4_weeks) {
+                          #     # If current date is less than Site Selection + 4 weeks but >= 2 weeks, color is green
+                          #     list(background = "green")
+                          #   } else {
+                          #     # If current date is greater than or equal to Site Selection + 4 weeks, color is red
+                          #     list(background = "red")
+                          #   }
+                          # }
+                        #}
+                        style  = function(value) {
+                          color<-ifelse(is.na(value) ,"#ffc457","#BFffa590")
+                          list(background =color)
+                        }
+                      ),
+                      Event2 = colDef(
+                        style  = function(value) {
+                          color<-ifelse(is.na(value) ,"#BE93D4","#BFffa590")
+                          list(background =color)
+                        }
+                      ),
+                      Event3 = colDef(
+                        style  = function(value) {
+                          color<-ifelse(is.na(value) ,"#BE93D4","#BFffa590")
+                          list(background =color)
+                        }
+                      ),
+                      Event4 = colDef(
+                        style  = function(value) {
+                          color<-ifelse(is.na(value) ,"#BE93D4","#BFffa590")
+                          list(background =color)
+                        }
+                      ), 
+                      Event5 = colDef(
+                        style  = function(value) {
+                          color<-ifelse(is.na(value) ,"#BE93D4","#BFffa590")
+                          list(background =color)
+                        }
+                      ), 
+                      Event6 = colDef(
+                        style  = function(value) {
+                          color<-ifelse(is.na(value) ,"#BE93D4","#BFffa590")
+                          list(background =color)
+                        }
+                      ), 
+                      Event7 = colDef(
+                        style  = function(value) {
+                          color<-ifelse(is.na(value) ,"#BE93D4","#BFffa590")
+                          list(background =color)
+                        }
+                      ),
+                      # Event1 = colDef(
+                      #   
+                      #   style  = function(value, index) {
+                      #     otherColumnValue <- value$`Site Selection`[index]
+                      #     
+                      #     if (){}
+                      #     
+                      #     color<-ifelse(is.na(value) ,"#BE93D4","#BFffa590")
+                      #     list(background =color)
+                      #   }
+                      # ),
                       #   # TLID2 = colDef(
                       #   #   cell =    function(value,index) {
                       #   #     s2<-register_en[which(register_en$ENID==ak$ENID[index] ), ]
@@ -513,8 +684,8 @@ observe({
                           #filterable = TRUE,
                           show = TRUE,
                           cell =    function(value,index) {
-                            s2<-Register_EN[which(Register_EN$ENID==value ), ]
-                            tippy(value,tooltip = paste("NAME:", s2$ENfirstName , s2$ENSurname, "<br>", "CONTACT:", s2$ENphoneNo))
+                            s2<-datacrop[which(datacrop$ENID==value ), ]
+                            tippy(value,tooltip = paste("NAME:", unique(s2$ENfirstName) , unique(s2$ENSurname), "<br>", "CONTACT:", unique(s2$ENphoneNo)))
                           },
                           header = function(value) {tippy(value,tooltip = paste("NAME:", "<br>", "CONTACT:"))},
                           style  = function(value) {
@@ -538,8 +709,11 @@ observe({
                           
                         ),
                         style  = function(value) {
-                          
-                          color<-ifelse(is.na(value) ,"#BE93D4","#BFffa590")
+                         # if (name=="Site Selection"){
+                         #   color<-ifelse(is.na(value) ,"orange","#BFffa590")
+                         # }
+
+                           color<-ifelse(is.na(value) ,"#BE93D4","#BFffa590")
                           # if (input[[paste0("seasonfinder_",i)]]== "2022B"){
                           #   color<-ifelse(value=="NA" ,"#ffa590","#BFffa590")
                           # } else if (input[[paste0("seasonfinder_",i)]]== "2022A"){
@@ -547,7 +721,7 @@ observe({
                           # } else {
                           #   color<-ifelse(value=="NA" ,"#ffa590","#BFffa590")
                           # }
-                          list(background =color)
+                          #list(background =color)
                         }
                         # 
                         
@@ -573,8 +747,28 @@ observe({
             
           })
           
+         
+          
+          output[[paste0("downloadsummary_",i)]] <- downloadHandler(
+            filename = function() {
+              paste("summary_",gsub("-", "",Sys.Date()), ".pdf", sep = "")
+              #paste("summary.pdf", sep = "")
+            },
+            content = function(file) {
+              withProgress(message = "Downloading...", {
+              # Create an R Markdown document
+              rmarkdown::render(
+                "./www/Scripts/Summary.Rmd",
+                output_file = file,
+                params = list(df1 = ranks.events, df2 = ranks)
+              )
+              })
+            }
+            
+          )
+          
           ##Data Download
-          datacropdown<-dataAll%>%
+          datacropdown<-rawdata%>%
             dplyr::rename(any_of(c(Date = "today",Country = "intro/country",      Crop = "crop")
 
             ))
@@ -586,7 +780,7 @@ observe({
               paste("data_",gsub("-", "",Sys.Date()), ".csv", sep = "")
             },
             content = function(file) {
-              write.csv(dataAll, file, row.names = FALSE)
+              write.csv(rawdata, file, row.names = FALSE)
             }
           )
           
@@ -596,8 +790,11 @@ observe({
             outputOptions(output, paste0("tabledownload_",i), suspendWhenHidden = FALSE)
             outputOptions(output, paste0("tableR_",i), suspendWhenHidden = FALSE)
             outputOptions(output, paste0("ranking_",i), suspendWhenHidden = FALSE)
+            outputOptions(output, paste0("rankingevents_",i), suspendWhenHidden = FALSE)
             
         })
+        #})
+          
       })
     })
     
