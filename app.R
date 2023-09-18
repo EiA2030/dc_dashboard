@@ -1,37 +1,39 @@
 
 # load packages
-library(shiny)
-library(shinyauthr)
-library(shinydashboard)
-library(tidyr)
-library(ggplot2)
-library(sf)
-library(lubridate)
-library(stringr)
-library(plotly)
-library(shinyBS)
-library(shinyjs)
-library(leaflet)
-library(shinyalert)
-library(magrittr)
-library(shinycssloaders)
+suppressMessages(suppressWarnings(library("shiny",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("shinyauthr",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("shinydashboard",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("tidyr",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("ggplot2",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("sf",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("lubridate",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("stringr",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("plotly",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("shinyBS",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("shinyjs",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("leaflet",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("shinyalert",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("magrittr",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("shinycssloaders",character.only = TRUE)))
 #library(ona)
-library(magrittr)
-library(reactable)
-library(tippy)
-library(shinyWidgets)
-library(auth0)
-library(data.table)
-library(dplyr)
-library(shinydashboardPlus)
-library(shinythemes)
-if(!'tools' %in% installed.packages()[, 'Package']) {install.packages('tools', repos = 'http://cran.us.r-project.org')}
-if(!'rmarkdown' %in% installed.packages()[, 'Package']) {install.packages('rmarkdown', repos = 'http://cran.us.r-project.org')}
-suppressMessages(suppressWarnings(library(tools)))
-suppressMessages(suppressWarnings(library(rmarkdown)))
+suppressMessages(suppressWarnings(library("magrittr",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("reactable",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("tippy",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("shinyWidgets",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("auth0",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("data.table",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("dplyr",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("shinydashboardPlus",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("shinythemes",character.only = TRUE)))
+# if(!'tools' %in% installed.packages()[, 'Package']) {install.packages('tools', repos = 'http://cran.us.r-project.org')}
+# if(!'rmarkdown' %in% installed.packages()[, 'Package']) {install.packages('rmarkdown', repos = 'http://cran.us.r-project.org')}
+#if(!'memoise' %in% installed.packages()[, 'Package']) {install.packages('memoise', repos = 'http://cran.us.r-project.org')}
+suppressMessages(suppressWarnings(library("tools",character.only = TRUE)))
+suppressMessages(suppressWarnings(library("rmarkdown",character.only = TRUE)))
+#suppressMessages(suppressWarnings(library("memoise",character.only = TRUE)))
 
 #tinytex::install_tinytex()
-#source('dataprocessing.R')
+source('dataprocessing.R')
 
 ## load functions+files
 source('support_fun.R')
@@ -485,7 +487,7 @@ observe({
                             show = TRUE,
                             cell =    function(value,index) {
                               s2<-datacrop[which(datacrop$ENID==value ), ]
-                              tippy(value,tooltip = paste("NAME:", s2$ENfirstName , s2$ENSurname, "<br>", "CONTACT:", s2$ENphoneNo))
+                              tippy(value,tooltip = paste("NAME:", unique(s2$ENfirstName) , unique(s2$ENSurname), "<br>", "CONTACT:", unique(s2$ENphoneNo)))
                             },
                           )
                         )
@@ -683,7 +685,7 @@ observe({
                           show = TRUE,
                           cell =    function(value,index) {
                             s2<-datacrop[which(datacrop$ENID==value ), ]
-                            tippy(value,tooltip = paste("NAME:", s2$ENfirstName , s2$ENSurname, "<br>", "CONTACT:", s2$ENphoneNo))
+                            tippy(value,tooltip = paste("NAME:", unique(s2$ENfirstName) , unique(s2$ENSurname), "<br>", "CONTACT:", unique(s2$ENphoneNo)))
                           },
                           header = function(value) {tippy(value,tooltip = paste("NAME:", "<br>", "CONTACT:"))},
                           style  = function(value) {

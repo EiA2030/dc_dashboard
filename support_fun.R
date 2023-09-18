@@ -188,9 +188,9 @@ create_tab_panel <- function(tab_name) {
                           ),
                           HTML('<br>'),
                          fluidRow(
-                           column(width = 10, h4("Summary of Complete Submissions", align = 'center')),
+                           column(width = 9, h4("Summary of Complete Submissions", align = 'center')),
                            column(width = 1, downloadButton(paste0("downloadsummary_", uc), "Download Summary", style = "color: green")),
-                           column(width = 1)
+                           column(width = 2)
                          ),
                          fluidRow( column( width = 12,h4("", align = 'center'),  reactableOutput(paste0("rankingevents_", uc)) )
                          ),
