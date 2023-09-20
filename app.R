@@ -551,7 +551,7 @@ observe({
                           
                           # Check if the value is missing or not in the expected date format
                           if (is.na(value) ) {
-                            list(background = "#ffc457")  # Set default background color for missing or invalid values
+                            list(background = "orange")  # Set default background color for missing or invalid values
                           } else {
                             list(background = "#BFffa590")
                             # # Convert the date string to a Date object
@@ -614,7 +614,7 @@ observe({
                           # }
                         #}
                         style  = function(value) {
-                          color<-ifelse(is.na(value) ,"#ffc457","#BFffa590")
+                          color<-ifelse(is.na(value) ,"orange","#BFffa590")
                           list(background =color)
                         }
                       ),
