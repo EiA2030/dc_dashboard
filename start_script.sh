@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Start cron service, otherwise it doesn't run
 cron
 # Run this once in the background so the dashboard will work a few minutes after deploying,
