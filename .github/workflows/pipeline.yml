@@ -63,8 +63,8 @@ jobs:
         port: ${{ secrets.SSH_PORT }}
         script: |
           ENV=dev
-          DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME}
-          DOCKERHUB_PASSWORD=${DOCKERHUB_PASSWORD}
-          REPO_NAME=eia2030-dc-dashboard
-          SSH_USER=${SSH_USER}
-          bash deploy.sh
+          export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+          export DOCKERHUB_PASSWORD=${{ secrets.DOCKERHUB_PASSWORD }}
+          export REPO_NAME=eia2030-dc-dashboard
+          export SSH_USER=${{ secrets.SSH_USER }}
+          export bash deploy.sh
