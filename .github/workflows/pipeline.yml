@@ -43,8 +43,6 @@ jobs:
         context: .
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/eia2030-dc-dashboard:dev
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
 
     - name: Set up SSH
       run: |
