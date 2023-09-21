@@ -43,6 +43,8 @@ jobs:
         context: .
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/eia2030-dc-dashboard:dev
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
 
     - name: Transfer deploy script
       uses: appleboy/scp-action@v0.1.4
@@ -68,3 +70,4 @@ jobs:
           export REPO_NAME=eia2030-dc-dashboard
           export SSH_USER=${{ secrets.SSH_USER }}
           bash deploy.sh
+          rm deploy.sh
