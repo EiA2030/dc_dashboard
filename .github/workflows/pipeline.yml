@@ -37,12 +37,12 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-    # - name: Build and Push Docker Image (dev)
-    #   uses: docker/build-push-action@v5
-    #   with:
-    #     context: .
-    #     push: true
-    #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/eia2030-dc-dashboard:dev
+    - name: Build and Push Docker Image (dev)
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/eia2030-dc-dashboard:dev
 
     - name: Transfer deploy script
       uses: appleboy/scp-action@v0.1.4
