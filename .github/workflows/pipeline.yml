@@ -38,7 +38,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
     - name: Build and Push Docker Image (dev)
-      uses: docker/buildx-action@v3
+      uses: docker/setup-buildx-action@v3
       with:
         context: .
         push: true
