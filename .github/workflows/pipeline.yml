@@ -43,6 +43,16 @@ jobs:
     #     context: .
     #     push: true
     #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/eia2030-dc-dashboard:dev
+
+    - name: Transfer deploy script
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.DEV_DEPLOYMENT_INSTANCE }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_KEY }}
+        port: ${{ secrets.SSH_PORT }}
+        source: deploy.sh
+        target: "~"
     
     - name: Deploy to Server
       uses: appleboy/ssh-action@v1.0.0
@@ -51,7 +61,8 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.SSH_PORT }}
-        script: bash deploy.sh
+        script: |
+          bash deploy.sh
         envs: |          
           ENV=dev
           DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME}
