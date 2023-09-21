@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  dc_dashboard:
+    image: ${DOCKERHUB_USERNAME}/dc_dashboard:${ENV}
+    container_name: dc_dashboard
+    restart: unless-stopped
+    ports:
+      - 22350:80

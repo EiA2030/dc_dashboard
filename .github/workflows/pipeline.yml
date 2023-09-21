@@ -1,0 +1,69 @@
+name: dc_dashboard
+
+on:
+  push:
+    branches: 
+    - "release/development" 
+    - "release/staging"
+    - "release/production"
+
+permissions:
+  contents: read
+
+jobs:
+  build_dev:
+    name: Build image
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Download envs from S3 bucket
+      run: |
+        aws s3 cp s3://scio-project-envs/dc_dashboard/_.Renviron .Renviron
+        aws s3 cp s3://scio-project-envs/dc_dashboard/_auth0-dev.yml _auth0.yml
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+    - name: Build and Push Docker Image (dev)
+    - uses: docker/build-push-action@v4
+      with:
+        context: .
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/eia2030-dc-dashboard:dev
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Set up SSH
+      run: |
+        echo "${{ secrets.DEPLOY_KEY }}" > private_key
+        chmod 600 private_key
+        eval $(ssh-agent -s)
+        ssh-add private_key
+
+    - name: Deploy via SSH
+      env:
+        SSH_USER: ${{ secrets.SSH_USER }}
+        SERVER: ${{ secrets.HOST }}
+        PORT: ${{ secrets.DEFAULT_SSH_PORT }}
+      run: |
+        ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.SSH_USER }}@{{ secrets.DEV_DEPLOYMENT_INSTANCE }} -p ${{ secrets.SSH_PORT }} 'bash -s' <<EOF
+          ENV=dev
+          DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME}
+          DOCKERHUB_PASSWORD=${DOCKERHUB_PASSWORD}
+          REPO_NAME=${{ github.repository }}
+          SSH_USER=${{ secrets.SSH_USER }}
+          ./deploy.sh
+        EOF
