@@ -59,7 +59,7 @@ jobs:
         SERVER: ${{ secrets.HOST }}
         PORT: ${{ secrets.DEFAULT_SSH_PORT }}
       run: |
-        ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.SSH_USER }}@{{ secrets.DEV_DEPLOYMENT_INSTANCE }} -p ${{ secrets.SSH_PORT }} 'bash -s' <<EOF
+        ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} -p ${{ secrets.SSH_PORT }} 'bash -s' <<EOF
           ENV=dev
           DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME}
           DOCKERHUB_PASSWORD=${DOCKERHUB_PASSWORD}
