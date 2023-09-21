@@ -27,7 +27,7 @@ jobs:
         REPO=$(echo "${{ github.repository }}" | cut -d'/' -f2)
         
         # Convert repo name to lowercase and replace spaces with hyphens
-        REPO=$(echo "$REPO" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+        REPO=$(echo "$REPO" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
         
         # Set the new repository name as an output variable
         echo "::set-output name=repository_name::${OWNER}-${REPO}"
