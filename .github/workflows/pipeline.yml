@@ -42,7 +42,7 @@ jobs:
       with:
         context: .
         push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.repository }}:dev
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/dc_dashboard:dev
 
     - name: Set up SSH
       run: |
@@ -61,7 +61,7 @@ jobs:
           ENV=dev
           DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME}
           DOCKERHUB_PASSWORD=${DOCKERHUB_PASSWORD}
-          REPO_NAME=${{ github.repository }}
+          REPO_NAME=dc_dashboard
           SSH_USER=${{ secrets.SSH_USER }}
           ./deploy.sh
         EOF
