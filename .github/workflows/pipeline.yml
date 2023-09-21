@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   build_dev:
-    name: Build image
+    name: Build & Deploy
     runs-on: ubuntu-latest
 
     steps:
@@ -37,14 +37,12 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-    - name: Build and Push Docker Image (dev)
-      uses: docker/setup-buildx-action@v3
-      with:
-        context: .
-        push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/eia2030-dc-dashboard:dev
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+    # - name: Build and Push Docker Image (dev)
+    #   uses: docker/build-push-action@v5
+    #   with:
+    #     context: .
+    #     push: true
+    #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/eia2030-dc-dashboard:dev
 
     - name: Set up SSH
       run: |
@@ -53,17 +51,14 @@ jobs:
         eval $(ssh-agent -s)
         ssh-add private_key
 
-    - name: Deploy via SSH
-      env:
-        SSH_USER: ${{ secrets.SSH_USER }}
-        SERVER: ${{ secrets.HOST }}
-        PORT: ${{ secrets.DEFAULT_SSH_PORT }}
+    - name: Deploy via SSH  
       run: |
-        ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} -p ${{ secrets.SSH_PORT }} 'bash -s' <<EOF
-          ENV=dev
-          DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME}
-          DOCKERHUB_PASSWORD=${DOCKERHUB_PASSWORD}
-          REPO_NAME=eia2030-dc-dashboard
-          SSH_USER=${{ secrets.SSH_USER }}
-          ./deploy.sh
-        EOF
+        ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} -p ${{ secrets.SSH_PORT }} export ENV=dev
+        ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} -p ${{ secrets.SSH_PORT }} docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_PASSWORD}
+        ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} -p ${{ secrets.SSH_PORT }} sudo mkdir -p /var/lib/app/eia2030-dc-dashboard
+        ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} -p ${{ secrets.SSH_PORT }} sudo chown -R ${SSH_USER}:${SSH_USER} /var/lib/app/eia2030-dc-dashboard
+        ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} -p ${{ secrets.SSH_PORT }} mv docker-compose.yml /var/lib/app/eia2030-dc-dashboard
+        ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} -p ${{ secrets.SSH_PORT }} docker-compose -f /var/lib/app/eia2030-dc-dashboard/docker-compose.yml down
+        ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} -p ${{ secrets.SSH_PORT }} docker-compose -f /var/lib/app/eia2030-dc-dashboard/docker-compose.yml pull
+        ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} -p ${{ secrets.SSH_PORT }} docker-compose -f /var/lib/app/eia2030-dc-dashboard/docker-compose.yml up -d
+        ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.SSH_USER }}@${{ secrets.DEV_DEPLOYMENT_INSTANCE }} -p ${{ secrets.SSH_PORT }} docker image prune -a -f
