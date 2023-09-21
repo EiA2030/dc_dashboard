@@ -33,7 +33,7 @@ suppressMessages(suppressWarnings(library("rmarkdown",character.only = TRUE)))
 #suppressMessages(suppressWarnings(library("memoise",character.only = TRUE)))
 
 #tinytex::install_tinytex()
-source('dataprocessing.R')
+#source('dataprocessing.R')
 
 ## load functions+files
 source('support_fun.R')
@@ -551,7 +551,7 @@ observe({
                           
                           # Check if the value is missing or not in the expected date format
                           if (is.na(value) ) {
-                            list(background = "orange")  # Set default background color for missing or invalid values
+                            list(background = "#ffa590")  # Set default background color for missing or invalid values
                           } else {
                             list(background = "#BFffa590")
                             # # Convert the date string to a Date object
