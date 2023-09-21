@@ -62,7 +62,7 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.SSH_PORT }}
         script: |
-          ENV=dev
+          export ENV=dev
           export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
           export DOCKERHUB_PASSWORD=${{ secrets.DOCKERHUB_PASSWORD }}
           export REPO_NAME=eia2030-dc-dashboard
