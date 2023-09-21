@@ -67,4 +67,4 @@ jobs:
           export DOCKERHUB_PASSWORD=${{ secrets.DOCKERHUB_PASSWORD }}
           export REPO_NAME=eia2030-dc-dashboard
           export SSH_USER=${{ secrets.SSH_USER }}
-          export bash deploy.sh
+          bash deploy.sh
