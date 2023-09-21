@@ -27,4 +27,4 @@ RUN Rscript cronfile.R
 EXPOSE 80
 # Script starts cron service, runs dataprocessing.R once, and starts shiny website.
 RUN chmod +x /root/start_script.sh
-CMD /root/start_script.sh
+ENTRYPOINT [ "/root/start_script.sh" ] 
