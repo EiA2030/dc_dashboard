@@ -51,10 +51,10 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.SSH_PORT }}
-        script: deploy.sh
+        script: bash deploy.sh
         envs: |          
           ENV=dev
           DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME}
           DOCKERHUB_PASSWORD=${DOCKERHUB_PASSWORD}
-          REPO_NAME=${eia2030-dc-dashboard}
+          REPO_NAME=eia2030-dc-dashboard
           SSH_USER=${SSH_USER}
