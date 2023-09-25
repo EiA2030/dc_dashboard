@@ -217,16 +217,16 @@ RWA.O_data<-valTest %>%
 
 
 
-ifelse(!dir.exists(file.path("./data/Usecases/SNS-Rwanda/")), dir.create(file.path("./data/Usecases/SNS-Rwanda/")), FALSE)
+#ifelse(!dir.exists(file.path("./data/Usecases/SNS-Rwanda/")), dir.create(file.path("./data/Usecases/SNS-Rwanda/")), FALSE)
 
 # wdnew<-"./data/Usecases/SNS-Rwanda/"
 # setwd(wdnew)
 #Save to be read into dc dashboard
-write.csv(RWA.VAL_data,"./data/Usecases/SNS-Rwanda/SNS-Rwanda.VAL_data.csv")
+write.csv(RWA.VAL_data,"./data/SNSRwandaVAdata.csv")
 
 #Save data for event submission summary purpose... not in long format (treatments)
-write.csv(RWA.SUM_data,"./data/Usecases/SNS-Rwanda/SNS-Rwanda.SUM_data.csv")
+write.csv(RWA.SUM_data,"./data/SNSRwandaSUMdata.csv")
 
-write.csv(RWA.O_data,"./data/Usecases/SNS-Rwanda/SNS-Rwanda.O_data.csv")
+write.csv(RWA.O_data,"./data/SNSRwandaOdata.csv")
 
 #setwd(wd)
