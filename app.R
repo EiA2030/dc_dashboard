@@ -34,7 +34,7 @@ suppressMessages(suppressWarnings(library("rmarkdown",character.only = TRUE)))
 #suppressMessages(suppressWarnings(library("memoise",character.only = TRUE)))
 
 #tinytex::install_tinytex()
-#source('dataprocessing.R')
+source('dataprocessing.R')
 
 ## load functions+files
 source('support_fun.R')
