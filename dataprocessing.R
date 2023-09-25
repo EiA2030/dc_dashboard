@@ -215,9 +215,9 @@ RWA.O_data<-valTest %>%
 
 
 
-ifelse(!dir.exists(file.path("./data/Usecases/SNS-Rwanda/")), dir.create(file.path("./data/Usecases/SNS-Rwanda/")), FALSE)
+ifelse(!dir.exists(file.path("/data/Usecases/SNS-Rwanda/")), dir.create(file.path("/data/Usecases/SNS-Rwanda/")), FALSE)
 
-wdnew<-"./data/Usecases/SNS-Rwanda/"
+wdnew<-"/data/Usecases/SNS-Rwanda/"
 setwd(wdnew)
 #Save to be read into dc dashboard
 write.csv(RWA.VAL_data,"SNS-Rwanda.VAL_data.csv")
