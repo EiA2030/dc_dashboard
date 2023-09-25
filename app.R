@@ -253,7 +253,7 @@ observe({
 
      output[[paste0("country_",i)]] <-renderUI({
        infoBox(
-         "Country", paste0(wd2) , icon = icon("globe"),
+         "Country", paste0(wd) , icon = icon("globe"),
          color = "olive",width = "100%"       )
 
      })
