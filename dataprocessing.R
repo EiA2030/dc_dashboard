@@ -1,8 +1,8 @@
 #####This Script runs daily to  update and aggregate data collected
 
-
+setwd("/root")
 wd<-getwd()
-
+#print(wd)
 #################################################################################################################
 ##source + downloaded files from ona.io
 source('okapi.R')
