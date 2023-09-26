@@ -1,6 +1,6 @@
 #load data(updated daily)
 
-SNS.Rwanda.VAL_data<-read.csv("./data/Usecases/SNS-Rwanda/SNS-Rwanda.VAL_data.csv") 
+#SNS.Rwanda.VAL_data<-read.csv("./data/Usecases/SNS-Rwanda/SNS-Rwanda.VAL_data.csv") 
 SNS.Rwanda.SUM_data<-read.csv("./data/SNSRwandaSUMdata.csv") 
 SNS.Rwanda.O_data<-read.csv("./data/SNSRwandaOdata.csv") 
 usersdata<-read.csv('./data/usecases_updated.csv')
