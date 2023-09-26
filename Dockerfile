@@ -22,8 +22,6 @@ RUN Rscript libraries.R
 COPY . .
 
 RUN Rscript dataprocessing.R >dataprocessing_startup_run.log 2>&1 &
-# Start dashboard service
-RUN R -e "shiny::runApp('app.R', host='0.0.0.0', port=80)"
 
 # Add cron job
 # RUN Rscript cronfile.R
