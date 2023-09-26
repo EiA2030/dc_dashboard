@@ -15,13 +15,14 @@ RUN apt-get install cron -y
 RUN apt-get install bzip2 -y
 RUN apt-get install libgit2-dev libssh2-1-dev librsvg2-dev -y
 
-# This is because cron jobs run in root
-WORKDIR /root
-COPY libraries.R libraries.R
-RUN Rscript libraries.R
+WORKDIR /app
+
 COPY . .
 
-RUN Rscript dataprocessing.R >dataprocessing_startup_run.log 2>&1 &
+RUN Rscript libraries.R
+RUN Rscript dataprocessing.R
+
+CMD ["R", "-e", "shiny::runApp('app.R', host='0.0.0.0', port=80)"]
 
 # Add cron job
 # RUN Rscript cronfile.R
