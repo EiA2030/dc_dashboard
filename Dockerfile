@@ -8,7 +8,13 @@ RUN apt-get update && \
 RUN apt-get install libmysqlclient-dev -y
 
 # OS dependencies
-RUN apt-get install libgdal-dev libharfbuzz-dev libfribidi-dev libsodium-dev libudunits2-dev libgit2-dev libssh2-1-dev librsvg2-dev cron nano bzip2 -y
+RUN apt-get install libgdal-dev -y
+RUN apt-get install libharfbuzz-dev libfribidi-dev -y
+RUN apt-get install libsodium-dev libudunits2-dev -y
+RUN apt-get install cron -y
+RUN apt-get install bzip2 -y
+RUN apt-get install libgit2-dev libssh2-1-dev librsvg2-dev -y
+RUN apt-get install nano -y
 
 WORKDIR /app
 
