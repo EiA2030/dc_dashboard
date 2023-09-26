@@ -217,7 +217,7 @@ RWA.O_data<-valTest %>%
 
 
 
-#ifelse(!dir.exists(file.path("./data/Usecases/SNS-Rwanda/")), dir.create(file.path("./data/Usecases/SNS-Rwanda/")), FALSE)
+ifelse(!dir.exists(file.path("./data/Usecases/SNS-Rwanda/")), dir.create(file.path("./data/Usecases/SNS-Rwanda/")), FALSE)
 
 # wdnew<-"./data/Usecases/SNS-Rwanda/"
 # setwd(wdnew)

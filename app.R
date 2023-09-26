@@ -34,7 +34,7 @@ suppressMessages(suppressWarnings(library("rmarkdown",character.only = TRUE)))
 #suppressMessages(suppressWarnings(library("memoise",character.only = TRUE)))
 
 #tinytex::install_tinytex()
-#source('dataprocessing.R')
+source('dataprocessing.R')
 
 ## load functions+files
 source('support_fun.R')
@@ -48,7 +48,9 @@ ui <-
   tags$head(
     tags$script(JS("setTimeout(function(){history.pushState({}, 'Page Title', '/');},2000);"))),
   #bootstrapPage(
-    
+  # tags$script(JS(
+  #   "setTimeout(function(){history.replaceState(null, '', '/')}, 2000);"
+  # ))
     
     
     shinyjs::useShinyjs(),
@@ -68,7 +70,8 @@ ui <-
 
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
- 
+  # session$setTimeout(1200)
+  # extendShinyjsSession(session, timeout = 1200)
   #Authentication credentials  
   #getwd()
   credentials <- shinyauthr::loginServer(
