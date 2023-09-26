@@ -21,10 +21,12 @@ COPY libraries.R libraries.R
 RUN Rscript libraries.R
 COPY . .
 
-# Add cron job
-RUN Rscript cronfile.R
+RUN Rscript dataprocessing.R
 
-EXPOSE 80
-# Script starts cron service, runs dataprocessing.R once, and starts shiny website.
-RUN chmod +x /root/start_script.sh
-CMD [ "/root/start_script.sh" ] 
+# Add cron job
+# RUN Rscript cronfile.R
+
+# EXPOSE 80
+# # Script starts cron service, runs dataprocessing.R once, and starts shiny website.
+# RUN chmod +x /root/start_script.sh
+# RUN /root/start_script.sh
