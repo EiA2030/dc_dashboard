@@ -272,7 +272,7 @@ observe({
 
      output[[paste0("Totsub_box_",i)]] <-renderUI({
        infoBox(
-         "Total submissions",paste0(nrow(rawdata),"/" ,nrow(SNS.Rwanda.O_data)), icon = icon("list"),
+         "Total submissions",paste0(nrow(rawdata)), icon = icon("list"),
          color = "olive", width = "100%"       )
      })
 
