@@ -1,7 +1,8 @@
 #load data(updated daily)
-SNS.Rwanda.VAL_data<-read.csv("./data/Usecases/SNS-Rwanda/SNS-Rwanda.VAL_data.csv") 
-SNS.Rwanda.SUM_data<-read.csv("./data/Usecases/SNS-Rwanda/SNS-Rwanda.SUM_data.csv") 
-SNS.Rwanda.O_data<-read.csv("./data/Usecases/SNS-Rwanda/SNS-Rwanda.O_data.csv") 
+
+#SNS.Rwanda.VAL_data<-read.csv("./data/Usecases/SNS-Rwanda/SNS-Rwanda.VAL_data.csv") 
+SNS.Rwanda.SUM_data<-read.csv("./data/SNSRwandaSUMdata.csv") 
+SNS.Rwanda.O_data<-read.csv("./data/SNSRwandaOdata.csv") 
 usersdata<-read.csv('./data/usecases_updated.csv')
 userList<-as.data.frame(strsplit((paste0(usersdata$users, collapse=",")), ','))[,1]
 passList<-as.data.frame(strsplit((paste0(usersdata$password, collapse=",")), ','))[,1]
@@ -16,8 +17,8 @@ user_base <- dplyr::tibble(
   permissions = unique(permissionList)#,
   #name = c("User RW1", "User RW2","User NG1", "User NG2")
 )
-list1<-c("user1","user2")
-list2<-c("user3","user4")
+# list1<-c("user1","user2")
+# list2<-c("user3","user4")
  
 
 #basemap for leaflet

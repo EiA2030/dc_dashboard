@@ -1,5 +1,8 @@
 #####This Script runs daily to  update and aggregate data collected
 
+
+wd<-getwd()
+#print(wd)
 #################################################################################################################
 ##source + downloaded files from ona.io
 source('okapi.R')
@@ -11,7 +14,6 @@ library(purrr)
 library(dplyr)
 library(readr)
 library(stringr)
-
 
 
 #################################################################################################################
@@ -165,8 +167,6 @@ RWA.VAL_data <- EN.HH_data %>%
   mutate(Date = coalesce(todayVal, DateId))%>%select(-c(DateId,todayVal))%>%
   suppressWarnings()
 
-#Save to be read into dc dashboard
-write.csv(RWA.VAL_data,"./data/Usecases/SNS-Rwanda/SNS-Rwanda.VAL_data.csv")
 
 
 dataev<-data%>%
@@ -204,8 +204,7 @@ RWA.SUM_data <- EN.HH_data %>%
   mutate(Date = coalesce(todayVal, DateId))%>%select(-c(DateId,todayVal))%>%
   suppressWarnings()
 
-#Save data for event submission summary purpose... not in long format (treatments)
-write.csv(RWA.SUM_data,"./data/Usecases/SNS-Rwanda/SNS-Rwanda.SUM_data.csv")
+
 
 
 #################################################################################################################
@@ -215,6 +214,19 @@ RWA.O_data<-valTest %>%
   select(-c(start,`intro/barcodehousehold_1`))%>% 
   rename_with(
   ~stringr::str_replace_all(.x, c("intro/"), ""))
-write.csv(RWA.O_data,"./data/Usecases/SNS-Rwanda/SNS-Rwanda.O_data.csv")
 
 
+
+ifelse(!dir.exists(file.path("./data/Usecases/SNS-Rwanda/")), dir.create(file.path("./data/Usecases/SNS-Rwanda/")), FALSE)
+
+# wdnew<-"./data/Usecases/SNS-Rwanda/"
+# setwd(wdnew)
+#Save to be read into dc dashboard
+write.csv(RWA.VAL_data,"./data/SNSRwandaVAdata.csv")
+
+#Save data for event submission summary purpose... not in long format (treatments)
+write.csv(RWA.SUM_data,"./data/SNSRwandaSUMdata.csv")
+
+write.csv(RWA.O_data,"./data/SNSRwandaOdata.csv")
+
+#setwd(wd)

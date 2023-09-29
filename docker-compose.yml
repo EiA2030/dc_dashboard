@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  app:
+    image: ${DOCKERHUB_USERNAME}/${REPO_NAME}:${ENV}
+    container_name: ${REPO_NAME}
+    restart: unless-stopped
+    ports:
+      - 22350:80
