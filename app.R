@@ -441,7 +441,7 @@ observe({
           # Columns to append
           datacroptable<-as.data.frame(datacroptable)
           columns_to_append <- c("ENID", "HHID", "crop",#"treat",
-                                 "Site.Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7")
+                                 "Site Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7")
           
       
           # # Check if columns exist in the dataframe
@@ -473,25 +473,26 @@ observe({
             
            datacroptable<-  tryCatch(  datacroptable %>%
                                  select(any_of(c("ENID", "HHID", "crop",#"treat",
-                                                 "Site.Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7") ))
+                                                 "Site Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7") ))
            )
            colnames(datacroptable) <- toTitleCase(colnames(datacroptable)) #Title case for table headers
            # datacroptablev<-left_join(datasum,datacroptable, by=c("ENID","HHID"))
            #colnames(datacroptablev) <- toTitleCase(colnames(datacroptablev)) #Title case for table headers
            
            ranks.events<-  tryCatch(  datacroptable %>%
-                                 select(any_of(c( "Site.Selection", "Event1", "Event2", "Event3", "Event4", "Event5", "Event6","Event7"))) %>%
+                                 select(any_of(c( "Site Selection", "Event1", "Event2", "Event3", "Event4", "Event5", "Event6","Event7"))) %>%
                                  dplyr::summarise(across(.fns = ~sum(!is.na(.)))) %>%  suppressWarnings() ,error = function(e) NULL)  #total submissions for each event
                                 
              
            
             ranks<-  tryCatch(  datacroptable %>%
-                                  select(any_of(c("ENID", "Site.Selection", "Event1", "Event2", "Event3", "Event4", "Event5", "Event6","Event7"))) %>%
+                                  select(any_of(c("ENID", "Site Selection", "Event1", "Event2", "Event3", "Event4", "Event5", "Event6","Event7"))) %>%
               group_by(ENID) %>%
               dplyr::summarise(across(.fns = ~sum(!is.na(.))))%>%  suppressWarnings()
               ,error = function(e) NULL)  #total submissions,  for each event per enumerator
             
       
+            #datacroptable$Site.Selection <-as.Date(datacroptable$Site.Selection)
             
             output[[paste0("rankingevents_",i)]]  <- renderReactable({
               reactable(ranks.events,
@@ -570,7 +571,7 @@ observe({
                             style  = function(value) {
                               list(background ="white")
                             }),
-                          Site.Selection = colDef(
+                          `Site Selection` = colDef(
                             #style  = function(value) {
                             
                             style = function(value) {
@@ -642,7 +643,7 @@ observe({
                             style  = function(value,index) {
                               current_date <-as.Date(Sys.Date() , format = "%Y-%m-%d")  
                               
-                              target_dates <- as.Date(datacroptable$Site.Selection[index], format = "%Y-%m-%d") + 14
+                              target_dates <- as.Date(datacroptable$`Site Selection`[index], format = "%Y-%m-%d") + 14
                               
                               if (is.na(target_dates)&& is.na(value) ) {
                                 color <-"#BE93D4"
