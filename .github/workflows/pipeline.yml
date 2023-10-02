@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   dev:
-    name: Build & Deploy
+    name: Build & Deploy (dev)
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/release/development'
 
@@ -75,9 +75,9 @@ jobs:
           export SSH_USER=${{ secrets.SSH_USER }}
           bash deploy.sh
           rm deploy.sh
-          
+
   stg:
-    name: Build & Deploy
+    name: Build & Deploy (stg)
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/release/staging'
 
@@ -142,7 +142,7 @@ jobs:
           rm deploy.sh
 
   prod:
-    name: Build & Deploy
+    name: Build & Deploy (prod)
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/release/production'
 
