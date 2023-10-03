@@ -7,24 +7,20 @@ RUN apt-get update && \
 # Could be unnecessary
 RUN apt-get install libmysqlclient-dev -y
 
-# Necessary
+# OS dependencies
 RUN apt-get install libgdal-dev -y
 RUN apt-get install libharfbuzz-dev libfribidi-dev -y
 RUN apt-get install libsodium-dev libudunits2-dev -y
 RUN apt-get install cron -y
 RUN apt-get install bzip2 -y
 RUN apt-get install libgit2-dev libssh2-1-dev librsvg2-dev -y
+RUN apt-get install nano -y
 
-# This is because cron jobs run in root
-WORKDIR /root
-COPY libraries.R libraries.R
-RUN Rscript libraries.R
+WORKDIR /app
+
 COPY . .
 
-# Add cron job
-RUN Rscript cronfile.R
+RUN Rscript libraries.R
+RUN Rscript dataprocessing.R
 
-EXPOSE 80
-# Script starts cron service, runs dataprocessing.R once, and starts shiny website.
-RUN chmod +x /root/start_script.sh
-CMD /root/start_script.sh
+CMD ["R", "-e", "shiny::runApp('app.R', host='0.0.0.0', port=80)"]

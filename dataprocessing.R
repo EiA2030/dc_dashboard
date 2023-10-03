@@ -1,347 +1,232 @@
-#scheduled daily run on server for processed data
-## Script scheduled to run daily at 00:00 to avoid expensive computation within the app.
-### 
-if(!require(tidyr)) install.packages("tidyr", repos = "http://cran.us.r-project.org")
-if(!require(magrittr)) install.packages("magrittr", repos = "http://cran.us.r-project.org")
-if(!require(sp)) install.packages("sp", repos = "http://cran.us.r-project.org")
-if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.org")
-if(!require(future)) install.packages("future", repos = "http://cran.us.r-project.org")
-if(!require(future.apply)) install.packages("future.apply", repos = "http://cran.us.r-project.org")
-if(!require(foreach)) install.packages("foreach", repos = "http://cran.us.r-project.org")
-if(!require(doParallel)) install.packages("doParallel", repos = "http://cran.us.r-project.org")
-if(!require(wrapr)) install.packages("wrapr", repos = "http://cran.us.r-project.org")
-if(!require(stringr)) install.packages("stringr", repos = "http://cran.us.r-project.org")
-if(!require(purrr)) install.packages("purrr", repos = "http://cran.us.r-project.org")
+#####This Script runs daily to  update and aggregate data collected
 
-source("okapi.R")
 
-cl <- makeCluster(6)
-registerDoParallel(cl)
+wd<-getwd()
+#print(wd)
+#################################################################################################################
+##source + downloaded files from ona.io
+source('okapi.R')
+# Load required libraries
+library(httr)
+library(jsonlite)
+library(tidyr)
+library(purrr)
+library(dplyr)
+library(readr)
+library(stringr)
 
- #setwd("C:/Users/dell/Documents/WORK/EiA/EiA Rwanda2/EiA_Rwanda_Dashboard")
- #getwd()
 
-# 
-# ## Read data (also updated daily)-json- consistent naming
-# #RW
-##NOT APPLICABLE
-Measure_Wheat_PO<-Measure_Wheat_PO %>% 
-  mutate(plot = map(plot, ~ .x %>% 
-                      mutate_all(as.list))) %>%
-  unnest(cols = c(plot))%>% 
-  unnest(`plot/PD`, keep_empty = TRUE)%>% 
-  type.convert(as.is = TRUE)
-
-Measure_Rice_PO<-Measure_Rice_PO %>% 
-  mutate(plot = map(plot, ~ .x %>% 
-                      mutate_all(as.list))) %>%
-  unnest(cols = c(plot))%>% 
-  unnest(`plot/PD`, keep_empty = TRUE)%>% 
-  type.convert(as.is = TRUE)
-
-Measure_Potato_PO<-Measure_Potato_PO %>% 
-  mutate(plot = map(plot, ~ .x %>% 
-                      mutate_all(as.list))) %>%
-  unnest(cols = c(plot))%>% 
-  unnest(`plot/PD`, keep_empty = TRUE)%>% 
-  type.convert(as.is = TRUE)
-
-Measure_Cassava_PO<-Measure_Cassava_PO %>% 
-  mutate(plot = map(plot, ~ .x %>% 
-                      mutate_all(as.list))) %>%
-  unnest(cols = c(plot))%>% 
-  unnest(`plot/PD`, keep_empty = TRUE)%>% 
-  type.convert(as.is = TRUE)
-
-Measure_Maize_PO<-Measure_Maize_PO %>% 
-  mutate(plot = map(plot, ~ .x %>% 
-                      mutate_all(as.list))) %>%
-  unnest(cols = c(plot))%>% 
-  unnest(`plot/PD`, keep_empty = TRUE)%>% 
-  type.convert(as.is = TRUE)
-
-Measure_Bean_PO<-Measure_Bean_PO %>% 
-  mutate(plot = map(plot, ~ .x %>% 
-                      mutate_all(as.list))) %>%
-  unnest(cols = c(plot))%>% 
-  unnest(`plot/PD`, keep_empty = TRUE)%>% 
-  type.convert(as.is = TRUE)
-
-Register_EN <- apply(Register_EN,2,as.character) %>%  as_tibble()
-write.csv(Register_EN, file = "./data/dpath1/Register_EN.csv")
-RegisterVerify_HH <- apply(RegisterVerify_HH,2,as.character) %>%  as_tibble()
-write.csv(RegisterVerify_HH, file = "./data/dpath1/RegisterVerify_HH.csv")
-RecordMgt_TL <- apply(RecordMgt_TL,2,as.character) %>%  as_tibble()
-write.csv(RecordMgt_TL, file = "./data/dpath1/RecordMgt_TL.csv")
-Process_PS <- apply(Process_PS,2,as.character) %>%  as_tibble()
-write.csv(Process_PS, file = "./data/dpath1/Process_PS.csv")
-Measure_Wheat_PO <- apply(Measure_Wheat_PO,2,as.character) %>%  as_tibble()
-write.csv(Measure_Wheat_PO, file = "./data/dpath1/Measure_Wheat_PO.csv")
-Measure_Rice_PO <- apply(Measure_Rice_PO,2,as.character) %>%  as_tibble()
-write.csv(Measure_Rice_PO, file = "./data/dpath1/Measure_Rice_PO.csv")
-Measure_Potato_PO <- apply(Measure_Potato_PO,2,as.character) %>%  as_tibble()
-write.csv(Measure_Potato_PO, file = "./data/dpath1/Measure_Potato_PO.csv")
-Measure_Maize_PO <- apply(Measure_Maize_PO,2,as.character) %>%  as_tibble()
-write.csv(Measure_Maize_PO, file = "./data/dpath1/Measure_Maize_PO.csv")
-Measure_Cassava_PO <- apply(Measure_Cassava_PO,2,as.character) %>%  as_tibble()
-write.csv(Measure_Cassava_PO, file = "./data/dpath1/Measure_Cassava_PO.csv")
-Measure_Bean_PO <- apply(Measure_Bean_PO,2,as.character) %>%  as_tibble()
-write.csv(Measure_Bean_PO, file = "./data/dpath1/Measure_Bean_PO.csv")
-Describe_Household <- apply(Describe_Household,2,as.character) %>%  as_tibble()
-write.csv(Describe_Household, file = "./data/dpath1/Describe_Household.csv")
-Describe_FD <- apply(Describe_FD,2,as.character) %>%  as_tibble()
-write.csv(Describe_FD, file = "./data/dpath1/Describe_FD.csv")
-Collect_SS <- apply(Collect_SS,2,as.character) %>%  as_tibble()
-write.csv(Collect_SS, file = "./data/dpath1/Collect_SS.csv")
-Assign_FDTLPO <- apply(Assign_FDTLPO,2,as.character) %>%  as_tibble()
-write.csv(Assign_FDTLPO, file = "./data/dpath1/Assign_FDTLPO.csv")
-Assign_FDTLPO_SG <- apply(Assign_FDTLPO_SG,2,as.character) %>%  as_tibble()
-write.csv(Assign_FDTLPO_SG, file = "./data/dpath2/Assign_FDTLPO_SG.csv")
-Measure_Maize_SG <- apply(Measure_Maize_SG,2,as.character) %>%  as_tibble()
-write.csv(Measure_Maize_SG, file = "./data/dpath2/Measure_Maize_SG.csv")
-
-#Set paths of saved converted files
-#list of paths additional projects to be added 
-path1<-'./data/dpath1'  ##RW
-path2<-'./data/dpath2'  ##NG
-
-pathslist<-c(path1,path2)
-
-#intoduce a loop through the paths 
-# This function processes data for all crops
-for (pl in pathslist){
-  old_wd <- getwd()
-  #Read crops names automatically; all named measure_crop
-  list<-list.files(pl, pattern="Measure", full.names=TRUE)
-  crops<-c()
-  for (i in 1:length(list)){
-    new_crop<-sub(".*Measure_", "", list[i])
-    new_crop<-sub("_.*", "", new_crop)
-    
-    crops<- c(crops,new_crop)
-    new_crop<-read.csv(list[i])
-    
-  }
-  
-  for (cr in crops){
-    #print(cr)
-    #read json data and convert to csv
-    ###NOT THIS...TO CHANGE
-    ##FIND A MORE DYNAMIC WAY *****read all files pattern== csv. save as (scrape name from lists)
-    #*****or fix names (easier for datalist) for all forms ..read file with pattern similar to name
-    if (pl==path1){
-      path<-paste(path1)
-      
-      assign_ftp<-read.csv(file.path(path,"/Assign_FDTLPO.csv"))
-      soilsample<-read.csv(file.path(path,"/Collect_SS.csv"))
-      d_field<-read.csv(file.path(path,"/Describe_FD.csv"))
-      d_HH<-read.csv(file.path(path,"/Describe_Household.csv"))
-      plant_samples<-read.csv(file.path(path,"/Process_PS.csv"))
-      trial_management<-read.csv(file.path(path,"/RecordMgt_TL.csv"))
-      register_hh<-read.csv(file.path(path,"/RegisterVerify_HH.csv"))
-      register_en<-read.csv(file.path(path,"/Register_EN.csv"))
-      
-      if ("Cassava" %in% cr){
-        Cassava<-read.csv(file.path(path,"/Measure_Cassava_PO.csv"))
-        cropdata<-Cassava
-      }else if  ("Bean" %in% cr){
-        Bean <- read.csv(file.path(path,"/Measure_Bean_PO.csv"))
-        cropdata<-Bean
-      }else if ("Wheat" %in% cr){
-        Wheat<-read.csv(file.path(path,"/Measure_Wheat_PO.csv"))
-        cropdata<-Wheat
-      }else if  ("Potato" %in% cr) {
-        Potato<-read.csv(file.path(path,"/Measure_Potato_PO.csv"))
-        cropdata<-Potato
-      }else if  ("Rice"  %in% cr){
-        Rice<-read.csv(file.path(path,"/Measure_Rice_PO.csv"))
-        cropdata<-Rice
-      }else if  ("Maize" %in% cr){
-        Maize<-read.csv(file.path(path,"/Measure_Maize_PO.csv"))
-        cropdata<-Maize
-      }
-      
-      # required to join to the df the HHID and expcode values
-      vv2 <-as.data.frame( assign_ftp [c("HHID","FDID2", "FDID2_new", "expCode","season")])
-      
-      vv2<-vv2[which(vv2$FDID2_new !='n/a'), ] 
-      
-      #to sort mixup in the expcode given for FDID2 and FDID2_new within Assign_FDTLPO form
-      #to avoid expcode  na's on join
-      
-      li<-c()
-      si<-c()
-      for (i in 1:nrow(vv2)){
-        bbn<-assign_ftp[which(assign_ftp$FDID2==vv2$FDID2_new[i] ), ]
-        #vv2$expCode[i]<-bbn$expCode
-        #assign_ftp2$FDID2[i]
-        #ifelse(is.na(vv2$expCode[i]),bbn$expCode[1], NA )
-        li<-c(li,bbn$expCode[1])
-        si<-c(si,bbn$season[1])
-      }
-      
-      for (i in 1:nrow(vv2)){
-        if (is.na(vv2$expCode[i])){
-          vv2$expCode[i]<-li[i]
-        }
-        if (is.na(vv2$season[i])){
-          vv2$season[i]<-si[i]
-        }
-        #ifelse(is.na(vv2$expCode[i]),li[i], NA )
-      }
-      vv2<-vv2
-      
-      
-    }else if (pl==path2){
-      path<-paste(path2)
-      assign_ftp<-read.csv(file.path(path,"/Assign_FDTLPO_SG.csv"))
-      vv2<-assign_ftp
-      if (cr=="Maize"){
-        Maize<-read.csv(file.path(path,"/Measure_Maize_SG.csv"))
-        cropdata<-as.data.frame(Maize)
-      }
-      #datalist <- list(Maize)
-    }
-    
-    #### add regions/district by intersecting points with GADM  shapefile.
-    Lat <- as.numeric(cropdata$lat)
-    Lon <- as.numeric(cropdata$lon)
-    #make a data frame
-    coords <- as.data.frame(cbind(Lon,Lat))
-    #and into Spatial
-    points <- SpatialPoints(coords)
-    #SpatialPolygonDataFrame -
-    path<-paste0(pl,"/Polygon")
-    counties <- rgdal::readOGR(path, "Region")
-    #assume same proj as shapefile!
-    proj4string(points) <- proj4string(counties)
-    #get GADM county polygon point is in
-    #choosing NAME_2 as it standard for GADM data
-    result <- as.character(over(points, counties)$NAME_2)
-    cropdata <- cropdata %>%
-      tibble:: add_column(District = ( result), .after = "today")
-    
-    measure_plot<-cropdata
-    
-    #join with assign plot to get missing variables
-    v2 <- vv2 %>% 
-      dplyr::select(any_of(c("HHID","FDID2","FDID2_new","expCode","season")))
-    
-    ###run expcode assignment in assignplot.... issues with FDID2 AND FDID2_new(repeated) n/a expcode
-    
-    cropdata <- left_join(cropdata, v2, by = c("FDID2" = "FDID2_new"))
-    
-    
-    #a<-cropdata
-    #select required columns for the interactive table 
-    #a <- a%>% dplyr:: select("today","ENID","HHID","FDID2","TLID2","expCode", "District")
-    
-    #Add the required monitoring steps
-  cropdata<-cropdata%>%
-    tibble::add_column(Register.Household= NA) %>%
-    tibble::add_column(Register.Field= NA) %>%
-    tibble::add_column(Register.Trial.Plot= NA) %>%
-    tibble::add_column(Field.Description= NA) %>%
-    tibble::add_column(Soil.Sampling= NA) %>%
-    tibble::add_column(Record.Crop.Variety= NA) %>%
-    tibble::add_column(Germination.Count= NA) %>%
-    tibble::add_column(Top.Dressing= NA) %>%
-    tibble::add_column(PD.Scoring= NA) %>%
-    tibble::add_column(Weeding= NA) %>%
-    tibble::add_column(Household.Survey= NA) %>%
-    tibble::add_column(Plant.Sampling= NA) %>%
-    tibble::add_column(Harvest= NA)
-  
-  
-  plist<-c("Register.Household", "Register.Field", "Register.Trial.Plot","Field.Description",
-           "Soil.Sampling", "Record.Crop.Variety","Germination.Count","Top.Dressing",
-           "PD.Scoring", "Weeding", "Household.Survey", "Plant.Sampling","Harvest")
-  
-  
-  
-  
-  for (p in plist){
-    
-    clist <- foreach(
-      i = 1:nrow(cropdata),
-      .combine = 'c'
-    ) %dopar%  {
-      if (p == "Register.Household") {
-        
-        ss<-register_hh[which(register_hh$HHID==cropdata$HHID[i] ), ]
-        
-      } else               if ("Household.Survey"  %in% p) {
-        
-        ss<-d_HH[which(d_HH$survey.barcodehousehold==cropdata$HHID[i] ), ]
-        colnames(ss)[grepl('today',colnames(ss))] <- 'today'
-        
-      }else if ("Register.Field"  %in% p || "Register.Trial.Plot"  %in% p)  {
-        ss<-assign_ftp[which(assign_ftp$HHID==cropdata$HHID[i] ), ]
-        ss<-ss[which(ss$FDID2_new==cropdata$FDID2[i] ), ]
-      }else               if ("Field.Description"  %in% p) {
-        ss<-d_field[which(d_field$HHID==cropdata$HHID[i] ), ]
-        ss<-ss[which(ss$FDID2==cropdata$FDID2[i] ), ]
-      }else               if ("Soil.Sampling"  %in% p) {
-        ss<-soilsample[which(soilsample$ENID==cropdata$ENID[i] ), ]
-      }              else  if ("Record.Crop.Variety"  %in% p || "Top.Dressing"  %in% p || "Weeding"  %in% p) {
-        ss<-trial_management[which(trial_management$ENID==cropdata$ENID[i] ), ]
-        if ( "Record.Crop.Variety"  %in% p){
-          #clist<-c(clist,(rev(ss$today)[1]))
-        } else if ("Top.Dressing"  %in% p){
-          ss<-ss[stringr::str_detect(ss$fieldbookSectionDetails, "fertilizer2"), ]
-        }else if ("Weeding"  %in% p){
-          ss<-ss[stringr::str_detect(ss$fieldbookSections, "weeding"), ]
-        }
-      }else if ("Germination.Count"  %in% p || "PD.Scoring"  %in% p || "Plant.Sampling"  %in% p || "Harvest"  %in% p) {
-        ss<-measure_plot[which(measure_plot$ENID==cropdata$ENID[i] ), ]
-        ss<-ss[which(ss$TLID2==cropdata$TLID2[i] ), ]
-        ss<-ss[which(ss$FDID2==cropdata$FDID2[i] ), ]
-        if ("Germination.Count"  %in% p){
-          ss<-ss[stringr::str_detect(ss$parameters, "plantStand"), ]
-        } else if ("PD.Scoring"  %in% p){
-          ss<-ss[stringr::str_detect(ss$parameters, "PD"), ]
-        }else if ("Plant.Sampling"  %in% p){
-          ss<-ss[stringr::str_detect(ss$parameters, "plantSampling"), ]
-        }else if ("Harvest"  %in% p){
-          if ("Wheat" %in% cr ){
-            ss<-ss[stringr::str_detect(ss$parameters, "plantHeight") 
-                   | stringr::str_detect(ss$parameters, "tillerNumber" ), ]
-          } else if ("Cassava" %in% cr){
-            ss<-ss[which(ss$parameters=="branching" | ss$parameters=="rootYield"), ]
-          }else if ("Potato" %in% cr){
-            ss<-ss[stringr::str_detect(ss$tuberYield_parDetails.tuberQuality, "yes"), ]
-          }else if ("Bean" %in% cr){
-            ss<-ss[stringr::str_detect(ss$parameters, "grainYield"), ]
-          }else if ("Rice" %in% cr){
-            ss<-ss[stringr::str_detect(ss$parameters, "plantHeight") 
-                   | stringr::str_detect(ss$parameters, "tillerNumber" ), ]
-          }else if ("Maize" %in% cr){
-            ss<-ss[stringr::str_detect(ss$parameters, "grainYield"), ]
-            
-          }
-        }
-      }
-      (rev(ss$today)[1])
-      
-      #})
-      
-    }
-    cropdata[p]<-as.data.frame(( clist))
-    
-    
-    
-  }
-  setwd(file.path(pl,"/Processed"))
-  
-  write.csv(cropdata,paste(cr,".csv"))
-  
-  setwd(old_wd)
-
-  }
-  
-}
+#################################################################################################################
+#ID DATA (Enumerators and households)
+#merge enum +household registration data
+Register_EN.Ids <- Register_EN%>%
+  rename(
+    ENID = `purpose/enumerator_ID`,
+    ENSurname = `purpose/surname`,
+    ENphoneNo = `purpose/phone_number`,
+    ENfirstName= `purpose/first_name`,
+    ENtoday = today
+  ) %>%
+  select(any_of(c("ENtoday","ENID","ENfirstName","ENSurname","ENphoneNo"))) %>%
+  arrange(ENID, desc(ENtoday)) %>% #sort to Keep last entry by date in duplicated records
+  distinct(ENID, .keep_all = TRUE) %>% # Keep last entry by date in duplicated records
+  filter(ENID != "RSENRW000001")#leave out the enumerator registered for testing and monitoring the tool and is not expected to collect data
 
 
 
-stopCluster(cl)
+RegisterVerify_HH.Ids <- RegisterVerify_HH%>%
+  rename(
+    ENID = enumerator_ID_dataSCRIBEcode_a1e28af2b2a745b6bb29467aa015164c_ENDDS,
+    HHID = `new_barcode_dataSCRIBEcode_02c9e5d2f2504f57ae636de562b9f837_ENDDS/household_ID_dataSCRIBEcode_85e11f6972e14bd0bfc5282a6d6b226f_ENDDS`,
+    geopoint = `new_barcode_dataSCRIBEcode_02c9e5d2f2504f57ae636de562b9f837_ENDDS/household_geopoint_dataSCRIBEcode_46dd9da06bc541a0a2917f8b4fcf0bd8_ENDDS`,
+    Country =country_ID_dataSCRIBEcode_95be8089f5c845e183a371095d44a55e_ENDDS
+  )%>%
+  separate(geopoint, into = c("LAT", "LON", "ALT", "ERR"), sep = " ")%>%
+  dplyr::select(any_of(c("today","ENID","HHID","LAT", "LON","Country"))) %>%
+  arrange(ENID, desc(today)) %>% # sorts to enable Keep last entry by date in duplicated records
+  distinct(HHID, .keep_all = TRUE) # Keep last entry by date in duplicated records
 
+
+# Join the data 
+EN.HH_data <- Register_EN.Ids %>%
+  left_join(RegisterVerify_HH.Ids, by = "ENID") %>% #join data household and enumerator data while keeping all enumerators
+  mutate(
+    DateId = coalesce(today, ENtoday), #date col for dash filter filter
+    Stage = "Validation" ,   # for 'stage' filter purpose 
+    `Site Selection` = today,
+    `Site Selection` = ifelse(is.na(HHID), NA, `Site Selection`)
+  )%>% select(-c(today,ENtoday)) %>% 
+  suppressWarnings()
+
+
+
+
+#################################################################################################################
+#Validation data
+
+data<-valTest #from ona api download (okapi2.R)
+
+#------------------------------------------------------------------------------------------
+#data cleaning
+#------------------------------------------------------------------------------------------
+#remove ystem variables
+system_var<- c("_tags","_uuid","_notes" ,"_edited","_status" ,"_version","_duration" ,"_xform_id",
+               "_attachments","_geolocation","_media_count","_total_media","formhub/uuid",
+               "_id","_media_count","_total_media","_submitted_by","_date_modified",
+               "meta/instanceID","_submission_time","intro/geopoint_household",
+               "_xform_id_string","_bamboo_dataset_id","intro/in_the_field","_media_all_received")
+
+data<- data %>% 
+  select(-any_of(system_var))
+
+#------------------------------------------------------------------------------------------
+# plant stand data
+Plant_stand_data<- data %>% 
+  dplyr::select(start,today,`intro/country` ,`intro/event`,`intro/latitude`,`intro/longitude`,`intro/altitude`,`intro/wrong_ENID`,`intro/wrong_ID`,crop,grep("planting.*", names(data), value = TRUE))
+
+#Plot data
+plot_data<- data %>% 
+  dplyr::select(start,today,`intro/country` ,`intro/event`,`intro/latitude`,`intro/longitude`,`intro/altitude`,crop,`intro/wrong_ENID`,`intro/wrong_ID`,crop,grep("plotDescription.*", names(data), value = TRUE))
+
+plot1<- plot_data %>% 
+  gather(v, value, 12:33) %>% 
+  mutate(treat=ifelse(v %in% grep("*.AEZ.*",v, value=T),"AEZ",
+                      ifelse(v %in% grep("*.BR.*",v, value=T),"BR",
+                             ifelse(v %in% grep("*.SSR.*",v, value=T),"SSR", NA)))) %>% 
+  separate(v, c("details","var", "col"),"/") %>% 
+  select(-details) %>% 
+  mutate(col1=gsub("\\_aez|\\_BR|\\_ssr|\\_control", "", col)) %>% 
+  mutate(col1=gsub("_SSR","",col1)) %>% select(-c(col,var))
+
+# clean col to reshape wide
+reshaped_data <- plot1 %>% 
+  pivot_wider(
+    id_cols = c( "start","today","intro/country","intro/event","intro/latitude","intro/longitude","intro/altitude","intro/wrong_ENID", "intro/wrong_ID", "crop", "plotDescription/plotSizeDetails/row_number","treat"),
+    names_from = col1,
+    values_from = value
+  )
+
+#drop rows that are entirely missing
+reshaped_data <- reshaped_data[rowSums(is.na(reshaped_data)) <= ncol(reshaped_data)-5-1, ]
+
+# land preparation data
+land_prep_data<- data %>% 
+  dplyr::select(start,today,`intro/country`,`intro/event` ,`intro/latitude`,`intro/longitude`,`intro/altitude`,`intro/wrong_ENID`,`intro/wrong_ID`,crop,grep("LandPreparation*", names(data), value = TRUE))
+
+# crop management data
+
+crop_mgt_data<- data %>% 
+  dplyr::select(start,today,`intro/country`,`intro/event` ,`intro/latitude`,`intro/longitude`,`intro/altitude`,`intro/wrong_ENID`,`intro/wrong_ID`,crop,grep("cropManagement*", names(data), value = TRUE))
+
+# merge all the datasets
+df_list<- list(reshaped_data,Plant_stand_data,land_prep_data,crop_mgt_data) 
+
+full_data<-df_list %>% reduce(full_join, by=c("start","today","intro/country","intro/event","intro/latitude","intro/longitude","intro/altitude","intro/wrong_ENID", "intro/wrong_ID","crop")) %>% 
+  rename_with(
+    ~stringr::str_replace_all(.x, c("plot_plot/"), ""))
+
+full_data <- full_data%>%
+  rename(
+    ENID = `intro/wrong_ENID`,
+    HHID = `intro/wrong_ID`,
+    todayVal = today,
+    plantingDate = `planting/plantingDetails/planting_date`
+  )#%>%mutate(todayVal2 = todayVal)
+
+VAL_data <- full_data %>%
+  dplyr::select(todayVal, ENID, HHID, crop, treat, `intro/event`) %>%
+  distinct(ENID, HHID, crop, treat, `intro/event`, .keep_all = TRUE)%>%
+  pivot_wider(names_from = `intro/event`, values_from = todayVal) %>%
+  arrange(ENID, HHID, crop, treat) %>%
+  left_join(
+    full_data %>%
+      distinct(ENID, HHID, crop, treat, `intro/event`, .keep_all = TRUE) %>%
+      dplyr::select(ENID, HHID, crop, treat, plantingDate) %>%
+      filter(!is.na(plantingDate)),
+    by = c("ENID", "HHID", "crop", "treat")
+  ) %>%
+  left_join(
+    full_data %>%
+      distinct(ENID, HHID, crop, treat, `intro/event`, .keep_all = TRUE) %>%
+      dplyr::select(ENID, HHID, crop, treat, todayVal) ,
+    by = c("ENID", "HHID", "crop", "treat")
+  ) %>% distinct(ENID, HHID, crop, treat, .keep_all = TRUE)%>% 
+  mutate(event1 = plantingDate)%>% select(-(plantingDate))%>% suppressWarnings()
+
+
+
+
+#################################################################################################################
+# Join Identifiers+Validation Data
+#################################################################################################################
+#EN.HH_data  IDENTIFIERS (ENID HHID)
+#VAL_data    val info
+
+RWA.VAL_data <- EN.HH_data %>%
+  left_join(VAL_data, by = c("ENID","HHID")) %>% #join identifiers and val data while keeping all enumerators/households
+  mutate(Date = coalesce(todayVal, DateId))%>%select(-c(DateId,todayVal))%>%
+  suppressWarnings()
+
+
+
+dataev<-data%>%
+  dplyr::select(today, `intro/wrong_ENID`,`intro/wrong_ID` ,crop, `intro/event`,  `planting/plantingDetails/planting_date`) 
+dataev <- dataev%>%
+  rename(
+    ENID = `intro/wrong_ENID`,
+    HHID = `intro/wrong_ID`,
+    todayVal = today,
+    plantingDate = `planting/plantingDetails/planting_date`
+  )
+dataev1 <- dataev%>%
+  dplyr::select(todayVal, ENID, HHID, crop,  `intro/event`) %>%
+  distinct(ENID, HHID, crop, `intro/event`, .keep_all = TRUE)%>%
+  pivot_wider(names_from = `intro/event`, values_from = todayVal) %>%
+  arrange(ENID, HHID, crop) %>%
+  left_join(
+    dataev %>%
+      distinct(ENID, HHID, crop, `intro/event`, .keep_all = TRUE) %>%
+      dplyr::select(ENID, HHID, crop, plantingDate) %>%
+      filter(!is.na(plantingDate)),
+    by = c("ENID", "HHID", "crop")
+  ) %>%
+  left_join(
+    dataev %>%
+      distinct(ENID, HHID, crop,  `intro/event`, .keep_all = TRUE) %>%
+      dplyr::select(ENID, HHID, crop, todayVal) ,
+    by = c("ENID", "HHID", "crop")
+  ) %>% distinct(ENID, HHID, crop, .keep_all = TRUE)%>% 
+  mutate(event1 = plantingDate)%>% select(-(plantingDate))%>%
+  suppressWarnings()
+
+RWA.SUM_data <- EN.HH_data %>%
+  left_join(dataev1, by = c("ENID","HHID")) %>% #join identifiers and val data while keeping all enumerators/households
+  mutate(Date = coalesce(todayVal, DateId))%>%select(-c(DateId,todayVal))%>%
+  suppressWarnings()
+
+
+
+
+#################################################################################################################
+#Validation Data
+RWA.O_data<-valTest %>% 
+  select(-any_of(system_var))%>% 
+  select(-c(start,`intro/barcodehousehold_1`))%>% 
+  rename_with(
+  ~stringr::str_replace_all(.x, c("intro/"), ""))
+
+
+
+ifelse(!dir.exists(file.path("./data/Usecases/SNS-Rwanda/")), dir.create(file.path("./data/Usecases/SNS-Rwanda/")), FALSE)
+
+# wdnew<-"./data/Usecases/SNS-Rwanda/"
+# setwd(wdnew)
+#Save to be read into dc dashboard
+write.csv(RWA.VAL_data,"./data/SNSRwandaVAdata.csv")
+
+#Save data for event submission summary purpose... not in long format (treatments)
+write.csv(RWA.SUM_data,"./data/SNSRwandaSUMdata.csv")
+
+write.csv(RWA.O_data,"./data/SNSRwandaOdata.csv")
+
+#setwd(wd)
