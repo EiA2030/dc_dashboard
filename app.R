@@ -52,10 +52,13 @@ source('support_fun.R')
 
 # Define UI for application 
 ui <- 
-  bootstrapPage(
+  fluidPage(
     #fix refresh/reload error by removing the token from URL, (also sets timeout)
-  tags$head(
-    tags$script(JS("setTimeout(function(){history.pushState({}, 'Page Title', '/');},2000);"))),
+    tags$head(
+      tags$script(HTML("setTimeout(function() { history.pushState({}, 'Page Title', '/'); }, 2000);"))
+    ),
+  # tags$head(
+  #   tags$script(JS("setTimeout(function(){history.pushState({}, 'Page Title', '/');},2000);"))),
   #bootstrapPage(
   # tags$script(JS(
   #   "setTimeout(function(){history.replaceState(null, '', '/')}, 2000);"
@@ -79,6 +82,10 @@ ui <-
 
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
+  
+  keep_alive <- shiny::reactiveTimer(intervalMs = 10000, session = shiny::getDefaultReactiveDomain())
+  shiny::observe({keep_alive()})
+  
    #session$setTimeout(1200)
    #extendShinyjsSession(session, timeout = 1200)
   #Authentication credentials  
@@ -96,7 +103,8 @@ server <- function(input, output, session) {
   
   logout_init <- shinyauthr::logoutServer(
                             id = "logout",
-                            active = reactive(credentials()$user_auth))
+                            active = reactive(credentials()$user_auth)%>%
+    bindCache(credentials()$user_auth))
   
   
   
@@ -168,17 +176,7 @@ server <- function(input, output, session) {
     #auth0::logoutButton()
   })
   
-  RWA.O_data <- 
-    save_object("s3://rtbglr/dc_dashboard/data/dpath1/SNSRwandaOdata.csv",
-                file = tempfile(fileext = ".csv")
-    ) %>%
-    fread()
-  
-  RWA.SUM_data <- 
-    save_object("s3://rtbglr/dc_dashboard/data/dpath1/SNSRwandaSUMdata.csv",
-                file = tempfile(fileext = ".csv")
-    ) %>%
-    fread()
+ 
  
 ##Define data for each usecase
 observe({
@@ -313,7 +311,8 @@ observe({
         reactive_expr <- reactive({
           req(input_nav,experimentUsecase, stageUsecase, dateUsecase, enumeratorUsecase, householdUsecase)
           
-        })
+        })%>%
+          bindCache(experimentUsecase, stageUsecase, dateUsecase, enumeratorUsecase, householdUsecase)
         # reactive_expr_filter <- reactive({
         #   req(applyfilter)
         #   
@@ -501,8 +500,9 @@ observe({
                         paginateSubRows = FALSE,
                         
               )
-            })
-            
+              
+            }) %>%
+              bindCache(ranks.events)
 
             output[[paste0("ranking_",i)]]  <- renderReactable({
               reactable(ranks,
@@ -520,7 +520,8 @@ observe({
                           )
                         )
               )
-            })
+            })%>%
+              bindCache(ranks)
 
             # Convert the date string to a Date object
             #datacroptable$`Site Selection` <- as.Date( datacroptable$`Site Selection` , format = "%Y-%m-%d")
@@ -1014,7 +1015,8 @@ observe({
                         
               )
               
-            })
+            })%>%
+              bindCache(datacroptable)
           
          
           
@@ -1078,6 +1080,8 @@ session$allowReconnect(TRUE)
 # Run the application
 shinyApp(ui = ui, server = server,options = list(port = 8000))
 
+# Run the app with profiling
+#profvis::profvis(shinyApp(ui, server))
 #####for AUTH0 login page ##to update on deploy
 ##run on a browser if locaal
 ## if run locally- error, will require callback URL updated on Auth0 -
