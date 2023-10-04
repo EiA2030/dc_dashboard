@@ -1,15 +1,5 @@
 #load data(updated daily)
-RWA.O_data <- 
-  save_object("s3://rtbglr/dc_dashboard/data/dpath1/SNSRwandaOdata.csv",
-              file = tempfile(fileext = ".csv")
-  ) %>%
-  fread()
 
-RWA.SUM_data <- 
-  save_object("s3://rtbglr/dc_dashboard/data/dpath1/SNSRwandaSUMdata.csv",
-              file = tempfile(fileext = ".csv")
-  ) %>%
-  fread()
 #SNS.Rwanda.VAL_data<-read.csv("./data/Usecases/SNS-Rwanda/SNS-Rwanda.VAL_data.csv") 
 #SNS.Rwanda.SUM_data<-read.csv("./data/SNSRwandaSUMdata.csv") 
 #SNS.Rwanda.O_data<-read.csv("./data/SNSRwandaOdata.csv") 
