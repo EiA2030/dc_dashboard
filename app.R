@@ -176,7 +176,17 @@ server <- function(input, output, session) {
     #auth0::logoutButton()
   })
   
- 
+  RWA.O_data <- 
+    save_object("s3://rtbglr/dc_dashboard/data/dpath1/SNSRwandaOdata.csv",
+                file = tempfile(fileext = ".csv")
+    ) %>%
+    fread()
+  
+  RWA.SUM_data <- 
+    save_object("s3://rtbglr/dc_dashboard/data/dpath1/SNSRwandaSUMdata.csv",
+                file = tempfile(fileext = ".csv")
+    ) %>%
+    fread()
  
 ##Define data for each usecase
 observe({
