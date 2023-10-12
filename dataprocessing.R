@@ -1,11 +1,25 @@
 #####This Script runs daily to  update and aggregate data collected
 
 
-wd<-getwd()
+#wd<-getwd()
 #print(wd)
 #################################################################################################################
 ##source + downloaded files from ona.io
-source('okapi.R')
+library(okapi)
+
+
+ona_auth_token <- function(token) {
+  Sys.setenv("ONA_TOKEN" = Sys.getenv("TOKEN1"))
+}
+
+ona_auth_token(token = Sys.getenv("ONA_TOKEN"))
+
+# Define the ONA base URL, token and form ID 
+Register_EN<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id = 750671)
+RegisterVerify_HH<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id = 750672)
+#PotatoFertRT<-  ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id = 757128)
+valTest<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id =752552 )
+
 # Load required libraries
 library(httr)
 library(jsonlite)
@@ -14,7 +28,7 @@ library(purrr)
 library(dplyr)
 library(readr)
 library(stringr)
-
+library(aws.s3)
 
 #################################################################################################################
 #ID DATA (Enumerators and households)
@@ -28,7 +42,7 @@ Register_EN.Ids <- Register_EN%>%
     ENtoday = today
   ) %>%
   select(any_of(c("ENtoday","ENID","ENfirstName","ENSurname","ENphoneNo"))) %>%
-  arrange(ENID, desc(ENtoday)) %>% #sort to Keep last entry by date in duplicated records
+  arrange("ENID", desc("ENtoday")) %>% #sort to Keep last entry by date in duplicated records
   distinct(ENID, .keep_all = TRUE) %>% # Keep last entry by date in duplicated records
   filter(ENID != "RSENRW000001")#leave out the enumerator registered for testing and monitoring the tool and is not expected to collect data
 
@@ -213,20 +227,41 @@ RWA.O_data<-valTest %>%
   select(-any_of(system_var))%>% 
   select(-c(start,`intro/barcodehousehold_1`))%>% 
   rename_with(
-  ~stringr::str_replace_all(.x, c("intro/"), ""))
+    ~stringr::str_replace_all(.x, c("intro/"), ""))
 
 
 
-ifelse(!dir.exists(file.path("./data/Usecases/SNS-Rwanda/")), dir.create(file.path("./data/Usecases/SNS-Rwanda/")), FALSE)
+#ifelse(!dir.exists(file.path("./data/Usecases/SNS-Rwanda/")), dir.create(file.path("./data/Usecases/SNS-Rwanda/")), FALSE)
 
+#write.csv(RWA.VAL_data, file = "./SNSRwandaVALdata.csv")
+zz <- rawConnection(raw(0), "r+")
+write.csv(RWA.VAL_data, zz)
+aws.s3::put_object(file = rawConnectionValue(zz),
+                   bucket = "rtbglr", object = "dc_dashboard/data/SNSRwandaVALdata.csv")
+close(zz)
+
+#write.csv(RWA.SUM_data, file = "./SNSRwandaSUMdata.csv")
+zz <- rawConnection(raw(0), "r+")
+write.csv(RWA.SUM_data, zz)
+aws.s3::put_object(file = rawConnectionValue(zz),
+                   bucket = "rtbglr", object = "dc_dashboard/data/dpath1/SNSRwandaSUMdata.csv")
+close(zz)
+
+#write.csv(RWA.O_data, file = "./SNSRwandaOdata.csv")
+zz <- rawConnection(raw(0), "r+")
+write.csv(RWA.O_data, zz)
+aws.s3::put_object(file = rawConnectionValue(zz),
+                   bucket = "rtbglr", object = "dc_dashboard/data/dpath1/SNSRwandaOdata.csv")
+close(zz)
 # wdnew<-"./data/Usecases/SNS-Rwanda/"
 # setwd(wdnew)
 #Save to be read into dc dashboard
-write.csv(RWA.VAL_data,"./data/SNSRwandaVAdata.csv")
+#write.csv(RWA.VAL_data,"./data/SNSRwandaVALdata.csv")
 
 #Save data for event submission summary purpose... not in long format (treatments)
-write.csv(RWA.SUM_data,"./data/SNSRwandaSUMdata.csv")
+#write.csv(RWA.SUM_data,"./data/SNSRwandaSUMdata.csv")
 
-write.csv(RWA.O_data,"./data/SNSRwandaOdata.csv")
+#write.csv(RWA.O_data,"./data/SNSRwandaOdata.csv")
 
 #setwd(wd)
+
