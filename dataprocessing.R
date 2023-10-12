@@ -42,7 +42,7 @@ Register_EN.Ids <- Register_EN%>%
     ENtoday = today
   ) %>%
   select(any_of(c("ENtoday","ENID","ENfirstName","ENSurname","ENphoneNo"))) %>%
-  arrange("ENID", desc("ENtoday")) %>% #sort to Keep last entry by date in duplicated records
+  #order(ENID, desc(ENtoday)) %>% #sort to Keep last entry by date in duplicated records
   distinct(ENID, .keep_all = TRUE) %>% # Keep last entry by date in duplicated records
   filter(ENID != "RSENRW000001")#leave out the enumerator registered for testing and monitoring the tool and is not expected to collect data
 
@@ -57,7 +57,7 @@ RegisterVerify_HH.Ids <- RegisterVerify_HH%>%
   )%>%
   separate(geopoint, into = c("LAT", "LON", "ALT", "ERR"), sep = " ")%>%
   dplyr::select(any_of(c("today","ENID","HHID","LAT", "LON","Country"))) %>%
-  arrange(ENID, desc(today)) %>% # sorts to enable Keep last entry by date in duplicated records
+  #arrange(ENID, desc(today)) %>% # sorts to enable Keep last entry by date in duplicated records
   distinct(HHID, .keep_all = TRUE) # Keep last entry by date in duplicated records
 
 
@@ -151,7 +151,7 @@ VAL_data <- full_data %>%
   dplyr::select(todayVal, ENID, HHID, crop, treat, `intro/event`) %>%
   distinct(ENID, HHID, crop, treat, `intro/event`, .keep_all = TRUE)%>%
   pivot_wider(names_from = `intro/event`, values_from = todayVal) %>%
-  arrange(ENID, HHID, crop, treat) %>%
+  #arrange(ENID, HHID, crop, treat) %>%
   left_join(
     full_data %>%
       distinct(ENID, HHID, crop, treat, `intro/event`, .keep_all = TRUE) %>%
@@ -196,7 +196,7 @@ dataev1 <- dataev%>%
   dplyr::select(todayVal, ENID, HHID, crop,  `intro/event`) %>%
   distinct(ENID, HHID, crop, `intro/event`, .keep_all = TRUE)%>%
   pivot_wider(names_from = `intro/event`, values_from = todayVal) %>%
-  arrange(ENID, HHID, crop) %>%
+  #arrange(ENID, HHID, crop) %>%
   left_join(
     dataev %>%
       distinct(ENID, HHID, crop, `intro/event`, .keep_all = TRUE) %>%
@@ -233,21 +233,21 @@ RWA.O_data<-valTest %>%
 
 #ifelse(!dir.exists(file.path("./data/Usecases/SNS-Rwanda/")), dir.create(file.path("./data/Usecases/SNS-Rwanda/")), FALSE)
 
-#write.csv(RWA.VAL_data, file = "./SNSRwandaVALdata.csv")
+#write.csv(RWA.VAL_data, file = "/home/rstudio/dc_dashboard/data/dpath1/SNSRwandaVALdata.csv")
 zz <- rawConnection(raw(0), "r+")
 write.csv(RWA.VAL_data, zz)
 aws.s3::put_object(file = rawConnectionValue(zz),
                    bucket = "rtbglr", object = "dc_dashboard/data/SNSRwandaVALdata.csv")
 close(zz)
 
-#write.csv(RWA.SUM_data, file = "./SNSRwandaSUMdata.csv")
+#write.csv(RWA.SUM_data, file = "/home/rstudio/dc_dashboard/data/dpath1/SNSRwandaSUMdata.csv")
 zz <- rawConnection(raw(0), "r+")
 write.csv(RWA.SUM_data, zz)
 aws.s3::put_object(file = rawConnectionValue(zz),
                    bucket = "rtbglr", object = "dc_dashboard/data/dpath1/SNSRwandaSUMdata.csv")
 close(zz)
 
-#write.csv(RWA.O_data, file = "./SNSRwandaOdata.csv")
+#write.csv(RWA.O_data, file = "/home/rstudio/dc_dashboard/data/dpath1/SNSRwandaOdata.csv")
 zz <- rawConnection(raw(0), "r+")
 write.csv(RWA.O_data, zz)
 aws.s3::put_object(file = rawConnectionValue(zz),
