@@ -1,5 +1,8 @@
 #####This Script runs daily to  update and aggregate data collected
 
+Sys.setenv("AWS_ACCESS_KEY_ID" = Sys.getenv("AWS_ACCESS_KEY_ID"))
+Sys.setenv("AWS_SECRET_ACCESS_KEY" = Sys.getenv("AWS_SECRET_ACCESS_KEY"))
+Sys.setenv("AWS_DEFAULT_REGION" = Sys.getenv("AWS_DEFAULT_REGION"))
 
 wd<-getwd()
 #print(wd)
@@ -227,16 +230,22 @@ RWA.O_data<-valTest %>%
 
 
 
-ifelse(!dir.exists(file.path("./data/Usecases/SNS-Rwanda/")), dir.create(file.path("./data/Usecases/SNS-Rwanda/")), FALSE)
 
-# wdnew<-"./data/Usecases/SNS-Rwanda/"
-# setwd(wdnew)
-#Save to be read into dc dashboard
-write.csv(RWA.VAL_data,"./data/SNSRwandaVAdata.csv")
+zz <- rawConnection(raw(0), "r+")
+write.csv(RWA.VAL_data, zz)
+aws.s3::put_object(file = rawConnectionValue(zz),
+                   bucket = "rtbglr", object = "dc_dashboard/data/SNSRwandaVALdata.csv")
+close(zz)
 
-#Save data for event submission summary purpose... not in long format (treatments)
-write.csv(RWA.SUM_data,"./data/SNSRwandaSUMdata.csv")
+zz <- rawConnection(raw(0), "r+")
+write.csv(RWA.SUM_data, zz)
+aws.s3::put_object(file = rawConnectionValue(zz),
+                   bucket = "rtbglr", object = "dc_dashboard/data/dpath1/SNSRwandaSUMdata.csv")
+close(zz)
 
-write.csv(RWA.O_data,"./data/SNSRwandaOdata.csv")
-
+zz <- rawConnection(raw(0), "r+")
+write.csv(RWA.O_data, zz)
+aws.s3::put_object(file = rawConnectionValue(zz),
+                   bucket = "rtbglr", object = "dc_dashboard/data/dpath1/SNSRwandaOdata.csv")
+close(zz)
 #setwd(wd)
