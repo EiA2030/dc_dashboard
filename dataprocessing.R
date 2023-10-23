@@ -42,12 +42,13 @@ RegisterVerify_HH.Ids <- RegisterVerify_HH%>%
   separate(geopoint, into = c("LAT", "LON", "ALT", "ERR"), sep = " ")%>%
   dplyr::select(any_of(c("today","ENID","HHID","LAT", "LON","Country"))) %>%
   arrange(ENID, desc(today)) %>% # sorts to enable Keep last entry by date in duplicated records
-  distinct(HHID, .keep_all = TRUE) # Keep last entry by date in duplicated records
+  distinct(ENID, HHID, .keep_all = TRUE) %>%# Keep last entry by date in duplicated records
+filter(ENID != "RSENRW000001")#leave out the enumerator registered for testing and monitoring the tool and is not expected to collect data
 
 
 # Join the data 
 EN.HH_data <- Register_EN.Ids %>%
-  left_join(RegisterVerify_HH.Ids, by = "ENID") %>% #join data household and enumerator data while keeping all enumerators
+  full_join(RegisterVerify_HH.Ids, by = "ENID") %>% #join data household and enumerator data while keeping all enumerators
   mutate(
     DateId = coalesce(today, ENtoday), #date col for dash filter filter
     Stage = "Validation" ,   # for 'stage' filter purpose 
@@ -79,6 +80,8 @@ data<- data %>%
 
 # Update HHID #scanned vs typed ids issue    ...merge vars: scanned - `intro/wrong_ID`, typed-`intro/barcodehousehold_1`...`intro/barcodehousehold`
 data$`intro/barcodehousehold_1` <- sub("RSHHRW1", "RSHHRW0", data$`intro/barcodehousehold_1`)
+data$`intro/wrong_ID` <- sub("LSHH", "RSHH", data$`intro/wrong_ID`)
+
 data$`intro/wrong_ID`<- ifelse(is.na(data$`intro/wrong_ID`) & data$`intro/barcodehousehold_1` != "RSHHRWNaN",
                                data$`intro/barcodehousehold_1`,
                                data$`intro/wrong_ID`)
