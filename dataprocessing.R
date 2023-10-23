@@ -1,7 +1,5 @@
 #####This Script runs daily to  update and aggregate data collected
 
-
-wd<-getwd()
 #print(wd)
 #################################################################################################################
 ##source + downloaded files from ona.io
@@ -78,6 +76,16 @@ system_var<- c("_tags","_uuid","_notes" ,"_edited","_status" ,"_version","_durat
 
 data<- data %>% 
   select(-any_of(system_var))
+
+# Update HHID #scanned vs typed ids issue    ...merge vars: scanned - `intro/wrong_ID`, typed-`intro/barcodehousehold_1`...`intro/barcodehousehold`
+data$`intro/barcodehousehold_1` <- sub("RSHHRW1", "RSHHRW0", data$`intro/barcodehousehold_1`)
+data$`intro/wrong_ID`<- ifelse(is.na(data$`intro/wrong_ID`) & data$`intro/barcodehousehold_1` != "RSHHRWNaN",
+                               data$`intro/barcodehousehold_1`,
+                               data$`intro/wrong_ID`)
+#control for `intro/barcodehousehold` variable too
+data$`intro/wrong_ID`<- ifelse(is.na(data$`intro/wrong_ID`) & data$`intro/barcodehousehold` != "RSHHRWNaN",
+                               data$`intro/barcodehousehold`,
+                               data$`intro/wrong_ID`)
 
 #------------------------------------------------------------------------------------------
 # plant stand data
@@ -217,16 +225,22 @@ RWA.O_data<-valTest %>%
 
 
 
-ifelse(!dir.exists(file.path("./data/Usecases/SNS-Rwanda/")), dir.create(file.path("./data/Usecases/SNS-Rwanda/")), FALSE)
-
-# wdnew<-"./data/Usecases/SNS-Rwanda/"
-# setwd(wdnew)
-#Save to be read into dc dashboard
-write.csv(RWA.VAL_data,"./data/SNSRwandaVAdata.csv")
-
-#Save data for event submission summary purpose... not in long format (treatments)
-write.csv(RWA.SUM_data,"./data/SNSRwandaSUMdata.csv")
-
-write.csv(RWA.O_data,"./data/SNSRwandaOdata.csv")
-
+#save to bucket 
+# zz <- rawConnection(raw(0), "r+")
+# write.csv(RWA.VAL_data, zz)
+# aws.s3::put_object(file = rawConnectionValue(zz),
+#                    bucket = "rtbglr", object = "dc_dashboard/data/dpath1/SNSRwandaVALdata.csv")
+# close(zz)
+# 
+# zz <- rawConnection(raw(0), "r+")
+# write.csv(RWA.SUM_data, zz)
+# aws.s3::put_object(file = rawConnectionValue(zz),
+#                    bucket = "rtbglr", object = "dc_dashboard/data/dpath1/SNSRwandaSUMdata.csv")
+# close(zz)
+# 
+# zz <- rawConnection(raw(0), "r+")
+# write.csv(RWA.O_data, zz)
+# aws.s3::put_object(file = rawConnectionValue(zz),
+#                    bucket = "rtbglr", object = "dc_dashboard/data/dpath1/SNSRwandaOdata.csv")
+# close(zz)
 #setwd(wd)
