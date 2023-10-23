@@ -1,10 +1,5 @@
 #####This Script runs daily to  update and aggregate data collected
 
-Sys.setenv("AWS_ACCESS_KEY_ID" = Sys.getenv("AWS_ACCESS_KEY_ID"))
-Sys.setenv("AWS_SECRET_ACCESS_KEY" = Sys.getenv("AWS_SECRET_ACCESS_KEY"))
-Sys.setenv("AWS_DEFAULT_REGION" = Sys.getenv("AWS_DEFAULT_REGION"))
-
-wd<-getwd()
 #print(wd)
 #################################################################################################################
 ##source + downloaded files from ona.io
@@ -230,22 +225,22 @@ RWA.O_data<-valTest %>%
 
 
 
-
-zz <- rawConnection(raw(0), "r+")
-write.csv(RWA.VAL_data, zz)
-aws.s3::put_object(file = rawConnectionValue(zz),
-                   bucket = "rtbglr", object = "dc_dashboard/data/SNSRwandaVALdata.csv")
-close(zz)
-
-zz <- rawConnection(raw(0), "r+")
-write.csv(RWA.SUM_data, zz)
-aws.s3::put_object(file = rawConnectionValue(zz),
-                   bucket = "rtbglr", object = "dc_dashboard/data/dpath1/SNSRwandaSUMdata.csv")
-close(zz)
-
-zz <- rawConnection(raw(0), "r+")
-write.csv(RWA.O_data, zz)
-aws.s3::put_object(file = rawConnectionValue(zz),
-                   bucket = "rtbglr", object = "dc_dashboard/data/dpath1/SNSRwandaOdata.csv")
-close(zz)
+#save to bucket 
+# zz <- rawConnection(raw(0), "r+")
+# write.csv(RWA.VAL_data, zz)
+# aws.s3::put_object(file = rawConnectionValue(zz),
+#                    bucket = "rtbglr", object = "dc_dashboard/data/dpath1/SNSRwandaVALdata.csv")
+# close(zz)
+# 
+# zz <- rawConnection(raw(0), "r+")
+# write.csv(RWA.SUM_data, zz)
+# aws.s3::put_object(file = rawConnectionValue(zz),
+#                    bucket = "rtbglr", object = "dc_dashboard/data/dpath1/SNSRwandaSUMdata.csv")
+# close(zz)
+# 
+# zz <- rawConnection(raw(0), "r+")
+# write.csv(RWA.O_data, zz)
+# aws.s3::put_object(file = rawConnectionValue(zz),
+#                    bucket = "rtbglr", object = "dc_dashboard/data/dpath1/SNSRwandaOdata.csv")
+# close(zz)
 #setwd(wd)
