@@ -12,7 +12,8 @@ library(purrr)
 library(dplyr)
 library(readr)
 library(stringr)
-
+if(!'aws.s3' %in% installed.packages()[, 'Package']) {install.packages('aws.s3', repos = 'http://cran.us.r-project.org')}
+suppressMessages(suppressWarnings(library("aws.s3",character.only = TRUE)))
 
 #################################################################################################################
 #ID DATA (Enumerators and households)
@@ -42,12 +43,13 @@ RegisterVerify_HH.Ids <- RegisterVerify_HH%>%
   separate(geopoint, into = c("LAT", "LON", "ALT", "ERR"), sep = " ")%>%
   dplyr::select(any_of(c("today","ENID","HHID","LAT", "LON","Country"))) %>%
   arrange(ENID, desc(today)) %>% # sorts to enable Keep last entry by date in duplicated records
-  distinct(HHID, .keep_all = TRUE) # Keep last entry by date in duplicated records
+  distinct(ENID, HHID, .keep_all = TRUE) %>%# Keep last entry by date in duplicated records
+  filter(!is.na(HHID) & ENID != "RSENRW000001")#leave out values with NA HHID the enumerator registered for testing and monitoring the tool and is not expected to collect data
 
 
 # Join the data 
 EN.HH_data <- Register_EN.Ids %>%
-  left_join(RegisterVerify_HH.Ids, by = "ENID") %>% #join data household and enumerator data while keeping all enumerators
+  full_join(RegisterVerify_HH.Ids, by = "ENID") %>% #join data household and enumerator data while keeping all enumerators
   mutate(
     DateId = coalesce(today, ENtoday), #date col for dash filter filter
     Stage = "Validation" ,   # for 'stage' filter purpose 
@@ -79,6 +81,8 @@ data<- data %>%
 
 # Update HHID #scanned vs typed ids issue    ...merge vars: scanned - `intro/wrong_ID`, typed-`intro/barcodehousehold_1`...`intro/barcodehousehold`
 data$`intro/barcodehousehold_1` <- sub("RSHHRW1", "RSHHRW0", data$`intro/barcodehousehold_1`)
+data$`intro/wrong_ID` <- sub("LSHH", "RSHH", data$`intro/wrong_ID`)
+
 data$`intro/wrong_ID`<- ifelse(is.na(data$`intro/wrong_ID`) & data$`intro/barcodehousehold_1` != "RSHHRWNaN",
                                data$`intro/barcodehousehold_1`,
                                data$`intro/wrong_ID`)
@@ -226,21 +230,21 @@ RWA.O_data<-valTest %>%
 
 
 #save to bucket 
-# zz <- rawConnection(raw(0), "r+")
-# write.csv(RWA.VAL_data, zz)
-# aws.s3::put_object(file = rawConnectionValue(zz),
-#                    bucket = "rtbglr", object = "dc_dashboard/data/dpath1/SNSRwandaVALdata.csv")
-# close(zz)
-# 
-# zz <- rawConnection(raw(0), "r+")
-# write.csv(RWA.SUM_data, zz)
-# aws.s3::put_object(file = rawConnectionValue(zz),
-#                    bucket = "rtbglr", object = "dc_dashboard/data/dpath1/SNSRwandaSUMdata.csv")
-# close(zz)
-# 
-# zz <- rawConnection(raw(0), "r+")
-# write.csv(RWA.O_data, zz)
-# aws.s3::put_object(file = rawConnectionValue(zz),
-#                    bucket = "rtbglr", object = "dc_dashboard/data/dpath1/SNSRwandaOdata.csv")
-# close(zz)
+zz <- rawConnection(raw(0), "r+")
+write.csv(RWA.VAL_data, zz)
+aws.s3::put_object(file = rawConnectionValue(zz),
+                   bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SNSRwandaVALdata.csv") )
+close(zz)
+
+zz <- rawConnection(raw(0), "r+")
+write.csv(RWA.SUM_data, zz)
+aws.s3::put_object(file = rawConnectionValue(zz),
+                   bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SNSRwandaSUMdata.csv"))
+close(zz)
+
+zz <- rawConnection(raw(0), "r+")
+write.csv(RWA.O_data, zz)
+aws.s3::put_object(file = rawConnectionValue(zz),
+                   bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SNSRwandaOdata.csv")) 
+close(zz)
 #setwd(wd)

@@ -32,7 +32,7 @@ jobs:
 
     - name: Download envs from S3 bucket
       run: |
-        aws s3 cp s3://scio-project-envs/eia2030-dc-dashboard/_.Renviron .Renviron
+        aws s3 cp s3://scio-project-envs/eia2030-dc-dashboard/dev.Renviron .Renviron
         aws s3 cp s3://scio-project-envs/eia2030-dc-dashboard/_auth0-dev.yml _auth0.yml
 
     - name: Login to Docker Hub
@@ -97,7 +97,7 @@ jobs:
 
     - name: Download envs from S3 bucket
       run: |
-        aws s3 cp s3://scio-project-envs/eia2030-dc-dashboard/_.Renviron .Renviron
+        aws s3 cp s3://scio-project-envs/eia2030-dc-dashboard/stg.Renviron .Renviron
         aws s3 cp s3://scio-project-envs/eia2030-dc-dashboard/_auth0-stg.yml _auth0.yml
 
     - name: Login to Docker Hub
@@ -162,7 +162,7 @@ jobs:
 
     - name: Download envs from S3 bucket
       run: |
-        aws s3 cp s3://scio-project-envs/eia2030-dc-dashboard/_.Renviron .Renviron
+        aws s3 cp s3://scio-project-envs/eia2030-dc-dashboard/prod.Renviron .Renviron
         aws s3 cp s3://scio-project-envs/eia2030-dc-dashboard/_auth0-prod.yml _auth0.yml
 
     - name: Login to Docker Hub
