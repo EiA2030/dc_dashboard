@@ -176,14 +176,17 @@ server <- function(input, output, session) {
     #auth0::logoutButton()
   })
   
-  RWA.O_data <- 
-    save_object("s3://rtbglr/dc_dashboard/data/dpath1/SNSRwandaOdata.csv",
-                file = tempfile(fileext = ".csv")
-    ) %>%
+  # RWA.O_data <- 
+  #   save_object("s3://rtbglr/dc_dashboard/data/dpath1/SNSRwandaOdata.csv",
+  #               file = tempfile(fileext = ".csv")
+  #   ) %>%
+  #   fread()
+  RWA.O_data <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SNSRwandaOdata.csv"),
+              file = tempfile(fileext = ".csv")
+  ) %>%
     fread()
   
-  RWA.SUM_data <- 
-    save_object("s3://rtbglr/dc_dashboard/data/dpath1/SNSRwandaSUMdata.csv",
+  RWA.SUM_data <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SNSRwandaSUMdata.csv"),
                 file = tempfile(fileext = ".csv")
     ) %>%
     fread()

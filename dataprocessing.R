@@ -43,7 +43,7 @@ RegisterVerify_HH.Ids <- RegisterVerify_HH%>%
   dplyr::select(any_of(c("today","ENID","HHID","LAT", "LON","Country"))) %>%
   arrange(ENID, desc(today)) %>% # sorts to enable Keep last entry by date in duplicated records
   distinct(ENID, HHID, .keep_all = TRUE) %>%# Keep last entry by date in duplicated records
-filter(ENID != "RSENRW000001")#leave out the enumerator registered for testing and monitoring the tool and is not expected to collect data
+  filter(!is.na(HHID) & ENID != "RSENRW000001")#leave out values with NA HHID the enumerator registered for testing and monitoring the tool and is not expected to collect data
 
 
 # Join the data 
@@ -229,21 +229,21 @@ RWA.O_data<-valTest %>%
 
 
 #save to bucket 
-# zz <- rawConnection(raw(0), "r+")
-# write.csv(RWA.VAL_data, zz)
-# aws.s3::put_object(file = rawConnectionValue(zz),
-#                    bucket = "rtbglr", object = "dc_dashboard/data/dpath1/SNSRwandaVALdata.csv")
-# close(zz)
-# 
-# zz <- rawConnection(raw(0), "r+")
-# write.csv(RWA.SUM_data, zz)
-# aws.s3::put_object(file = rawConnectionValue(zz),
-#                    bucket = "rtbglr", object = "dc_dashboard/data/dpath1/SNSRwandaSUMdata.csv")
-# close(zz)
-# 
-# zz <- rawConnection(raw(0), "r+")
-# write.csv(RWA.O_data, zz)
-# aws.s3::put_object(file = rawConnectionValue(zz),
-#                    bucket = "rtbglr", object = "dc_dashboard/data/dpath1/SNSRwandaOdata.csv")
-# close(zz)
+zz <- rawConnection(raw(0), "r+")
+write.csv(RWA.VAL_data, zz)
+aws.s3::put_object(file = rawConnectionValue(zz),
+                   bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SNSRwandaVALdata.csv") )
+close(zz)
+
+zz <- rawConnection(raw(0), "r+")
+write.csv(RWA.SUM_data, zz)
+aws.s3::put_object(file = rawConnectionValue(zz),
+                   bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SNSRwandaSUMdata.csv"))
+close(zz)
+
+zz <- rawConnection(raw(0), "r+")
+write.csv(RWA.O_data, zz)
+aws.s3::put_object(file = rawConnectionValue(zz),
+                   bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SNSRwandaOdata.csv")) 
+close(zz)
 #setwd(wd)
