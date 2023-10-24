@@ -12,7 +12,8 @@ library(purrr)
 library(dplyr)
 library(readr)
 library(stringr)
-
+if(!'aws.s3' %in% installed.packages()[, 'Package']) {install.packages('aws.s3', repos = 'http://cran.us.r-project.org')}
+suppressMessages(suppressWarnings(library("aws.s3",character.only = TRUE)))
 
 #################################################################################################################
 #ID DATA (Enumerators and households)
