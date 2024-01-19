@@ -190,6 +190,8 @@ server <- function(input, output, session) {
                 file = tempfile(fileext = ".csv")
     ) %>%
     fread()
+  RWA.O_data <-RWA.O_data%>%
+    mutate(Stage = "Validation"  ) # for 'stage' filter purpose 
  
 ##Define data for each usecase
 observe({
@@ -350,67 +352,88 @@ observe({
           #CORRECT TO-
           #subset_df <- df[df$category %in% selected_categories, ]
           tryCatch(
-            if ("Validation" %in% stageUsecase ){
+            if (stageUsecase %in% stageUsecase ){
               datacrop<-datacrop[datacrop$Stage %in% stageUsecase, ]
-              #datasum<-datasum[datasum$Stage %in% stageUsecase, ]
-            }else if ("Piloting" %in% stageUsecase ) {
-              datacrop<-datacrop[datacrop$Stage %in% stageUsecase, ]
+              datacropO<-rawdata[rawdata$Stage %in% stageUsecase, ]
               #datasum<-datasum[datasum$Stage %in% stageUsecase, ]
             }
           )
-       
+          
+          
           tryCatch(
-          if ("All" %in% experimentUsecase){
-            datacrop<-datacrop
-            #datasum<-datasum
-          }else {
-            datacrop<-datacrop[datacrop$crop %in% experimentUsecase, ]
-            #datasum<-datasum[datasum$crop %in% experimentUsecase, ]
-          }
-          ,error = function(e) NULL)
-
+            if ("All" %in% experimentUsecase){
+              datacrop<-datacrop
+              datacropO<-datacropO
+              #datasum<-datasum
+            }else {
+              datacrop<-datacrop[datacrop$crop %in% experimentUsecase, ]
+              datacropO<-datacropO[datacropO$crop %in% experimentUsecase, ]
+              
+              #datasum<-datasum[datasum$crop %in% experimentUsecase, ]
+            }
+            ,error = function(e) NULL)
+          
           tryCatch(
             if ("All" %in% enumeratorUsecase ){
               datacrop<-datacrop
+              datacropO<-datacropO
               #datasum<-datasum
             }else {
               #datasum<-datasum[datasum$ENID %in% enumeratorUsecase, ]
               datacrop<-datacrop[datacrop$ENID %in% enumeratorUsecase, ]
+              datacropO<-datacropO[datacropO$wrong_ENID %in% enumeratorUsecase, ]
+              
             }
-             ,error = function(e) NULL)
-
-            tryCatch(
+            ,error = function(e) NULL)
+          
+          tryCatch(
             if ("All" %in% householdUsecase){
               datacrop<-datacrop
+              datacropO<-datacropO
               #datasum<-datasum
             }else{
               datacrop<-datacrop[which(datacrop$HHID %in%  householdUsecase), ]
+              datacropO<-datacropO[datacropO$wrong_ID %in% householdUsecase, ]
+              
               #datasum<-datasum[which(datasum$HHID %in%  householdUsecase), ]
             }
             ,error = function(e) NULL)
-            
-         
+          
+          
+          
           tryCatch(
-            datacrop <- datacrop[which(datacrop$Date >= dateUsecase[1] & datacrop$Date <= dateUsecase[2]), ]
+            datacropO <- datacropO[which(datacropO$today >= dateUsecase[1] & datacropO$today <= dateUsecase[2]), ]
             ,error = function(e) NULL)
+          
+          tryCatch(
+            #datacrop <- datacrop[which(datacrop$Date >= dateUsecase[1] & datacrop$Date <= dateUsecase[2]), ]
+            datacrop <- datacrop[datacrop$ENID %in% datacropO$wrong_ENID, ]
+            ,error = function(e) NULL)
+          tryCatch(
+            #datacrop <- datacrop[which(datacrop$Date >= dateUsecase[1] & datacrop$Date <= dateUsecase[2]), ]
+            datacrop <- datacrop[datacrop$HHID %in% datacropO$wrong_ID, ]
+            ,error = function(e) NULL)
+          
+          
           #Summary map
           output[[paste0("trials_map_",i)]] <-renderLeaflet({
             leaflet() %>%
               addProviderTiles(providers$CartoDB.Positron) %>%
-            addCircles(data = datacrop ,lng = as.numeric(datacrop$LON), lat = as.numeric(datacrop$LAT),color = "orange") %>%suppressWarnings()
+              addCircles(data = datacropO ,lng = as.numeric(datacropO$longitude), lat = as.numeric(datacropO$latitude),color = "orange") %>%suppressWarnings()
             #fitBounds(max(as.numeric(datacrop$`intro/longitude`)), max(as.numeric(datacrop$`intro/latitude`)),min(as.numeric(datacrop$`intro/longitude`)), min(as.numeric(datacrop$`intro/latitude`)))
           })
           
           ##Summary_submissions trend
           #group by date
+          
           wgroup <-tryCatch( 
-            datacrop %>%
-            mutate(date = as.Date(Date)) %>%
-            select(date) %>%
-            group_by(date) %>%
-            count() %>%
-            #rename(total_freq = n) %>%
-            mutate(date = as.Date(date))
+            datacropO %>%
+              mutate(date = as.Date(today)) %>%
+              select(date) %>%
+              group_by(date) %>%
+              count() %>%
+              #rename(total_freq = n) %>%
+              mutate(date = as.Date(date))
             ,error = function(e) NULL)
           
           # #plot of submissions trend
@@ -420,7 +443,7 @@ observe({
             #scale_x_discrete(labels= paste("Week", c(1:length(ff))))+
             theme_bw(base_size = 24)+
             labs(title="", x="Month", y="Submissions Count")+scale_x_date(date_breaks = "1 month", date_minor_breaks = "1 week", date_labels = "%m-%Y")+them2
-        
+          
           # #plotly -interactive ouput
           output[[paste0("submission_trend_",i)]] <-renderPlotly({
             tryCatch(  ggplotly(Ir, tooltip=c("x","y"))  ,error = function(e) NULL)
