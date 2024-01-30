@@ -361,6 +361,7 @@ valSol1<-valSol%>%
   mutate(Stage = "Validation") %>%
   mutate(Country = capitalize(Country))
 
+valSol1<-as.data.frame(valSol1)
 
 valSol2<-valSol1%>%
   dplyr::select(any_of(c(  "today", "Event"  ,  "ENID" , "HHID" ,"Country"
