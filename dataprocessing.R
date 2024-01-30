@@ -16,6 +16,7 @@ library(purrr)
 library(dplyr)
 library(readr)
 library(stringr)
+if(!'R.utils' %in% installed.packages()[, 'Package']) {install.packages('R.utils', repos = 'http://cran.us.r-project.org')}
 library(R.utils)
 if(!'aws.s3' %in% installed.packages()[, 'Package']) {install.packages('aws.s3', repos = 'http://cran.us.r-project.org')}
 suppressMessages(suppressWarnings(library("aws.s3",character.only = TRUE)))
@@ -390,15 +391,7 @@ close(zz)
 
 
 
-SOL.O_data <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SolidaridadOdata.csv"),
-                          file = tempfile(fileext = ".csv")
-) %>%
-  fread()
 
-SOL.SUM_data <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SolidaridadSUMdata.csv"),
-                            file = tempfile(fileext = ".csv")
-) %>%
-  fread()
 
 
 
