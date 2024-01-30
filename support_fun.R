@@ -221,7 +221,7 @@ create_tab_panel <- function(tab_name) {
                           downloadButton(paste0("downloadData_",uc), "Download csv",style="color: green")
                  ),
                  tabPanel(tabName="glossary" ,"GLOSSARY",
-                          includeHTML('glossary.html')
+                          includeHTML('Solidaridadglossary.html')
                  ),
 
                )

@@ -176,36 +176,64 @@ server <- function(input, output, session) {
     #auth0::logoutButton()
   })
   
-  # RWA.O_data <- 
-  #   save_object("s3://rtbglr/dc_dashboard/data/dpath1/SNSRwandaOdata.csv",
-  #               file = tempfile(fileext = ".csv")
-  #   ) %>%
-  #   fread()
-  RWA.O_data <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SNSRwandaOdata.csv"),
-              file = tempfile(fileext = ".csv")
-  ) %>%
-    fread()
   
-  RWA.SUM_data <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SNSRwandaSUMdata.csv"),
-                file = tempfile(fileext = ".csv")
-    ) %>%
-    fread()
-  RWA.O_data <-RWA.O_data%>%
-    mutate(Stage = "Validation"  ) # for 'stage' filter purpose 
- 
+  
+  
+  
 ##Define data for each usecase
-observe({
+observeEvent(input$nav,{
       tryCatch( 
       if (input$nav== " SNS-Rwanda"){
+        #glossary<-'glossary.html'
+        # RWA.O_data <- 
+        #   save_object("s3://rtbglr/dc_dashboard/data/dpath1/SNSRwandaOdata.csv",
+        #               file = tempfile(fileext = ".csv")
+        #   ) %>%
+        #   fread()
+        RWA.O_data <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SNSRwandaOdata.csv"),
+                                  file = tempfile(fileext = ".csv")
+        ) %>%
+          fread()
+        
+        RWA.SUM_data <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SNSRwandaSUMdata.csv"),
+                                    file = tempfile(fileext = ".csv")
+        ) %>%
+          fread()
+        
+        RWA.O_data <-RWA.O_data%>%
+          rename(
+            ENID = wrong_ENID,
+            HHID = wrong_ID)%>%
+          mutate(Stage = "Validation"  ) # for 'stage' filter purpose 
+        
         datacrop <- RWA.SUM_data
-        #datasum <- SNS.Rwanda.SUM_data
         rawdata <- RWA.O_data
+        columns_to_append <- c("ENID", "HHID", "crop",#"treat",
+                               "Site Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7")
+        
+      }else if (input$nav== " Solidaridad Soy Advisory"){
+        #glossary<-'Solidaridadglossary.html'
+        SOL.O_data <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SolidaridadOdata.csv"),
+                                  file = tempfile(fileext = ".csv")
+        ) %>%
+          fread()
+        
+        SOL.SUM_data <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SolidaridadSUMdata.csv"),
+                                    file = tempfile(fileext = ".csv")
+        ) %>%
+          fread()
         
         
+        datacrop <- SOL.SUM_data
+        rawdata <- SOL.O_data
+        columns_to_append <- c("ENID", "HHID", "crop",#"treat",
+                               "Site Selection", "event1", "event2", "event3", "event4", "event5",  "event8a", "event8b","event8c")
+        
+      
       }else{
         datacrop <- data.frame()
-        #datasum <- data.frame()
         rawdata <- data.frame()
+        columns_to_append <- c()
       },
       error = function(e) NULL)
   
@@ -252,7 +280,7 @@ observe({
      output[[paste0("datefinderr_",i)]] <-renderUI({
        dateRangeInput(paste0("datefinder_",i),
                       "DATE:",
-                      start = min(na.omit(datacrop$Date)),
+                      start = min(na.omit(rawdata$today)),
                       end   =  Sys.time())
      })
 
@@ -291,7 +319,7 @@ observe({
 
      output[[paste0("country_",i)]] <-renderUI({
        infoBox(
-         "Country", as.character(unique(datacrop$Country))[1] , icon = icon("globe"),
+         "Country", HTML(paste(unique(datacrop$Country), collapse = ", ")) , icon = icon("globe"),
          color = "olive",width = "100%"       )
 
      })
@@ -340,12 +368,23 @@ observe({
           tryCatch(
             if (input$nav== " SNS-Rwanda"){
               datacrop <- RWA.SUM_data
-              #datasum <- SNS.Rwanda.SUM_data
               rawdata <- RWA.O_data
+              columns_to_append <- c("ENID", "HHID", "crop",#"treat",
+                                     "Site Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7")
+              
+              
+            }else if (input$nav== " Solidaridad Soy Advisory"){
+              datacrop <- SOL.SUM_data
+              rawdata <- SOL.O_data
+              columns_to_append <- c("ENID", "HHID", "crop",#"treat",
+                                     "Site Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7", "event8a", "event8b","event8c")
+              
+              
             }else{
               datacrop <- data.frame()
-              #datasum <- data.frame()
               rawdata <- data.frame()
+              columns_to_append <- c()
+              
             }
             ,error = function(e) NULL)
           
@@ -381,7 +420,7 @@ observe({
             }else {
               #datasum<-datasum[datasum$ENID %in% enumeratorUsecase, ]
               datacrop<-datacrop[datacrop$ENID %in% enumeratorUsecase, ]
-              datacropO<-datacropO[datacropO$wrong_ENID %in% enumeratorUsecase, ]
+              datacropO<-datacropO[datacropO$ENID %in% enumeratorUsecase, ]
               
             }
             ,error = function(e) NULL)
@@ -393,7 +432,7 @@ observe({
               #datasum<-datasum
             }else{
               datacrop<-datacrop[which(datacrop$HHID %in%  householdUsecase), ]
-              datacropO<-datacropO[datacropO$wrong_ID %in% householdUsecase, ]
+              datacropO<-datacropO[datacropO$HHID %in% householdUsecase, ]
               
               #datasum<-datasum[which(datasum$HHID %in%  householdUsecase), ]
             }
@@ -407,11 +446,11 @@ observe({
           
           tryCatch(
             #datacrop <- datacrop[which(datacrop$Date >= dateUsecase[1] & datacrop$Date <= dateUsecase[2]), ]
-            datacrop <- datacrop[datacrop$ENID %in% datacropO$wrong_ENID, ]
+            datacrop <- datacrop[datacrop$ENID %in% datacropO$ENID, ]
             ,error = function(e) NULL)
           tryCatch(
             #datacrop <- datacrop[which(datacrop$Date >= dateUsecase[1] & datacrop$Date <= dateUsecase[2]), ]
-            datacrop <- datacrop[datacrop$HHID %in% datacropO$wrong_ID, ]
+            datacrop <- datacrop[datacrop$HHID %in% datacropO$HHID, ]
             ,error = function(e) NULL)
           
           
@@ -475,8 +514,9 @@ observe({
       
           # Columns to append
           datacroptable<-as.data.frame(datacroptable)
-          columns_to_append <- c("ENID", "HHID", "crop",#"treat",
-                                 "Site Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7")
+          
+         
+          
           
       
           # # Check if columns exist in the dataframe
@@ -507,21 +547,22 @@ observe({
            
             
            datacroptable<-  tryCatch(  datacroptable %>%
-                                 select(any_of(c("ENID", "HHID", "crop",#"treat",
-                                                 "Site Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7") ))
+                                 select(any_of(columns_to_append ))
            )
            colnames(datacroptable) <- toTitleCase(colnames(datacroptable)) #Title case for table headers
            # datacroptablev<-left_join(datasum,datacroptable, by=c("ENID","HHID"))
            #colnames(datacroptablev) <- toTitleCase(colnames(datacroptablev)) #Title case for table headers
            
            ranks.events<-  tryCatch(  datacroptable %>%
-                                 select(any_of(c( "Site Selection", "Event1", "Event2", "Event3", "Event4", "Event5", "Event6","Event7"))) %>%
+                                        #select(any_of(columns_to_append)) %>%
+                                        select(-any_of(c("ENID", "HHID", "Crop"))) %>%
                                  dplyr::summarise(across(.fns = ~sum(!is.na(.)))) %>%  suppressWarnings() ,error = function(e) NULL)  #total submissions for each event
                                 
              
            
             ranks<-  tryCatch(  datacroptable %>%
-                                  select(any_of(c("ENID", "Site Selection", "Event1", "Event2", "Event3", "Event4", "Event5", "Event6","Event7"))) %>%
+                                 # select(any_of(columns_to_append)) %>%
+                                  select(-any_of(c( "HHID", "Crop")))%>%
               group_by(ENID) %>%
               dplyr::summarise(across(.fns = ~sum(!is.na(.))))%>%  suppressWarnings()
               ,error = function(e) NULL)  #total submissions,  for each event per enumerator
