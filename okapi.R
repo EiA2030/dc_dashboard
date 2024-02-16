@@ -1,7 +1,7 @@
 #to install okapi [package
 #remotes::install_github("rapidsurveys/odktools")
 #ONA :: load data  R okapi package.
-library(okapi)
+suppressMessages(suppressWarnings(library(okapi)))
 
 ##########################################################################################
 ##########################SNS-RWANDA######################################################
@@ -25,6 +25,11 @@ valTest<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form
 ##########################SOLIDARIDAD#####################################################
 ##########################################################################################
 
+###############Solidaridad NOT trials######################################
+NOTSol<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id =780907 )
+
+
+###############Solidaridad On-farm validations######################################
 valSol<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id =780906 )
 f.seg_malawi<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id =755562 )
 f.seg_mozambique<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id =756460 )
