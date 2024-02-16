@@ -14,6 +14,7 @@ suppressMessages(suppressWarnings(library(jsonlite)))
 suppressMessages(suppressWarnings(library(tidyr)))
 suppressMessages(suppressWarnings(library(purrr)))
 suppressMessages(suppressWarnings(library(dplyr)))
+if(!'readr' %in% installed.packages()[, 'readr']) {install.packages('readr', repos = 'http://cran.us.r-project.org')}
 suppressMessages(suppressWarnings(library(readr)))
 suppressMessages(suppressWarnings(library(stringr)))
 if(!'R.utils' %in% installed.packages()[, 'Package']) {install.packages('R.utils', repos = 'http://cran.us.r-project.org')}
