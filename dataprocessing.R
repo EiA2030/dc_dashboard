@@ -3,8 +3,6 @@
 ##########################################################################################
 
 #####This Script runs daily to  update and aggregate data collected
-install.packages('readr')
-if(!'readr' %in% installed.packages()[, 'Package']) {install.packages('readr', repos = 'http://cran.us.r-project.org')}
 
 #print(wd)
 #################################################################################################################
