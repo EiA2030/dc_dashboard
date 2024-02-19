@@ -3,6 +3,8 @@
 ##########################################################################################
 
 #####This Script runs daily to  update and aggregate data collected
+install.packages('readr')
+if(!'readr' %in% installed.packages()[, 'Package']) {install.packages('readr', repos = 'http://cran.us.r-project.org')}
 
 #print(wd)
 #################################################################################################################
@@ -14,15 +16,16 @@ suppressMessages(suppressWarnings(library(jsonlite)))
 suppressMessages(suppressWarnings(library(tidyr)))
 suppressMessages(suppressWarnings(library(purrr)))
 suppressMessages(suppressWarnings(library(dplyr)))
-if(!'readr' %in% installed.packages()[, 'readr']) {install.packages('readr', repos = 'http://cran.us.r-project.org')}
-suppressMessages(suppressWarnings(library(readr)))
+if(!'data.table' %in% installed.packages()[, 'Package']) {install.packages('data.table', repos = 'http://cran.us.r-project.org')}
+suppressMessages(suppressWarnings(library("data.table",character.only = TRUE)))
+if(!'readr' %in% installed.packages()[, 'Package']) {install.packages('readr', repos = 'http://cran.us.r-project.org')}
+suppressMessages(suppressWarnings(library("readr",character.only = TRUE)))
 suppressMessages(suppressWarnings(library(stringr)))
 if(!'R.utils' %in% installed.packages()[, 'Package']) {install.packages('R.utils', repos = 'http://cran.us.r-project.org')}
 suppressMessages(suppressWarnings(library(R.utils)))
 if(!'aws.s3' %in% installed.packages()[, 'Package']) {install.packages('aws.s3', repos = 'http://cran.us.r-project.org')}
 suppressMessages(suppressWarnings(library("aws.s3",character.only = TRUE)))
-if(!'data.table' %in% installed.packages()[, 'Package']) {install.packages('data.table', repos = 'http://cran.us.r-project.org')}
-suppressMessages(suppressWarnings(library("data.table",character.only = TRUE)))
+
 
 #################################################################################################################
 #ID DATA (Enumerators and households)
