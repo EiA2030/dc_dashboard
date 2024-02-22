@@ -383,6 +383,8 @@ server <- function(input, output, session) {
             if (input$nav== " SNS-Rwanda"){
               datacrop <- RWA.SUM_data
               rawdata <- RWA.O_data
+              columns_to_append <- c("ENID", "HHID", "crop",#"treat",
+                                     "Site Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7")
               
             }else if (input$nav== " Solidaridad Soy Advisory"){
               if ("Validation" %in% stageUsecase ){
@@ -401,7 +403,7 @@ server <- function(input, output, session) {
             }else {
               datacrop <- data.frame()
               rawdata <- data.frame()
-              
+              columns_to_append <- c()
               
             }
             ,error = function(e) NULL)
@@ -420,6 +422,16 @@ server <- function(input, output, session) {
             
           })
           
+          experimentfinderr_new_choices <- c("All", sort(unique(datacrop$crop)))
+          enumeratorfinderr_new_choices <- c("All", sort(unique(datacrop$ENID)))
+          householdfinderr_new_choices <- c("All", sort(unique(na.omit(datacrop$HHID))))
+          datefinderr_new_choices <- min(na.omit(rawdata$today))
+          
+          
+          updateSelectInput(session, paste0("experimentfinderr_",i), choices =  experimentfinderr_new_choices  )
+          updateSelectInput(session, paste0("enumeratorfinderr_",i), choices = enumeratorfinderr_new_choices)
+          updateSelectInput(session, paste0("householdfinderr_",i), choices = householdfinderr_new_choices)
+          updateDateRangeInput(session, paste0("datefinderr_",i), start = datefinderr_new_choices, end = Sys.time())
           
           
           #CORRECT TO-
@@ -433,16 +445,7 @@ server <- function(input, output, session) {
             }
             ,error = function(e) NULL)
           
-          experimentfinderr_new_choices <- c("All", sort(unique(datacrop$crop)))
-          enumeratorfinderr_new_choices <- c("All", sort(unique(datacrop$ENID)))
-          householdfinderr_new_choices <- c("All", sort(unique(na.omit(datacrop$HHID))))
-          datefinderr_new_choices <- min(na.omit(rawdata$today))
-          
-          
-          updateSelectInput(session, paste0("experimentfinderr_",i), choices =  experimentfinderr_new_choices  )
-          updateSelectInput(session, paste0("enumeratorfinderr_",i), choices = enumeratorfinderr_new_choices)
-          updateSelectInput(session, paste0("householdfinderr_",i), choices = householdfinderr_new_choices)
-          updateDateRangeInput(session, paste0("datefinderr_",i), start = datefinderr_new_choices, end = Sys.time())
+       
           
           
           tryCatch(
