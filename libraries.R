@@ -3,7 +3,7 @@ install.packages(pkgs=c('devtools', 'remotes'), dependencies=TRUE, repos='https:
 install.packages(pkgs=c('shiny', 'shinyauthr', 'shinydashboard', 'tidyr', 'ggplot2', 'sf', 'lubridate', 'stringr', 'plotly',
 	'shinyBS', 'shinyjs', 'leaflet', 'shinyalert', 'magrittr', 'shinycssloaders', 'reactable',
 	'tippy', 'shinyWidgets', 'auth0', 'data.table', 'dplyr', 'sp', 'future', 'future.apply', 'foreach',
-	'doParallel', 'wrapr'), dependencies=TRUE, repos='https://cran.rstudio.com/')
+	'doParallel', 'wrapr','R.utils'), dependencies=TRUE, repos='https://cran.rstudio.com/')
 
 shinytest::installDependencies()
 

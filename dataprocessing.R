@@ -1,3 +1,7 @@
+##########################################################################################
+##########################SNS-RWANDA######################################################
+##########################################################################################
+
 #####This Script runs daily to  update and aggregate data collected
 
 #print(wd)
@@ -5,15 +9,21 @@
 ##source + downloaded files from ona.io
 source('okapi.R')
 # Load required libraries
-library(httr)
-library(jsonlite)
-library(tidyr)
-library(purrr)
-library(dplyr)
-library(readr)
-library(stringr)
+suppressMessages(suppressWarnings(library(httr)))
+suppressMessages(suppressWarnings(library(jsonlite)))
+suppressMessages(suppressWarnings(library(tidyr)))
+suppressMessages(suppressWarnings(library(purrr)))
+suppressMessages(suppressWarnings(library(dplyr)))
+if(!'data.table' %in% installed.packages()[, 'Package']) {install.packages('data.table', repos = 'http://cran.us.r-project.org')}
+suppressMessages(suppressWarnings(library("data.table",character.only = TRUE)))
+if(!'readr' %in% installed.packages()[, 'Package']) {install.packages('readr', repos = 'http://cran.us.r-project.org')}
+suppressMessages(suppressWarnings(library("readr",character.only = TRUE)))
+suppressMessages(suppressWarnings(library(stringr)))
+if(!'R.utils' %in% installed.packages()[, 'Package']) {install.packages('R.utils', repos = 'http://cran.us.r-project.org')}
+suppressMessages(suppressWarnings(library(R.utils)))
 if(!'aws.s3' %in% installed.packages()[, 'Package']) {install.packages('aws.s3', repos = 'http://cran.us.r-project.org')}
 suppressMessages(suppressWarnings(library("aws.s3",character.only = TRUE)))
+
 
 #################################################################################################################
 #ID DATA (Enumerators and households)
@@ -224,6 +234,7 @@ RWA.SUM_data <- EN.HH_data %>%
 RWA.O_data<-valTest %>% 
   select(-any_of(system_var))%>% 
   select(-c(start,`intro/barcodehousehold_1`))%>% 
+  rename(Country = `intro/country`)%>% 
   rename_with(
   ~stringr::str_replace_all(.x, c("intro/"), ""))
 
@@ -248,3 +259,232 @@ aws.s3::put_object(file = rawConnectionValue(zz),
                    bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SNSRwandaOdata.csv")) 
 close(zz)
 #setwd(wd)
+
+
+
+##########################################################################################
+##########################SOLIDARIDAD#####################################################
+##########################################################################################
+colsnot<-c("_id"                 ,                     "_tags"                      ,              "_uuid"       ,                            
+           "event"                            ,        "_notes"                      ,             "_edited"          ,                       
+           "_status"                          ,        "_version"                    ,             "_duration"          ,                     
+           "_xform_id"                        ,        "_attachments"                ,             "_geolocation"       ,                     
+           "_media_count"                     ,        "_total_media"                 ,            "formhub/uuid"         ,                   
+           "_submitted_by"                     ,       "_date_modified"                 ,          "enumerator_id_1"      ,                   
+           "meta/instanceID"                    ,      "_submission_time"               ,          "_xform_id_string"        ,                
+           "meta/instanceName"                  ,      "_bamboo_dataset_id"                 ,      "_media_all_received"        ,             
+           "projectDetails/project"              ,     "projectDetails/activity"             ,     "projectDetails/use_case"   ,              
+           "projectDetails/countries"             ,    "projectDetails/plot_area"             ,    "projectDetails/project_ID"     ,          
+           "projectDetails/trial_type"            ,    "projectDetails/use_case_ID"            ,   "planting_practice/crop_name"   ,          
+           "projectDetails/plot_width_m"          ,    "projectDetails/sub_activity"            ,  "projectDetails/initiative_ID"     ,       
+           "projectDetails/plot_length_m"          ,   "planting_practice/planting_date"         , "projectDetails/initiative_title"     ,    
+           "projectDetails/number_of_blocks"       ,   "planting_practice/intercrop_name"      ,   "planting_practice/planting_labor"     ,   
+           "planting_practice/row_spacing_cm"      ,   "planting_practice/seeding_method"        , "projectDetails/activity_end_date"       , 
+           "projectDetails/experiment_design"      ,   "planting_practice/sowing_depth_cm"       , "projectDetails/rep_ID_or_number_1"      , 
+           "planting_practice/plant_population"    ,   "planting_practice/plant_spacing_cm"      , "projectDetails/activity_start_date"      ,
+           "projectDetails/plot_ID_or_number_1"    ,   "planting_practice/crop_variety_name"     , "planting_practice/planting_material"     ,
+           "planting_practice/seedling_age_days"   ,   "planting_practice/planting_technique"    , "projectDetails/number_of_replications"   ,
+           "planting_practice/number_of_intercrops" ,  "planting_practice/plant_population_unit"  ,"planting_practice/intercrop_variety_name",
+           "planting_practice/planting_material_cost", "enumerator_ID"                          ,  "site_characterization/admin_1"           ,
+           "site_characterization/admin_2"          ,  "site_characterization/admin_3"          ,  "site_characterization/country"           ,
+           "site_characterization/currency"         ,  "projectDetails/rep_ID_or_number"        ,  "site_characterization/gps_field"         ,
+           "projectDetails/plot_ID_or_number"       ,  "site_characterization/latitude_field"   ,  "site_characterization/longitude_field"   ,
+           "site_characterization/altitude_field_m",    "site_characterization/admin_4"  ,         "site_characterization/site_name"      )
+
+
+###############Solidaridad NOT trials######################################
+NOTSol1<-NOTSol%>%
+  select(-any_of(c( "_notes" , "_total_media", "_id", "_tags", "_uuid" ,"start", "_edited","_status" ,"_version" , "_duration"  ,"_xform_id" ,"_attachments", "_geolocation" ,"_media_count" ,"formhub/uuid"   ,                                      
+                    "_submitted_by","consent/photo","_date_modified","meta/instanceID"  , "_xform_id_string" ,"_bamboo_dataset_id"  ,"meta/instanceName" ,
+                    "_media_all_received"  ,  "consent/read_consent_form"    ,"consent/copy",  "consent/give_consent" ,"formhub/uuid"    )))%>%
+  rename(
+    ENID = enumerator_id_1,
+    HHID = `projectDetails/rep_ID_or_number_1`,
+    Country = `projectDetails/countries`,
+    Event= event,
+    latitude= `site_characterization/latitude_field`,
+    longitude= `site_characterization/longitude_field`,
+    #crop= `projectDetails/trial_type`,
+    today = `_submission_time`,
+  ) %>%
+  mutate(today = as.IDate(today)) %>%
+  arrange(ENID,HHID, desc(today)) %>% #sort to Keep last entry by date in duplicated records
+  distinct(ENID,HHID,today,Event, .keep_all = TRUE)  %>%
+  mutate(Stage = "NOT Trials") %>%
+  mutate(Country = capitalize(Country))
+  
+
+
+NOTSol2<-NOTSol%>%
+  rename(today =`_submission_time`,
+         Event =  event,
+         crop= `projectDetails/trial_type`,
+         #Country = `projectDetails/countries`,
+         ENID= enumerator_id_1,
+         #PLID = `projectDetails/plot_ID_or_number_1`,
+         HHID = `projectDetails/rep_ID_or_number_1`
+  )%>%
+  mutate(today = as.IDate(today)) %>%
+  mutate(Event = paste( "event",Event, sep = ""))%>%
+  pivot_wider(names_from = Event, values_from = today) %>%
+  mutate(Stage = "NOT Trials") %>%
+  #rename(`Site Selection` =event1)%>%
+  arrange(Stage,crop, 
+          ENID, HHID )%>%
+  select(-any_of(c(colsnot)))
+
+
+###############Solidaridad On-farm validations######################################
+#farmer seg data 
+#f.seg_malawi f.seg_zambia f.seg_mozambique
+f.seg_malawi1<-f.seg_malawi%>%
+  select(any_of(c( "_submission_time"
+                   ,"eia_addon_survey/eia_addon_use_case_main_crop"
+                   ,"eia_addon_survey/eia_addon_metadata_title/eia_addon_Location/eia_addon_country"
+                   ,"eia_addon_survey/eia_addon_metadata_title/eia_addon_enumerator_name"
+                   ,"eia_addon_survey/eia_addon_metadata_title/eia_addon_barcodeenumerator_1"
+                   ,"eia_addon_survey/eia_addon_surveywithland/eia_addon_survey_grp/eia_addon_part_1/eia_addon_hh_roster_title/eia_addon_hh_member1" 
+                   ,"eia_addon_survey/eia_addon_metadata_title/eia_addon_barcodehousehold_1"
+                   ,"eia_addon_survey/eia_addon_surveywithland/eia_addon_survey_grp/eia_addon_closing_title/eia_addon_nearly_finished/eia_addon_phone_number" 
+                   )))%>%
+  rename(`Site Selection` =`_submission_time`,
+         crop=`eia_addon_survey/eia_addon_use_case_main_crop`,
+         Country = `eia_addon_survey/eia_addon_metadata_title/eia_addon_Location/eia_addon_country`,
+         ENfirstName=`eia_addon_survey/eia_addon_metadata_title/eia_addon_enumerator_name`,
+         ENID=`eia_addon_survey/eia_addon_metadata_title/eia_addon_barcodeenumerator_1`,
+         HHfirstName=`eia_addon_survey/eia_addon_surveywithland/eia_addon_survey_grp/eia_addon_part_1/eia_addon_hh_roster_title/eia_addon_hh_member1`,
+         HHID=`eia_addon_survey/eia_addon_metadata_title/eia_addon_barcodehousehold_1`,
+         HHphoneNo=`eia_addon_survey/eia_addon_surveywithland/eia_addon_survey_grp/eia_addon_closing_title/eia_addon_nearly_finished/eia_addon_phone_number` 
+    
+  )%>%
+  mutate(`Site Selection` = as.Date(`Site Selection`)) %>%
+  distinct(ENID,HHID,Country,`Site Selection`, .keep_all = TRUE)  %>%
+  mutate(ENSurname =NA)%>%
+  mutate(ENphoneNo =NA)
+
+f.seg_zambia1<-f.seg_zambia%>%
+  select(any_of(c( "_submission_time"
+                   ,"eia_addon_survey/eia_addon_use_case_main_crop"
+                   ,"eia_addon_survey/eia_addon_metadata_title/eia_addon_Location/eia_addon_country"
+                   ,"eia_addon_survey/eia_addon_metadata_title/eia_addon_enumerator_name"
+                   ,"eia_addon_survey/eia_addon_metadata_title/eia_addon_barcodeenumerator_1"
+                   ,"eia_addon_survey/eia_addon_surveywithland/eia_addon_survey_grp/eia_addon_part_1/eia_addon_hh_roster_title/eia_addon_hh_member1" 
+                   ,"eia_addon_survey/eia_addon_metadata_title/eia_addon_barcodehousehold_1"
+                   ,"eia_addon_survey/eia_addon_surveywithland/eia_addon_survey_grp/eia_addon_closing_title/eia_addon_nearly_finished/eia_addon_phone_number" 
+  )))%>%
+  rename(`Site Selection` =`_submission_time`,
+         crop=`eia_addon_survey/eia_addon_use_case_main_crop`,
+         Country = `eia_addon_survey/eia_addon_metadata_title/eia_addon_Location/eia_addon_country`,
+         ENfirstName=`eia_addon_survey/eia_addon_metadata_title/eia_addon_enumerator_name`,
+         ENID=`eia_addon_survey/eia_addon_metadata_title/eia_addon_barcodeenumerator_1`,
+         HHfirstName=`eia_addon_survey/eia_addon_surveywithland/eia_addon_survey_grp/eia_addon_part_1/eia_addon_hh_roster_title/eia_addon_hh_member1`,
+         HHID=`eia_addon_survey/eia_addon_metadata_title/eia_addon_barcodehousehold_1`,
+         HHphoneNo=`eia_addon_survey/eia_addon_surveywithland/eia_addon_survey_grp/eia_addon_closing_title/eia_addon_nearly_finished/eia_addon_phone_number` 
+         
+  )%>%
+  mutate(`Site Selection` = as.Date(`Site Selection`)) %>%
+  distinct(ENID,HHID,Country,`Site Selection`, .keep_all = TRUE)  %>%
+  mutate(ENSurname =NA)%>%
+  mutate(ENphoneNo =NA)
+
+f.seg_mozambique1<-f.seg_mozambique%>%
+  select(any_of(c( "_submission_time"
+                   ,"eia_addon_survey/eia_addon_use_case_main_crop"
+                   ,"eia_addon_survey/eia_addon_metadata_title/eia_addon_Location/eia_addon_country"
+                   ,"eia_addon_survey/eia_addon_metadata_title/eia_addon_enumerator_name"
+                   ,"eia_addon_survey/eia_addon_metadata_title/eia_addon_barcodeenumerator_1"
+                   ,"eia_addon_survey/eia_addon_surveywithland/eia_addon_survey_grp/eia_addon_part_1/eia_addon_hh_roster_title/eia_addon_hh_member1" 
+                   ,"eia_addon_survey/eia_addon_metadata_title/eia_addon_barcodehousehold_1"
+                   ,"eia_addon_survey/eia_addon_surveywithland/eia_addon_survey_grp/eia_addon_closing_title/eia_addon_nearly_finished/eia_addon_phone_number" 
+  )))%>%
+  rename(`Site Selection` =`_submission_time`,
+         crop=`eia_addon_survey/eia_addon_use_case_main_crop`,
+         Country = `eia_addon_survey/eia_addon_metadata_title/eia_addon_Location/eia_addon_country`,
+         ENfirstName=`eia_addon_survey/eia_addon_metadata_title/eia_addon_enumerator_name`,
+         ENID=`eia_addon_survey/eia_addon_metadata_title/eia_addon_barcodeenumerator_1`,
+         HHfirstName=`eia_addon_survey/eia_addon_surveywithland/eia_addon_survey_grp/eia_addon_part_1/eia_addon_hh_roster_title/eia_addon_hh_member1`,
+         HHID=`eia_addon_survey/eia_addon_metadata_title/eia_addon_barcodehousehold_1`,
+         HHphoneNo=`eia_addon_survey/eia_addon_surveywithland/eia_addon_survey_grp/eia_addon_closing_title/eia_addon_nearly_finished/eia_addon_phone_number` 
+         
+  )%>%
+  mutate(`Site Selection` = as.Date(`Site Selection`)) %>%
+  distinct(ENID,HHID,Country,`Site Selection`, .keep_all = TRUE)  %>%
+  mutate(ENSurname =NA)%>%
+  mutate(ENphoneNo =NA)
+
+  #View(f.seg_malawi1)
+# Append all f_seg files rows using rbind() to get list of all IDs HHIDs and ENIDs
+f.seg_data <- rbind(f.seg_malawi1, f.seg_zambia1, f.seg_mozambique1)
+
+
+# #######Validation data
+valSol1<-valSol%>%
+  select(-any_of(c( "_notes" , "_total_media", "_id", "_tags", "_uuid" ,"start", "_edited","_status" ,"_version" , "_duration"  ,"_xform_id" ,"_attachments", "_geolocation" ,"_media_count" ,"formhub/uuid"   ,
+                   "_submitted_by","consent/photo","_date_modified","meta/instanceID"  ,"_submission_time", "_xform_id_string" ,"_bamboo_dataset_id"  ,
+                   "_media_all_received"  ,  "consent/read_consent_form"    ,"consent/copy",  "consent/give_consent"   )))%>%
+  rename(
+    ENID = `intro/enumerator_id_1`,
+    HHID = `intro/barcodehousehold_1`,
+    Country = `location/country`,
+    Event= `intro/event`,
+    latitude= `location/latitude`,
+    longitude= `location/longitude`,
+    today = today
+  ) %>%
+  mutate(today = as.IDate(today)) %>%
+  arrange(ENID,HHID, desc(today)) %>% #sort to Keep last entry by date in duplicated records
+  distinct(ENID,HHID,today,Event, .keep_all = TRUE)  %>%
+  mutate(Stage = "Validation") %>%
+  mutate(Country = capitalize(Country))
+
+
+
+valSol2<-valSol1%>%
+  dplyr::select(any_of(c(  "today", "Event"  ,  "ENID" , "HHID" 
+                           )  ))%>%
+  pivot_wider(names_from = Event, values_from = today) %>%
+  mutate(Stage = "Validation") %>%
+  mutate(crop = "Validation") %>%
+  arrange(Stage,crop, 
+          ENID, HHID )
+
+valSol1<-as.data.frame(valSol1)
+# SOL.SUM_data <- f.seg_data %>%
+#   left_join(valSol2, by = c("ENID","HHID")) %>% #join identifiers and val data while keeping all enumerators/households
+#   suppressWarnings()
+
+
+# 
+# # Remove columns with all NA values
+# clean_data <- n[, colSums(is.na(n)) != nrow(n)]
+
+###########################################################################################################################
+#rbind valSol2, NOTSol2 and save as SOL.SUM_data on aws
+NOTValSol2 <-bind_rows(valSol2, NOTSol2)
+#NOTValSol1 <- bind_rows(valSol1, NOTSol1)
+# write.csv(SOL.SUM_data.DE,"SOL.SUM_data.DE.csv")
+# write.csv(NOTSol1,"NOTSol1.csv")
+
+#save to bucket
+zz <- rawConnection(raw(0), "r+")
+write.csv(NOTValSol2, zz)
+aws.s3::put_object(file = rawConnectionValue(zz),
+                   bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SolidaridadSUMdata.csv"))
+close(zz)
+
+
+zz <- rawConnection(raw(0), "r+")
+write.csv(valSol1, zz)
+aws.s3::put_object(file = rawConnectionValue(zz),
+                   bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SolidaridadOdata.csv"))
+close(zz)
+
+zz <- rawConnection(raw(0), "r+")
+write.csv(NOTSol1, zz)
+aws.s3::put_object(file = rawConnectionValue(zz),
+                   bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SolidaridadNOTdata.csv"))
+close(zz)
+
+
+
+
