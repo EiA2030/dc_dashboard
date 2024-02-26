@@ -208,9 +208,12 @@ create_tab_panel <- function(tab_name) {
                           reactableOutput(paste0("tableR_",uc))
                  ),
 
-                 # tabPanel(tabName="quality" ,"QUALITY CHECKS"
-                 #          #reactableOutput("tableQ1")
-                 # ),
+                 tabPanel(tabName="issues" ,"ISSUES",
+                          HTML('<h5> The following list comprises all enumerator IDs (ENID) and Household IDs (HHID) that have been flagged as odd.</h5>'),
+                          fluidRow( column( width = 12,h4("", align = 'center'),  reactableOutput(paste0("issues_", uc)) )
+                          )
+                          #reactableOutput("tableQ1")
+                 ),
 
                  tabPanel(tabName= "data","DATA PREVIEW",
                           column(12,
@@ -221,7 +224,8 @@ create_tab_panel <- function(tab_name) {
                           downloadButton(paste0("downloadData_",uc), "Download csv",style="color: green")
                  ),
                  tabPanel(tabName="glossary" ,"GLOSSARY",
-                          includeHTML('glossary.html')
+                          includeHTML(paste0('./www/Glossary/glossary_',uc,'.html'))
+                          #includeHTML('Solidaridadglossary.html')
                  ),
 
                )
