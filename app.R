@@ -231,6 +231,8 @@ server <- function(input, output, session) {
         rawdata <- SOL.O_data
         patternissues<-"^SDENMW|SDENZM|SDENMZ"
         patternissuesE<-"^SDHHMW|SDHHZM|SDHHMZ|SDRP"
+        columns_to_append <- c("ENID", "HHID", "crop",#"treat",
+                               "Site Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7", "event8a", "event8b","event8c")
         
         
       }else{
