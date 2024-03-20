@@ -9,17 +9,11 @@ passList<-as.data.frame(strsplit((paste0(usersdata$password, collapse=",")), ','
 permissionList<-as.data.frame(strsplit((paste0(usersdata$permissions, collapse=",")), ','))[,1]
 #toremove ...replace with auth0 after deploy
 user_base <- dplyr::tibble(
-  #user = c("user1", "user2", "user3", "user4"),
   user = unique(userList),
-  #password = sapply(c("pass1", "pass2", "pass3", "pass4"), sodium::password_store),
   password = sapply(unique(passList), sodium::password_store),
-  #permissions = c("admin", "standard","admin", "standard"),
   permissions = unique(permissionList)#,
-  #name = c("User RW1", "User RW2","User NG1", "User NG2")
 )
-# list1<-c("user1","user2")
-# list2<-c("user3","user4")
- 
+
 
 #basemap for leaflet
 basemap <- leaflet() %>%
@@ -126,7 +120,9 @@ shinyjs.hrefAuto = function(url) { window.location.href = url;};
 usecases.index<-c(  " SAA-Nigeria"  =1           , " DigGreen-Ethiopia"  =2  ," Fert-Ethiopia"     =3    , " SNS-Rwanda"  =4  ,  " ATAFI/MOVE"    =5      , " ex-Wcover-Ghana" =6     ,
                     " Planting-S-Asia" =7     ," DSRC-SE-Asia" =8       ,   " Govt-Egypt"     =9    ," Govt-LatAm"  =10     ,   " Cocoa Soils"  =11   ,   " Rainforest Alliance" =12  ,
                     " One Acre Fund"    =13     ,  " DRC Coffee OLAM"  =14       ,   " Solidaridad Soy Advisory" =15 , " DSR Extension Vietnam" =16  , " Morocco CA" =17          ,  " Mercy Corps SPROUT"  =18,
-                    " BAYGAP (BAYER)" =19  )
+                    " BAYGAP (BAYER)" =19, " KALRO" =20  )
+
+#usecases.index<-c(  " SNS-Rwanda"  =4  ,   " Solidaridad Soy Advisory" =15 ," KALRO" =20  )
 
 
 
