@@ -569,14 +569,16 @@ KL.val2 <- KL.val1 %>%
   arrange(Stage, crop, ENID, HHID)
 
 
-
+#full join to include all training data... left join later
 KL.SUM_data <- KL.ENHHReg %>%
-  left_join(KL.val2, by = c("ENID","HHID")) %>% #join identifiers and val data while keeping all enumerators/households
+  full_join(KL.val2, by = c("ENID","HHID")) %>% #join identifiers and val data while keeping all enumerators/households
+  arrange(ENID,HHID, desc(`Site Selection`)) %>% 
+  distinct(ENID,HHID, .keep_all = TRUE) %>% 
   suppressWarnings()
+
 
 ##### KLENKE000000 KLHHKE000000 not duplicated... one househld id used in training with multiple people asigned with different details.  
 ###training data to be excluded later...
-
 
 #save to bucket
 zz <- rawConnection(raw(0), "r+")

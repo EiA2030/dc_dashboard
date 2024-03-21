@@ -790,6 +790,14 @@ server <- function(input, output, session) {
                         #                 list(background ="white")
                         #               }),
                         HHID = colDef(
+                          html = TRUE,
+                          #filterable = TRUE,
+                          show = TRUE,
+                          cell =    function(value,index) {
+                            s2<-datacrop[which(datacrop$HHID==value ), ]
+                            tippy(value,tooltip = paste("NAME:", unique(s2$HHfirstName) , unique(s2$HHSurname), "<br>", "CONTACT:", unique(s2$HHphoneNo)))
+                          },
+                          
                           style  = function(value) {
                             list(background ="white")
                           }),
