@@ -50,31 +50,15 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
-    - name: Transfer deploy script
-      uses: appleboy/scp-action@v0.1.4
-      with:
-        host: ${{ secrets.DEV_DEPLOYMENT_INSTANCE }}
-        username: ${{ secrets.SSH_USER }}
-        key: ${{ secrets.SSH_KEY }}
-        port: ${{ secrets.SSH_PORT }}
-        source: deploy.sh, docker-compose.yml
-        target: "~"
-    
-    - name: Deploy to Server
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.DEV_DEPLOYMENT_INSTANCE }}
-        username: ${{ secrets.SSH_USER }}
-        key: ${{ secrets.SSH_KEY }}
-        port: ${{ secrets.SSH_PORT }}
-        script: |
-          export ENV=dev
-          export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-          export DOCKERHUB_PASSWORD=${{ secrets.DOCKERHUB_PASSWORD }}
-          export REPO_NAME=eia2030-dc-dashboard
-          export SSH_USER=${{ secrets.SSH_USER }}
-          bash deploy.sh
-          rm deploy.sh
+    - name: Update new image tag to manifests repo
+      run: |
+        git clone https://x-token-auth:${{ secrets.MANIFESTS_REPO_ACCESS_TOKEN }}@bitbucket.org/sciocore/${{ secrets.MANIFESTS_REPO }}.git && cd ${{ secrets.MANIFESTS_REPO }}
+        sed -i "s|image:.*|image:\ ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ steps.short-sha.outputs.sha }}|" apps/${{ secrets.DOCKERHUB_REPOSITORY }}/playground/eia2030-dc-dashboard/dev/deployment.yml
+        git add .
+        git config --global user.email "devops@scio.systems"
+        git config --global user.name "scio"
+        git commit -m "Updated image for ${{ secrets.DOCKERHUB_REPOSITORY }}"
+        git push origin main
 
   stg:
     name: Build & Deploy (stg)
@@ -115,31 +99,15 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
-    - name: Transfer deploy script
-      uses: appleboy/scp-action@v0.1.4
-      with:
-        host: ${{ secrets.STG_DEPLOYMENT_INSTANCE }}
-        username: ${{ secrets.SSH_USER }}
-        key: ${{ secrets.SSH_KEY }}
-        port: ${{ secrets.SSH_PORT }}
-        source: deploy.sh, docker-compose.yml
-        target: "~"
-    
-    - name: Deploy to Server
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.STG_DEPLOYMENT_INSTANCE }}
-        username: ${{ secrets.SSH_USER }}
-        key: ${{ secrets.SSH_KEY }}
-        port: ${{ secrets.SSH_PORT }}
-        script: |
-          export ENV=stg
-          export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-          export DOCKERHUB_PASSWORD=${{ secrets.DOCKERHUB_PASSWORD }}
-          export REPO_NAME=eia2030-dc-dashboard
-          export SSH_USER=${{ secrets.SSH_USER }}
-          bash deploy.sh
-          rm deploy.sh
+    - name: Update new image tag to manifests repo
+      run: |
+        git clone https://x-token-auth:${{ secrets.MANIFESTS_REPO_ACCESS_TOKEN }}@bitbucket.org/sciocore/${{ secrets.MANIFESTS_REPO }}.git && cd ${{ secrets.MANIFESTS_REPO }}
+        sed -i "s|image:.*|image:\ ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ steps.short-sha.outputs.sha }}|" apps/${{ secrets.DOCKERHUB_REPOSITORY }}/playground/eia2030-dc-dashboard/stg/deployment.yml
+        git add .
+        git config --global user.email "devops@scio.systems"
+        git config --global user.name "scio"
+        git commit -m "Updated image for ${{ secrets.DOCKERHUB_REPOSITORY }}"
+        git push origin main
 
   prod:
     name: Build & Deploy (prod)
@@ -180,28 +148,12 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
-    - name: Transfer deploy script
-      uses: appleboy/scp-action@v0.1.4
-      with:
-        host: ${{ secrets.PROD_DEPLOYMENT_INSTANCE }}
-        username: ${{ secrets.SSH_USER }}
-        key: ${{ secrets.SSH_KEY }}
-        port: ${{ secrets.SSH_PORT }}
-        source: deploy.sh, docker-compose.yml
-        target: "~"
-    
-    - name: Deploy to Server
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.PROD_DEPLOYMENT_INSTANCE }}
-        username: ${{ secrets.SSH_USER }}
-        key: ${{ secrets.SSH_KEY }}
-        port: ${{ secrets.SSH_PORT }}
-        script: |
-          export ENV=prod
-          export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-          export DOCKERHUB_PASSWORD=${{ secrets.DOCKERHUB_PASSWORD }}
-          export REPO_NAME=eia2030-dc-dashboard
-          export SSH_USER=${{ secrets.SSH_USER }}
-          bash deploy.sh
-          rm deploy.sh
+    - name: Update new image tag to manifests repo
+      run: |
+        git clone https://x-token-auth:${{ secrets.MANIFESTS_REPO_ACCESS_TOKEN }}@bitbucket.org/sciocore/${{ secrets.MANIFESTS_REPO }}.git && cd ${{ secrets.MANIFESTS_REPO }}
+        sed -i "s|image:.*|image:\ ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ steps.short-sha.outputs.sha }}|" apps/${{ secrets.DOCKERHUB_REPOSITORY }}/playground/eia2030-dc-dashboard/prod/deployment.yml
+        git add .
+        git config --global user.email "devops@scio.systems"
+        git config --global user.name "scio"
+        git commit -m "Updated image for ${{ secrets.DOCKERHUB_REPOSITORY }}"
+        git push origin main
