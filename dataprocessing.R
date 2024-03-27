@@ -442,7 +442,8 @@ NOTSol2<-NOTSol%>%
 valSol2<-valSol1%>%
   dplyr::select(any_of(c(  "today", "Event"  ,  "ENID" , "HHID" 
                            )  ))%>%
-  pivot_wider(names_from = Event, values_from = today) %>%
+  arrange(Event) %>%
+  pivot_wider(names_from = Event, values_from = today, values_fn = last) %>%
   mutate(Stage = "Validation") %>%
   mutate(crop = "Validation") %>%
   arrange(Stage,crop, 
@@ -566,7 +567,8 @@ KL.val2 <- KL.val1 %>%
   mutate(across(starts_with("event"), as.Date, format = "%Y-%m-%d")) %>%
   mutate(Stage = "Validation") %>%
   mutate(crop = "Validation") %>%
-  arrange(Stage, crop, ENID, HHID)
+  arrange(Stage, crop, ENID, HHID)%>%
+  suppressWarnings()
 
 
 #full join to include all training data... left join later
