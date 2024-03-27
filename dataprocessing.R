@@ -295,7 +295,7 @@ colsnot<-c("_id"                 ,                     "_tags"                  
 ###############Solidaridad NOT trials######################################
 NOTSol1<-NOTSol%>%
   select(-any_of(c( "_notes" , "_total_media", "_id", "_tags", "_uuid" ,"start", "_edited","_status" ,"_version" , "_duration"  ,"_xform_id" ,"_attachments", "_geolocation" ,"_media_count" ,"formhub/uuid"   ,                                      
-                    "_submitted_by","consent/photo","_date_modified","meta/instanceID"  , "_xform_id_string" ,"_bamboo_dataset_id"  ,"meta/instanceName" ,
+                    "_submitted_by","consent/photo","_date_modified","meta/instanceID"  , "_xform_id_string" ,"_bamboo_dataset_id"  ,"meta/instanceName" ,"plot_data" , #tocheck
                     "_media_all_received"  ,  "consent/read_consent_form"    ,"consent/copy",  "consent/give_consent" ,"formhub/uuid"    )))%>%
   rename(
     ENID = enumerator_id_1,
@@ -465,7 +465,9 @@ NOTValSol2 <-bind_rows(valSol2, NOTSol2)
 #NOTValSol1 <- bind_rows(valSol1, NOTSol1)
 # write.csv(SOL.SUM_data.DE,"SOL.SUM_data.DE.csv")
 # write.csv(NOTSol1,"NOTSol1.csv")
-
+NOTValSol2 <- NOTValSol2 %>%
+  select(-any_of(c ("plot_data"))) #to check
+               
 #save to bucket
 zz <- rawConnection(raw(0), "r+")
 write.csv(NOTValSol2, zz, row.names = FALSE)
