@@ -1,4 +1,4 @@
-name: dc_dashboard_pipeline
+name: CI/CD Pipeline
 
 on:
   push:
