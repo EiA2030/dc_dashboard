@@ -235,6 +235,26 @@ server <- function(input, output, session) {
                                "Site Selection", "event1", "event2", "event3", "event4", "event5", "event6","event7", "event8a", "event8b","event8c")
         
         
+      }else if (input$nav== " KALRO"){
+        KL.O_data <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "KLOdata.csv"),
+                                  file = tempfile(fileext = ".csv")
+        ) %>%
+          fread()
+        
+        KL.SUM_data <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "KLSUMdata.csv"),
+                                    file = tempfile(fileext = ".csv")
+        ) %>%
+          fread()
+        
+        datacrop <- KL.SUM_data
+        rawdata <- KL.O_data
+        patternissues<-""
+        patternissuesE<-""
+        columns_to_append <- c("ENID", "HHID", "crop",#"treat",
+                               "Site Selection", "event1","event1", "event2", "event3", "event4", "event5", "event6", "event8", "eventS")
+        
+        
+        
       }else{
         datacrop <- data.frame()
         rawdata <- data.frame()
@@ -251,7 +271,7 @@ server <- function(input, output, session) {
     selectInput_ids <- list()
     selectInput_values <- list()
     
-    lapply(1:19, function(k) {
+    lapply(1:20, function(k) {
       i<- usecases.index[names(usecases.index[ k ])]
       
       selectInput_ids <- c(selectInput_ids,
@@ -351,7 +371,7 @@ server <- function(input, output, session) {
       
       
       # Create a reactive expression for all use cases
-      lapply(1:19, function(k) {
+      lapply(1:20, function(k) {
         
         i <- usecases.index[names(usecases.index[ k ])]
         
@@ -402,6 +422,27 @@ server <- function(input, output, session) {
                                        "Site Selection","event1",  "event2", "event3", "event4", "event5", "event6","event7", "event8", "event9", "event10","event11", "event12", "event13", "event14", "event15", "event16","event17", "event18", "event19", "event20","event21")
                 
               }
+            }else if (input$nav== " KALRO"){
+              
+              KL.O_data <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "KLOdata.csv"),
+                                       file = tempfile(fileext = ".csv")
+              ) %>%
+                fread()
+              
+              KL.SUM_data <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "KLSUMdata.csv"),
+                                         file = tempfile(fileext = ".csv")
+              ) %>%
+                fread()
+              
+              datacrop <- KL.SUM_data
+              rawdata <- KL.O_data
+              patternissues<-""
+              patternissuesE<-""
+              columns_to_append <- c("ENID", "HHID", "crop",#"treat",
+                                     "Site Selection", "event1","event1", "event2", "event3", "event4", "event5", "event6", "event8", "eventS")
+              
+              
+              
             }else {
               datacrop <- data.frame()
               rawdata <- data.frame()
@@ -749,6 +790,14 @@ server <- function(input, output, session) {
                         #                 list(background ="white")
                         #               }),
                         HHID = colDef(
+                          html = TRUE,
+                          #filterable = TRUE,
+                          show = TRUE,
+                          cell =    function(value,index) {
+                            s2<-datacrop[which(datacrop$HHID==value ), ]
+                            tippy(value,tooltip = paste("NAME:", unique(s2$HHfirstName) , unique(s2$HHSurname), "<br>", "CONTACT:", unique(s2$HHphoneNo)))
+                          },
+                          
                           style  = function(value) {
                             list(background ="white")
                           }),
