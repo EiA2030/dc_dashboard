@@ -59,7 +59,7 @@ jobs:
     - name: Update new image tag to manifests repo
       run: |
         git clone https://x-token-auth:${{ secrets.MANIFESTS_REPO_ACCESS_TOKEN }}@bitbucket.org/sciocore/${{ secrets.MANIFESTS_REPO }}.git && cd ${{ secrets.MANIFESTS_REPO }}
-        sed -i "s|image:.*|image:\ ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ steps.short-sha.outputs.sha }}|" apps/${{ secrets.DOCKERHUB_REPOSITORY }}/playground/${{ secrets.DOCKERHUB_REPOSITORY }}/dev/deployment.yml
+        sed -i "s|image:.*|image:\ ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:dev-${{ steps.short-sha.outputs.sha }}|" apps/playground/${{ secrets.DOCKERHUB_REPOSITORY }}/dev/deployment.yml
         git add .
         git config --global user.email "devops@scio.systems"
         git config --global user.name "scio"
@@ -114,7 +114,7 @@ jobs:
     - name: Update new image tag to manifests repo
       run: |
         git clone https://x-token-auth:${{ secrets.MANIFESTS_REPO_ACCESS_TOKEN }}@bitbucket.org/sciocore/${{ secrets.MANIFESTS_REPO }}.git && cd ${{ secrets.MANIFESTS_REPO }}
-        sed -i "s|image:.*|image:\ ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ steps.short-sha.outputs.sha }}|" apps/${{ secrets.DOCKERHUB_REPOSITORY }}/playground/${{ secrets.DOCKERHUB_REPOSITORY }}/stg/deployment.yml
+        sed -i "s|image:.*|image:\ ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:stg-${{ steps.short-sha.outputs.sha }}|" apps/playground/${{ secrets.DOCKERHUB_REPOSITORY }}/stg/deployment.yml
         git add .
         git config --global user.email "devops@scio.systems"
         git config --global user.name "scio"
@@ -169,7 +169,7 @@ jobs:
     - name: Update new image tag to manifests repo
       run: |
         git clone https://x-token-auth:${{ secrets.MANIFESTS_REPO_ACCESS_TOKEN }}@bitbucket.org/sciocore/${{ secrets.MANIFESTS_REPO }}.git && cd ${{ secrets.MANIFESTS_REPO }}
-        sed -i "s|image:.*|image:\ ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ steps.short-sha.outputs.sha }}|" apps/${{ secrets.DOCKERHUB_REPOSITORY }}/playground/${{ secrets.DOCKERHUB_REPOSITORY }}/prod/deployment.yml
+        sed -i "s|image:.*|image:\ ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ steps.short-sha.outputs.sha }}|" apps/playground/${{ secrets.DOCKERHUB_REPOSITORY }}/prod/deployment.yml
         git add .
         git config --global user.email "devops@scio.systems"
         git config --global user.name "scio"
