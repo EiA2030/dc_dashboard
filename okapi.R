@@ -3,6 +3,7 @@
 #ONA :: load data  R okapi package.
 suppressMessages(suppressWarnings(library(okapi)))
 
+
 ##########################################################################################
 ##########################SNS-RWANDA######################################################
 ##########################################################################################
@@ -34,5 +35,16 @@ valSol<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_
 f.seg_malawi<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id =755562 )
 f.seg_mozambique<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id =756460 )
 f.seg_zambia<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id =755802 )
+
+
+##########################################################################################
+##########################KALRO###########################################################
+##########################################################################################
+
+# Define the ONA base URL, token and form ID 
+KL.Register_EN<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id = 789929)
+KL.RegisterVerify_HH<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id = 789933)
+#PotatoFertRT<-  ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id = 757128)
+KL.valData<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id =793461 )
 
 

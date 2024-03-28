@@ -1,0 +1,177 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: 
+    - "release/development" 
+    - "release/staging"
+    - "release/production"
+
+permissions:
+  contents: read
+
+jobs:
+  dev:
+    name: Build & Deploy (dev)
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/release/development'
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Get short SHA
+      uses: benjlevesque/short-sha@v3.0
+      id: short-sha
+      with:
+        length: 7
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Download envs from S3 bucket
+      run: |
+        aws s3 cp s3://scio-project-envs/${{ secrets.DOCKERHUB_REPOSITORY }}/dev.Renviron .Renviron
+        aws s3 cp s3://scio-project-envs/${{ secrets.DOCKERHUB_REPOSITORY }}/_auth0-dev.yml _auth0.yml
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+    - name: Build and Push Docker Image (dev)
+      uses: docker/build-push-action@v5      
+      with:
+        context: .
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:dev-${{ steps.short-sha.outputs.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Update new image tag to manifests repo
+      run: |
+        git clone https://x-token-auth:${{ secrets.MANIFESTS_REPO_ACCESS_TOKEN }}@bitbucket.org/sciocore/${{ secrets.MANIFESTS_REPO }}.git && cd ${{ secrets.MANIFESTS_REPO }}
+        sed -i "s|image:.*|image:\ ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:dev-${{ steps.short-sha.outputs.sha }}|" apps/eia/${{ secrets.DOCKERHUB_REPOSITORY }}/dev/deployment.yml
+        git add .
+        git config --global user.email "devops@scio.systems"
+        git config --global user.name "scio"
+        git commit -m "Updated image for ${{ secrets.DOCKERHUB_REPOSITORY }}"
+        git push origin main
+
+  stg:
+    name: Build & Deploy (stg)
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/release/staging'
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Get short SHA
+      uses: benjlevesque/short-sha@v3.0
+      id: short-sha
+      with:
+        length: 7
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Download envs from S3 bucket
+      run: |
+        aws s3 cp s3://scio-project-envs/${{ secrets.DOCKERHUB_REPOSITORY }}/dev.Renviron .Renviron
+        aws s3 cp s3://scio-project-envs/${{ secrets.DOCKERHUB_REPOSITORY }}/_auth0-dev.yml _auth0.yml
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+    - name: Build and Push Docker Image (stg)
+      uses: docker/build-push-action@v5      
+      with:
+        context: .
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:stg-${{ steps.short-sha.outputs.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Update new image tag to manifests repo
+      run: |
+        git clone https://x-token-auth:${{ secrets.MANIFESTS_REPO_ACCESS_TOKEN }}@bitbucket.org/sciocore/${{ secrets.MANIFESTS_REPO }}.git && cd ${{ secrets.MANIFESTS_REPO }}
+        sed -i "s|image:.*|image:\ ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:stg-${{ steps.short-sha.outputs.sha }}|" apps/eia/${{ secrets.DOCKERHUB_REPOSITORY }}/stg/deployment.yml
+        git add .
+        git config --global user.email "devops@scio.systems"
+        git config --global user.name "scio"
+        git commit -m "Updated image for ${{ secrets.DOCKERHUB_REPOSITORY }}"
+        git push origin main
+
+  prod:
+    name: Build & Deploy (prod)
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/release/production'
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Get short SHA
+      uses: benjlevesque/short-sha@v3.0
+      id: short-sha
+      with:
+        length: 7
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Download envs from S3 bucket
+      run: |
+        aws s3 cp s3://scio-project-envs/${{ secrets.DOCKERHUB_REPOSITORY }}/dev.Renviron .Renviron
+        aws s3 cp s3://scio-project-envs/${{ secrets.DOCKERHUB_REPOSITORY }}/_auth0-dev.yml _auth0.yml
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+    - name: Build and Push Docker Image (prod)
+      uses: docker/build-push-action@v5      
+      with:
+        context: .
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ steps.short-sha.outputs.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Update new image tag to manifests repo
+      run: |
+        git clone https://x-token-auth:${{ secrets.MANIFESTS_REPO_ACCESS_TOKEN }}@bitbucket.org/sciocore/${{ secrets.MANIFESTS_REPO }}.git && cd ${{ secrets.MANIFESTS_REPO }}
+        sed -i "s|image:.*|image:\ ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ steps.short-sha.outputs.sha }}|" apps/eia/${{ secrets.DOCKERHUB_REPOSITORY }}/prod/deployment.yml
+        git add .
+        git config --global user.email "devops@scio.systems"
+        git config --global user.name "scio"
+        git commit -m "Updated image for ${{ secrets.DOCKERHUB_REPOSITORY }}"
+        git push origin main
