@@ -152,27 +152,28 @@ full_data <- full_data%>%
     ENID = `intro/wrong_ENID`,
     HHID = `intro/wrong_ID`,
     todayVal = today,
+    Trial = crop,
     plantingDate = `planting/plantingDetails/planting_date`
   )#%>%mutate(todayVal2 = todayVal)
 
 VAL_data <- full_data %>%
-  dplyr::select(todayVal, ENID, HHID, crop, treat, `intro/event`) %>%
-  distinct(ENID, HHID, crop, treat, `intro/event`, .keep_all = TRUE)%>%
+  dplyr::select(todayVal, ENID, HHID, Trial, treat, `intro/event`) %>%
+  distinct(ENID, HHID, Trial, treat, `intro/event`, .keep_all = TRUE)%>%
   pivot_wider(names_from = `intro/event`, values_from = todayVal) %>%
-  arrange(ENID, HHID, crop, treat) %>%
+  arrange(ENID, HHID, Trial, treat) %>%
   left_join(
     full_data %>%
-      distinct(ENID, HHID, crop, treat, `intro/event`, .keep_all = TRUE) %>%
-      dplyr::select(ENID, HHID, crop, treat, plantingDate) %>%
+      distinct(ENID, HHID, Trial, treat, `intro/event`, .keep_all = TRUE) %>%
+      dplyr::select(ENID, HHID, Trial, treat, plantingDate) %>%
       filter(!is.na(plantingDate)),
-    by = c("ENID", "HHID", "crop", "treat")
+    by = c("ENID", "HHID", "Trial", "treat")
   ) %>%
   left_join(
     full_data %>%
-      distinct(ENID, HHID, crop, treat, `intro/event`, .keep_all = TRUE) %>%
-      dplyr::select(ENID, HHID, crop, treat, todayVal) ,
-    by = c("ENID", "HHID", "crop", "treat")
-  ) %>% distinct(ENID, HHID, crop, treat, .keep_all = TRUE)%>% 
+      distinct(ENID, HHID, Trial, treat, `intro/event`, .keep_all = TRUE) %>%
+      dplyr::select(ENID, HHID, Trial, treat, todayVal) ,
+    by = c("ENID", "HHID", "Trial", "treat")
+  ) %>% distinct(ENID, HHID, Trial, treat, .keep_all = TRUE)%>% 
   mutate(event1 = plantingDate)%>% select(-(plantingDate))%>% suppressWarnings()
 
 
@@ -198,26 +199,27 @@ dataev <- dataev%>%
     ENID = `intro/wrong_ENID`,
     HHID = `intro/wrong_ID`,
     todayVal = today,
+    Trial =crop,
     plantingDate = `planting/plantingDetails/planting_date`
   )
 dataev1 <- dataev%>%
-  dplyr::select(todayVal, ENID, HHID, crop,  `intro/event`) %>%
-  distinct(ENID, HHID, crop, `intro/event`, .keep_all = TRUE)%>%
+  dplyr::select(todayVal, ENID, HHID, Trial,  `intro/event`) %>%
+  distinct(ENID, HHID, Trial, `intro/event`, .keep_all = TRUE)%>%
   pivot_wider(names_from = `intro/event`, values_from = todayVal) %>%
-  arrange(ENID, HHID, crop) %>%
+  arrange(ENID, HHID, Trial) %>%
   left_join(
     dataev %>%
-      distinct(ENID, HHID, crop, `intro/event`, .keep_all = TRUE) %>%
-      dplyr::select(ENID, HHID, crop, plantingDate) %>%
+      distinct(ENID, HHID, Trial, `intro/event`, .keep_all = TRUE) %>%
+      dplyr::select(ENID, HHID, Trial, plantingDate) %>%
       filter(!is.na(plantingDate)),
-    by = c("ENID", "HHID", "crop")
+    by = c("ENID", "HHID", "Trial")
   ) %>%
   left_join(
     dataev %>%
-      distinct(ENID, HHID, crop,  `intro/event`, .keep_all = TRUE) %>%
-      dplyr::select(ENID, HHID, crop, todayVal) ,
-    by = c("ENID", "HHID", "crop")
-  ) %>% distinct(ENID, HHID, crop, .keep_all = TRUE)%>% 
+      distinct(ENID, HHID, Trial,  `intro/event`, .keep_all = TRUE) %>%
+      dplyr::select(ENID, HHID, Trial, todayVal) ,
+    by = c("ENID", "HHID", "Trial")
+  ) %>% distinct(ENID, HHID, Trial, .keep_all = TRUE)%>% 
   mutate(event1 = plantingDate)%>% select(-(plantingDate))%>%
   suppressWarnings()
 
@@ -295,7 +297,7 @@ colsnot<-c("_id"                 ,                     "_tags"                  
 ###############Solidaridad NOT trials######################################
 NOTSol1<-NOTSol%>%
   select(-any_of(c( "_notes" , "_total_media", "_id", "_tags", "_uuid" ,"start", "_edited","_status" ,"_version" , "_duration"  ,"_xform_id" ,"_attachments", "_geolocation" ,"_media_count" ,"formhub/uuid"   ,                                      
-                    "_submitted_by","consent/photo","_date_modified","meta/instanceID"  , "_xform_id_string" ,"_bamboo_dataset_id"  ,"meta/instanceName" ,"plot_data" , #tocheck
+                    "_submitted_by","consent/photo","_date_modified","meta/instanceID"  , "_xform_id_string" ,"_bamboo_dataset_id"  ,"meta/instanceName" ,
                     "_media_all_received"  ,  "consent/read_consent_form"    ,"consent/copy",  "consent/give_consent" ,"formhub/uuid"    )))%>%
   rename(
     ENID = enumerator_id_1,
@@ -304,34 +306,51 @@ NOTSol1<-NOTSol%>%
     Event= event,
     latitude= `site_characterization/latitude_field`,
     longitude= `site_characterization/longitude_field`,
-    #crop= `projectDetails/trial_type`,
+    Trial= `projectDetails/trial_type`,
     today = `_submission_time`,
   ) %>%
   mutate(today = as.IDate(today)) %>%
+  mutate(HHID = coalesce(`start/barcodehousehold_solidaridad`, HHID) )%>%
+  mutate(ENID = coalesce(`start/enumerator_ID`, ENID) )%>%
+  mutate(Trial = coalesce(`start/trial`, Trial) )%>%
+  mutate(Event = coalesce(`start/event`, Event) )%>%
   arrange(ENID,HHID, desc(today)) %>% #sort to Keep last entry by date in duplicated records
   distinct(ENID,HHID,today,Event, .keep_all = TRUE)  %>%
   mutate(Stage = "NOT Trials") %>%
+  mutate(Country = coalesce(`start/country`, Country) )%>%
   mutate(Country = capitalize(Country))
   
-
-
-NOTSol2<-NOTSol%>%
-  rename(today =`_submission_time`,
-         Event =  event,
-         crop= `projectDetails/trial_type`,
-         #Country = `projectDetails/countries`,
-         ENID= enumerator_id_1,
-         #PLID = `projectDetails/plot_ID_or_number_1`,
-         HHID = `projectDetails/rep_ID_or_number_1`
-  )%>%
-  mutate(today = as.IDate(today)) %>%
+NOTSol2<-NOTSol1%>%
+  dplyr::select(any_of(c(  "today", "Event"  , "Trial", "ENID" , "HHID" 
+  )  ))%>%
+  arrange(Event) %>%
   mutate(Event = paste( "event",Event, sep = ""))%>%
-  pivot_wider(names_from = Event, values_from = today) %>%
+  pivot_wider(names_from = Event, values_from = today, values_fn = last) %>%
   mutate(Stage = "NOT Trials") %>%
-  #rename(`Site Selection` =event1)%>%
-  arrange(Stage,crop, 
-          ENID, HHID )%>%
-  select(-any_of(c(colsnot)))
+  arrange(Stage,Trial, 
+          ENID, HHID )
+
+# NOTSol2<-NOTSol%>%
+#   rename(today =`_submission_time`,
+#          Event =  event,
+#          Trial= `projectDetails/trial_type`,
+#          #Country = `projectDetails/countries`,
+#          ENID= enumerator_id_1,
+#          #PLID = `projectDetails/plot_ID_or_number_1`,
+#          HHID = `projectDetails/rep_ID_or_number_1`
+#   )%>%
+#   mutate(today = as.IDate(today)) %>%
+#   mutate(HHID = coalesce(`start/barcodehousehold_solidaridad`, HHID) )%>%
+#   mutate(ENID = coalesce(`start/enumerator_ID`, ENID) )%>%
+#   mutate(Trial = coalesce(`start/trial`, Trial) )%>%
+#   mutate(Event = coalesce(`start/event`, Event) )%>%
+#   mutate(Event = paste( "event",Event, sep = ""))%>%
+#   pivot_wider(names_from = Event, values_from = today) %>%
+#   mutate(Stage = "NOT Trials") %>%
+#   #rename(`Site Selection` =event1)%>%
+#   arrange(Stage,Trial, 
+#           ENID, HHID )%>%
+#   select(-any_of(c(colsnot)))
 
 
 ###############Solidaridad On-farm validations######################################
@@ -419,9 +438,6 @@ NOTSol2<-NOTSol%>%
 
 # #######Validation data
   valSol1<-valSol%>%
-  select(-any_of(c( "_notes" , "_total_media", "_id", "_tags", "_uuid" ,"start", "_edited","_status" ,"_version" , "_duration"  ,"_xform_id" ,"_attachments", "_geolocation" ,"_media_count" ,"formhub/uuid"   ,
-                   "_submitted_by","consent/photo","_date_modified","meta/instanceID"  ,"_submission_time", "_xform_id_string" ,"_bamboo_dataset_id"  ,
-                   "_media_all_received"  ,  "consent/read_consent_form"    ,"consent/copy",  "consent/give_consent"   )))%>%
   rename(
     ENID = `intro/enumerator_id_1`,
     HHID = `intro/barcodehousehold_1`,
@@ -435,7 +451,13 @@ NOTSol2<-NOTSol%>%
   arrange(ENID,HHID, desc(today)) %>% #sort to Keep last entry by date in duplicated records
   distinct(ENID,HHID,today,Event, .keep_all = TRUE)  %>%
   mutate(Stage = "Validation") %>%
-  mutate(Country = capitalize(Country))
+  mutate(
+    Country = coalesce(`intro/country`, Country) )%>%
+  mutate(Country = capitalize(Country))%>%
+  select(-any_of(c( "_notes" , "_total_media", "_id", "_tags", "_uuid" ,"start", "_edited","_status" ,"_version" , "_duration"  ,"_xform_id" ,"_attachments", "_geolocation" ,"_media_count" ,"formhub/uuid"   ,
+                                                            "_submitted_by","consent/photo","_date_modified","meta/instanceID"  ,"_submission_time", "_xform_id_string" ,"_bamboo_dataset_id"  ,
+                                                            "_media_all_received"  ,  "consent/read_consent_form"    ,"consent/copy",  "consent/give_consent", "intro/country" )))
+  
 
 
 
@@ -445,8 +467,8 @@ valSol2<-valSol1%>%
   arrange(Event) %>%
   pivot_wider(names_from = Event, values_from = today, values_fn = last) %>%
   mutate(Stage = "Validation") %>%
-  mutate(crop = "Validation") %>%
-  arrange(Stage,crop, 
+  mutate(Trial = "Validation") %>%
+  arrange(Stage,Trial, 
           ENID, HHID )
 
 valSol1<-as.data.frame(valSol1)
@@ -462,12 +484,45 @@ valSol1<-as.data.frame(valSol1)
 ###########################################################################################################################
 #rbind valSol2, NOTSol2 and save as SOL.SUM_data on aws
 NOTValSol2 <-bind_rows(valSol2, NOTSol2)
-#NOTValSol1 <- bind_rows(valSol1, NOTSol1)
-# write.csv(SOL.SUM_data.DE,"SOL.SUM_data.DE.csv")
-# write.csv(NOTSol1,"NOTSol1.csv")
-NOTValSol2 <- NOTValSol2 %>%
-  select(-any_of(c ("plot_data"))) #to check
-               
+
+NOTSolID<-NOTSol1%>%
+  rename(
+    HHfirstName=`site_characterization/first_name`,
+    HHSurname = `site_characterization/surname`,
+    HHphoneNo= `site_characterization/phone_number`
+  )%>%
+  dplyr::select(any_of(c( "ENID" , "HHID" ,"HHfirstName","HHSurname", "HHphoneNo"
+  )  ))%>%
+  filter(!is.na(HHfirstName)) %>%
+  distinct(ENID, HHID, .keep_all = TRUE)
+  
+
+
+NOTValSol2 <-NOTValSol2 %>%
+  left_join(NOTSolID, by = c("ENID","HHID")) %>% 
+  filter(!is.na(ENID) & !is.na(HHID))
+
+NOTSol1 <- lapply(NOTSol1, function(x) {
+  if (is.list(x)) {
+    sapply(x, paste, collapse = ',')
+  } else {
+    x
+  }
+})
+NOTSol1 <- as.data.frame(NOTSol1)
+
+NOTValSol2 <- lapply(NOTValSol2, function(x) {
+  if (is.list(x)) {
+    sapply(x, paste, collapse = ',')
+  } else {
+    x
+  }
+})
+
+NOTValSol2 <- as.data.frame(NOTValSol2)
+
+
+         
 #save to bucket
 zz <- rawConnection(raw(0), "r+")
 write.csv(NOTValSol2, zz, row.names = FALSE)
@@ -487,8 +542,6 @@ write.csv(NOTSol1, zz, row.names = FALSE)
 aws.s3::put_object(file = rawConnectionValue(zz),
                    bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SolidaridadNOTdata.csv"))
 close(zz)
-
-
 
 
 
@@ -543,7 +596,7 @@ KL.val1<-KL.valData%>%
   
   as.data.frame()%>%
   select(-any_of(c( "_notes" , "_total_media", "_id", "_tags", "_uuid" ,"start", "_edited","_status" ,"_version" , "_duration"  ,"_xform_id" ,"_attachments", "_geolocation" ,"_media_count" ,"formhub/uuid"   ,
-                    "_submitted_by","consent/photo","_date_modified","meta/instanceID"  ,"_submission_time", "_xform_id_string" ,"_bamboo_dataset_id"  ,"soil_sample/soilSample", #tochecksoilcol
+                    "_submitted_by","consent/photo","_date_modified","meta/instanceID"  ,"_submission_time", "_xform_id_string" ,"_bamboo_dataset_id"  ,
                     "_media_all_received"  ,  "consent/read_consent_form"    ,"consent/copy",  "consent/give_consent")))%>%
   rename(
     ENID = `intro/enumerator_id`,
@@ -568,8 +621,8 @@ KL.val2 <- KL.val1 %>%
   pivot_wider(names_from = Event, values_from = today, values_fn = last) %>%
   mutate(across(starts_with("event"), as.Date, format = "%Y-%m-%d")) %>%
   mutate(Stage = "Validation") %>%
-  mutate(crop = "Validation") %>%
-  arrange(Stage, crop, ENID, HHID)%>%
+  mutate(Trial = "Validation") %>%
+  arrange(Stage, Trial, ENID, HHID)%>%
   suppressWarnings()
 
 
@@ -580,7 +633,15 @@ KL.SUM_data <- KL.ENHHReg %>%
   distinct(ENID,HHID, .keep_all = TRUE) %>% 
   suppressWarnings()
 
+KL.val1 <- lapply(KL.val1, function(x) {
+  if (is.list(x)) {
+    sapply(x, paste, collapse = ',')
+  } else {
+    x
+  }
+})
 
+KL.val1 <- as.data.frame(KL.val1)
 ##### KLENKE000000 KLHHKE000000 not duplicated... one househld id used in training with multiple people asigned with different details.  
 ###training data to be excluded later...
 
