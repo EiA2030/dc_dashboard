@@ -251,7 +251,7 @@ server <- function(input, output, session) {
         patternissues<-""
         patternissuesE<-""
         columns_to_append <- c("ENID", "HHID", "Trial",#"treat",
-                               "Site Selection", "event1","event1", "event2", "event3", "event4", "event5", "event6", "event8", "eventS")
+                               "Site Selection", "eventS", "event1","event1", "event2", "event3", "event4", "event5", "event6", "event8")
         
         
         
@@ -439,7 +439,7 @@ server <- function(input, output, session) {
               patternissues<-""
               patternissuesE<-""
               columns_to_append <- c("ENID", "HHID", "Trial",#"treat",
-                                     "Site Selection", "event1","event1", "event2", "event3", "event4", "event5", "event6", "event8", "eventS")
+                                     "Site Selection", "eventS", "event1","event1", "event2", "event3", "event4", "event5", "event6", "event8")
               
               
               
@@ -706,7 +706,7 @@ server <- function(input, output, session) {
             dplyr::select(any_of(c("ENID", "HHID")))
           
           event_conditions <- function(row) {
-            for (i in 4:length(row)) { # Start from the "event1" column index
+            for (i in 3:length(row)) { # Start from the "event1" column index
               if (is.na(row[i-1]) && !is.na(row[i])) {
                 return(TRUE)
               } else if (!is.na(row[i-1]) && !is.na(row[i])) {
@@ -725,7 +725,8 @@ server <- function(input, output, session) {
                                          mutate(Issues = ifelse(!grepl(patternissuesE, HHID), "Check HHID", NA)) %>%
                                          mutate(Issues = as.character(Issues)),error = function(e) NULL) 
           datacropissuesC <- tryCatch( datacropI %>%
-                                         filter(apply(datacropI[, 4:ncol(datacropI)], 1, event_conditions))%>% # Consider columns from "event1" to the end
+                                         filter(apply(datacropI[, 3:ncol(datacropI)], 1, event_conditions)) %>% 
+                                        #filter(apply(datacropI[, 4:ncol(datacropI)], 1, event_conditions))%>% # Consider columns from "event1" to the end
                                          dplyr::select(any_of(c("ENID", "HHID")))%>%
                                          mutate(Issues = "Check submission events" ),error = function(e) NULL) 
           
