@@ -586,12 +586,14 @@ KL.HHReg<-KL.RegisterVerify_HH%>%
          
   )%>%
   mutate(`Site Selection` = as.Date(`Site Selection`)) %>%
+  filter(!is.na(HHID)) %>%  # Filter out rows where HHID is NA
   distinct(ENID,HHID,Country,`Site Selection`,HHphoneNo, .keep_all = TRUE)  
 
 KL.ENHHReg <- KL.ENReg %>%
   full_join(KL.HHReg, by = "ENID") %>%
   suppressWarnings()
  
+
 
 
 #Validation data
@@ -627,19 +629,27 @@ KL.val2 <- KL.val1 %>%
   arrange(Event) %>%
   pivot_wider(names_from = Event, values_from = today, values_fn = last) %>%
   mutate(across(starts_with("event"), as.Date, format = "%Y-%m-%d")) %>%
-  mutate(Stage = "Validation") %>%
-  mutate(Trial = "Validation") %>%
-  arrange(Stage, Trial, ENID, HHID)%>%
+  arrange( ENID, HHID)%>%
   suppressWarnings()
 
+ 
+#join to include all EN details... some not in the hh details. 
 
-#full join to include all training data... left join later
-KL.SUM_data <- KL.ENHHReg %>%
-  full_join(KL.val2, by = c("ENID","HHID")) %>% #join identifiers and val data while keeping all enumerators/households
+KL.ENHHReg2<-KL.ENHHReg %>%
+  dplyr::select(-any_of(c("Country", "ENtoday", "ENfirstName","ENSurname","ENphoneNo" ))) 
+
+
+#get hh details
+KL.SUM_data <- KL.val2 %>%
+  full_join(KL.ENHHReg2, by = c("ENID","HHID")) %>% #join identifiers and val data while keeping all enumerators/households
+  left_join(KL.ENReg, by = "ENID")  %>%
   arrange(ENID,HHID, desc(`Site Selection`)) %>% 
   distinct(ENID,HHID, .keep_all = TRUE) %>% 
   filter(ENID != "KLENKE000000" ) %>%#leave out the enumerator registered for testing and monitoring the tool and is not expected to collect data
   filter(ENID != "KLENKE123456")%>%
+  filter(!(duplicated(ENID) & is.na(HHID))) %>% # remove rows where ENID is not unique and HHID is NA
+  mutate(Stage = "Validation") %>%
+  mutate(Trial = "Validation") %>%
   suppressWarnings()
 
 KL.val1 <- lapply(KL.val1, function(x) {

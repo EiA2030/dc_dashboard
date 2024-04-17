@@ -477,6 +477,7 @@ server <- function(input, output, session) {
           updateSelectInput(session, paste0("householdfinderr_",i), choices = householdfinderr_new_choices)
           updateDateRangeInput(session, paste0("datefinderr_",i), start = datefinderr_new_choices, end = Sys.time())
           
+       
           
           #CORRECT TO-
           #subset_df <- df[df$category %in% selected_categories, ]
@@ -488,7 +489,6 @@ server <- function(input, output, session) {
               
             }
             ,error = function(e) NULL)
-          
           
           
           
@@ -537,18 +537,29 @@ server <- function(input, output, session) {
             datacropO <- datacropO[which(datacropO$today >= dateUsecase[1] & datacropO$today <= dateUsecase[2]), ]
             ,error = function(e) NULL)
           
+          
+          dateleo<-format(Sys.time(), "%Y-%m-%d")
+          datestart<-min(na.omit(rawdata$today))
           tryCatch(
+            if (dateUsecase[1] == datestart && dateUsecase[2] == dateleo ){
+              datacrop <- datacrop
+            }else{
             #datacrop <- datacrop[which(datacrop$Date >= dateUsecase[1] & datacrop$Date <= dateUsecase[2]), ]
             datacrop <- datacrop[datacrop$ENID %in% datacropO$ENID, ]
+            }
             ,error = function(e) NULL)
-         
+          
+ 
           tryCatch(
+            if (dateUsecase[1] == datestart && dateUsecase[2] == dateleo ){
+              datacrop <- datacrop
+            }else{
             #datacrop <- datacrop[which(datacrop$Date >= dateUsecase[1] & datacrop$Date <= dateUsecase[2]), ]
             datacrop <- datacrop[datacrop$HHID %in% datacropO$HHID, ]
+            }
             ,error = function(e) NULL)
           
-          
-          
+       
           
           
           #Summary map
