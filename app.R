@@ -251,7 +251,7 @@ server <- function(input, output, session) {
         patternissues<-""
         patternissuesE<-""
         columns_to_append <- c("ENID", "HHID", "Trial",#"treat",
-                               "Site Selection", "event1","event1", "event2", "event3", "event4", "event5", "event6", "event8", "eventS")
+                               "Site Selection", "eventS", "event1","event1", "event2", "event3", "event4", "event5", "event6", "event8")
         
         
         
@@ -439,7 +439,7 @@ server <- function(input, output, session) {
               patternissues<-""
               patternissuesE<-""
               columns_to_append <- c("ENID", "HHID", "Trial",#"treat",
-                                     "Site Selection", "event1","event1", "event2", "event3", "event4", "event5", "event6", "event8", "eventS")
+                                     "Site Selection", "eventS", "event1","event1", "event2", "event3", "event4", "event5", "event6", "event8")
               
               
               
@@ -477,6 +477,7 @@ server <- function(input, output, session) {
           updateSelectInput(session, paste0("householdfinderr_",i), choices = householdfinderr_new_choices)
           updateDateRangeInput(session, paste0("datefinderr_",i), start = datefinderr_new_choices, end = Sys.time())
           
+       
           
           #CORRECT TO-
           #subset_df <- df[df$category %in% selected_categories, ]
@@ -488,7 +489,6 @@ server <- function(input, output, session) {
               
             }
             ,error = function(e) NULL)
-          
           
           
           
@@ -537,18 +537,29 @@ server <- function(input, output, session) {
             datacropO <- datacropO[which(datacropO$today >= dateUsecase[1] & datacropO$today <= dateUsecase[2]), ]
             ,error = function(e) NULL)
           
+          
+          dateleo<-format(Sys.time(), "%Y-%m-%d")
+          datestart<-min(na.omit(rawdata$today))
           tryCatch(
+            if (dateUsecase[1] == datestart && dateUsecase[2] == dateleo ){
+              datacrop <- datacrop
+            }else{
             #datacrop <- datacrop[which(datacrop$Date >= dateUsecase[1] & datacrop$Date <= dateUsecase[2]), ]
             datacrop <- datacrop[datacrop$ENID %in% datacropO$ENID, ]
+            }
             ,error = function(e) NULL)
-         
+          
+ 
           tryCatch(
+            if (dateUsecase[1] == datestart && dateUsecase[2] == dateleo ){
+              datacrop <- datacrop
+            }else{
             #datacrop <- datacrop[which(datacrop$Date >= dateUsecase[1] & datacrop$Date <= dateUsecase[2]), ]
             datacrop <- datacrop[datacrop$HHID %in% datacropO$HHID, ]
+            }
             ,error = function(e) NULL)
           
-          
-          
+       
           
           
           #Summary map
@@ -706,7 +717,7 @@ server <- function(input, output, session) {
             dplyr::select(any_of(c("ENID", "HHID")))
           
           event_conditions <- function(row) {
-            for (i in 4:length(row)) { # Start from the "event1" column index
+            for (i in 3:length(row)) { # Start from the "event1" column index
               if (is.na(row[i-1]) && !is.na(row[i])) {
                 return(TRUE)
               } else if (!is.na(row[i-1]) && !is.na(row[i])) {
@@ -725,7 +736,8 @@ server <- function(input, output, session) {
                                          mutate(Issues = ifelse(!grepl(patternissuesE, HHID), "Check HHID", NA)) %>%
                                          mutate(Issues = as.character(Issues)),error = function(e) NULL) 
           datacropissuesC <- tryCatch( datacropI %>%
-                                         filter(apply(datacropI[, 4:ncol(datacropI)], 1, event_conditions))%>% # Consider columns from "event1" to the end
+                                         filter(apply(datacropI[, 3:ncol(datacropI)], 1, event_conditions)) %>% 
+                                        #filter(apply(datacropI[, 4:ncol(datacropI)], 1, event_conditions))%>% # Consider columns from "event1" to the end
                                          dplyr::select(any_of(c("ENID", "HHID")))%>%
                                          mutate(Issues = "Check submission events" ),error = function(e) NULL) 
           
