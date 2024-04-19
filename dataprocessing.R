@@ -561,7 +561,10 @@ KL.ENReg <- KL.Register_EN%>%
   ) %>%
   select(any_of(c("ENtoday","ENID","ENfirstName","ENSurname","ENphoneNo"))) %>%
   arrange(ENID, desc(ENtoday)) %>% #sort to Keep last entry by date in duplicated records
-  distinct(ENID, .keep_all = TRUE) # Keep last entry by date in duplicated records
+  distinct(ENID, .keep_all = TRUE)# Keep last entry by date in duplicated records
+  
+
+
 
 
 KL.HHReg<-KL.RegisterVerify_HH%>%
@@ -583,12 +586,14 @@ KL.HHReg<-KL.RegisterVerify_HH%>%
          
   )%>%
   mutate(`Site Selection` = as.Date(`Site Selection`)) %>%
+  filter(!is.na(HHID)) %>%  # Filter out rows where HHID is NA
   distinct(ENID,HHID,Country,`Site Selection`,HHphoneNo, .keep_all = TRUE)  
 
 KL.ENHHReg <- KL.ENReg %>%
   full_join(KL.HHReg, by = "ENID") %>%
   suppressWarnings()
  
+
 
 
 #Validation data
@@ -607,30 +612,44 @@ KL.val1<-KL.valData%>%
     longitude= `location/longitude`,
     today = today
   ) %>%
+  mutate(ENID = if_else(ENID == "KHENKE000028", "KLENKE000028", ENID)) %>%
   mutate(today = as.IDate(today)) %>%
   arrange(ENID,HHID, desc(today)) %>% #sort to Keep last entry by date in duplicated records
   distinct(ENID,HHID,today,Event, .keep_all = TRUE)  %>%
   mutate(Stage = "Validation") %>%
-  mutate(Country = capitalize(Country))
+  mutate(Country = capitalize(Country))%>%
+  filter(ENID != "KLENKE000000" ) %>%#leave out the enumerator registered for testing and monitoring the tool and is not expected to collect data
+  filter(ENID != "KLENKE123456")
 
 
 
 KL.val2 <- KL.val1 %>%
   dplyr::select(any_of(c("today", "Event", "ENID", "HHID"))) %>%
+  mutate(ENID = if_else(ENID == "KHENKE000028", "KLENKE000028", ENID)) %>%
   arrange(Event) %>%
   pivot_wider(names_from = Event, values_from = today, values_fn = last) %>%
   mutate(across(starts_with("event"), as.Date, format = "%Y-%m-%d")) %>%
-  mutate(Stage = "Validation") %>%
-  mutate(Trial = "Validation") %>%
-  arrange(Stage, Trial, ENID, HHID)%>%
+  arrange( ENID, HHID)%>%
   suppressWarnings()
 
+ 
+#join to include all EN details... some not in the hh details. 
 
-#full join to include all training data... left join later
-KL.SUM_data <- KL.ENHHReg %>%
-  full_join(KL.val2, by = c("ENID","HHID")) %>% #join identifiers and val data while keeping all enumerators/households
+KL.ENHHReg2<-KL.ENHHReg %>%
+  dplyr::select(-any_of(c("Country", "ENtoday", "ENfirstName","ENSurname","ENphoneNo" ))) 
+
+
+#get hh details
+KL.SUM_data <- KL.val2 %>%
+  full_join(KL.ENHHReg2, by = c("ENID","HHID")) %>% #join identifiers and val data while keeping all enumerators/households
+  left_join(KL.ENReg, by = "ENID")  %>%
   arrange(ENID,HHID, desc(`Site Selection`)) %>% 
   distinct(ENID,HHID, .keep_all = TRUE) %>% 
+  filter(ENID != "KLENKE000000" ) %>%#leave out the enumerator registered for testing and monitoring the tool and is not expected to collect data
+  filter(ENID != "KLENKE123456")%>%
+  filter(!(duplicated(ENID) & is.na(HHID))) %>% # remove rows where ENID is not unique and HHID is NA
+  mutate(Stage = "Validation") %>%
+  mutate(Trial = "Validation") %>%
   suppressWarnings()
 
 KL.val1 <- lapply(KL.val1, function(x) {
@@ -644,7 +663,7 @@ KL.val1 <- lapply(KL.val1, function(x) {
 KL.val1 <- as.data.frame(KL.val1)
 ##### KLENKE000000 KLHHKE000000 not duplicated... one househld id used in training with multiple people asigned with different details.  
 ###training data to be excluded later...
-
+#View(KL.SUM_data)
 #save to bucket
 zz <- rawConnection(raw(0), "r+")
 write.csv(KL.SUM_data, zz, row.names = FALSE)
