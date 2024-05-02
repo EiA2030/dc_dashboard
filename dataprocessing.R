@@ -243,24 +243,47 @@ RWA.O_data<-valTest %>%
 
 
 #save to bucket 
-zz <- rawConnection(raw(0), "r+")
-write.csv(RWA.VAL_data, zz, row.names = FALSE)
-aws.s3::put_object(file = rawConnectionValue(zz),
-                   bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SNSRwandaVALdata.csv") )
-close(zz)
+temp_file <- tempfile()
+write.csv(RWA.VAL_data, temp_file, row.names = FALSE)
+aws.s3::put_object(file = temp_file,
+                   bucket = "rtbglr", 
+                   object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SNSRwandaVALdata.csv"))
+unlink(temp_file)
 
-zz <- rawConnection(raw(0), "r+")
-write.csv(RWA.SUM_data, zz, row.names = FALSE)
-aws.s3::put_object(file = rawConnectionValue(zz),
-                   bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SNSRwandaSUMdata.csv"))
-close(zz)
+temp_file <- tempfile()
+write.csv(RWA.SUM_data, temp_file, row.names = FALSE)
+aws.s3::put_object(file = temp_file,
+                   bucket = "rtbglr", 
+                   object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SNSRwandaSUMdata.csv"))
+unlink(temp_file)
 
-zz <- rawConnection(raw(0), "r+")
-write.csv(RWA.O_data, zz, row.names = FALSE)
-aws.s3::put_object(file = rawConnectionValue(zz),
-                   bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SNSRwandaOdata.csv")) 
-close(zz)
-#setwd(wd)
+temp_file <- tempfile()
+write.csv(RWA.O_data, temp_file, row.names = FALSE)
+aws.s3::put_object(file = temp_file,
+                   bucket = "rtbglr", 
+                   object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SNSRwandaOdata.csv"))
+unlink(temp_file)
+
+
+
+# zz <- rawConnection(raw(0), "r+")
+# write.csv(RWA.VAL_data, zz, row.names = FALSE)
+# aws.s3::put_object(file = rawConnectionValue(zz),
+#                    bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SNSRwandaVALdata.csv") )
+# close(zz)
+# 
+# zz <- rawConnection(raw(0), "r+")
+# write.csv(RWA.SUM_data, zz, row.names = FALSE)
+# aws.s3::put_object(file = rawConnectionValue(zz),
+#                    bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SNSRwandaSUMdata.csv"))
+# close(zz)
+# 
+# zz <- rawConnection(raw(0), "r+")
+# write.csv(RWA.O_data, zz, row.names = FALSE)
+# aws.s3::put_object(file = rawConnectionValue(zz),
+#                    bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SNSRwandaOdata.csv")) 
+# close(zz)
+# #setwd(wd)
 
 
 
@@ -524,24 +547,46 @@ NOTValSol2 <- as.data.frame(NOTValSol2)
 
          
 #save to bucket
-zz <- rawConnection(raw(0), "r+")
-write.csv(NOTValSol2, zz, row.names = FALSE)
-aws.s3::put_object(file = rawConnectionValue(zz),
-                   bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SolidaridadSUMdata.csv"))
-close(zz)
+temp_file <- tempfile()
+write.csv(NOTValSol2, temp_file, row.names = FALSE)
+aws.s3::put_object(file = temp_file,
+                   bucket = "rtbglr", 
+                   object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SolidaridadSUMdata.csv"))
+unlink(temp_file)
+
+temp_file <- tempfile()
+write.csv(valSol1, temp_file, row.names = FALSE)
+aws.s3::put_object(file = temp_file,
+                   bucket = "rtbglr", 
+                   object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SolidaridadOdata.csv"))
+unlink(temp_file)
+
+temp_file <- tempfile()
+write.csv(NOTSol1, temp_file, row.names = FALSE)
+aws.s3::put_object(file = temp_file,
+                   bucket = "rtbglr", 
+                   object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SolidaridadNOTdata.csv"))
+unlink(temp_file)
 
 
-zz <- rawConnection(raw(0), "r+")
-write.csv(valSol1, zz, row.names = FALSE)
-aws.s3::put_object(file = rawConnectionValue(zz),
-                   bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SolidaridadOdata.csv"))
-close(zz)
-
-zz <- rawConnection(raw(0), "r+")
-write.csv(NOTSol1, zz, row.names = FALSE)
-aws.s3::put_object(file = rawConnectionValue(zz),
-                   bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SolidaridadNOTdata.csv"))
-close(zz)
+# zz <- rawConnection(raw(0), "r+")
+# write.csv(NOTValSol2, zz, row.names = FALSE)
+# aws.s3::put_object(file = rawConnectionValue(zz),
+#                    bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SolidaridadSUMdata.csv"))
+# close(zz)
+# 
+# 
+# zz <- rawConnection(raw(0), "r+")
+# write.csv(valSol1, zz, row.names = FALSE)
+# aws.s3::put_object(file = rawConnectionValue(zz),
+#                    bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SolidaridadOdata.csv"))
+# close(zz)
+# 
+# zz <- rawConnection(raw(0), "r+")
+# write.csv(NOTSol1, zz, row.names = FALSE)
+# aws.s3::put_object(file = rawConnectionValue(zz),
+#                    bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "SolidaridadNOTdata.csv"))
+# close(zz)
 
 
 
@@ -665,18 +710,32 @@ KL.val1 <- as.data.frame(KL.val1)
 ###training data to be excluded later...
 #View(KL.SUM_data)
 #save to bucket
-zz <- rawConnection(raw(0), "r+")
-write.csv(KL.SUM_data, zz, row.names = FALSE)
-aws.s3::put_object(file = rawConnectionValue(zz),
-                   bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "KLSUMdata.csv"))
-close(zz)
+temp_file <- tempfile()
+write.csv(KL.val1, temp_file, row.names = FALSE)
+aws.s3::put_object(file = temp_file,
+                   bucket = "rtbglr", 
+                   object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "KLOdata.csv"))
+unlink(temp_file)
 
+temp_file <- tempfile()
+write.csv(KL.SUM_data, temp_file, row.names = FALSE)
+aws.s3::put_object(file = temp_file,
+                   bucket = "rtbglr", 
+                   object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "KLSUMdata.csv"))
+unlink(temp_file)
 
-zz <- rawConnection(raw(0), "r+")
-write.csv(KL.val1, zz, row.names = FALSE)
-aws.s3::put_object(file = rawConnectionValue(zz),
-                   bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "KLOdata.csv"))
-close(zz)
+# zz <- rawConnection(raw(0), "r+")
+# write.csv(KL.SUM_data, zz, row.names = FALSE)
+# aws.s3::put_object(file = rawConnectionValue(zz),
+#                    bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "KLSUMdata.csv"))
+# close(zz)
+# 
+# 
+# zz <- rawConnection(raw(0), "r+")
+# write.csv(KL.val1, zz, row.names = FALSE)
+# aws.s3::put_object(file = rawConnectionValue(zz),
+#                    bucket = "rtbglr", object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "KLOdata.csv"))
+# close(zz)
 
 
 
