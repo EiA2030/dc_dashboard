@@ -738,4 +738,124 @@ unlink(temp_file)
 # close(zz)
 
 
+##########################################################################################
+##########################MercyCorpsSprot###########################################################
+##########################################################################################
 
+#ID DATA (Enumerators and households)
+#merge enum +household registration data
+MC.ENReg <- MC.Register_EN%>%
+  rename(
+    ENID = `register_enumerator/purpose/enumerator_id`,
+    ENSurname = `register_enumerator/purpose/surname`,
+    ENphoneNo = `register_enumerator/purpose/phone_number`,
+    ENfirstName= `register_enumerator/purpose/first_name`,
+    ENtoday = `register_enumerator/today`
+  ) %>%
+  select(any_of(c("ENtoday","ENID","ENfirstName","ENSurname","ENphoneNo"))) %>%
+  arrange(ENID, desc(ENtoday)) %>% #sort to Keep last entry by date in duplicated records
+  distinct(ENID, .keep_all = TRUE)# Keep last entry by date in duplicated records
+
+MC.HHReg<-MC.RegisterVerify_HH%>%
+  select(any_of(c( "register_hh/today"
+                   ,"register_hh/country_ID"
+                   ,"register_hh/enumerator_ID"
+                   ,"register_hh/new_barcode/surname" 
+                   ,"register_hh/new_barcode/first_name"
+                   ,"register_hh/new_barcode/household_id"
+                   ,"register_hh/new_barcode/phone_number" 
+  )))%>%
+  rename(`Site Selection` =`register_hh/today`,
+         Country = `register_hh/country_ID`,
+         ENID=`register_hh/enumerator_ID`,
+         HHfirstName=`register_hh/new_barcode/first_name`,
+         HHSurname = `register_hh/new_barcode/surname`,
+         HHID=`register_hh/new_barcode/household_id`,
+         HHphoneNo=`register_hh/new_barcode/phone_number` 
+         
+  )%>%
+  mutate(`Site Selection` = as.Date(`Site Selection`)) %>%
+  filter(!is.na(HHID)) %>%  # Filter out rows where HHID is NA
+  distinct(ENID,HHID,Country,`Site Selection`,HHphoneNo, .keep_all = TRUE)  
+
+
+MC.ENHHReg <- MC.ENReg %>%
+  full_join(MC.HHReg, by = "ENID") %>%
+  suppressWarnings()
+
+
+
+#Validation data
+MC.val1<-MC.valData%>%
+  
+  as.data.frame()%>%
+  select(-any_of(c( "_notes" , "_total_media", "_id", "_tags", "_uuid" ,"start", "_edited","_status" ,"_version" , "_duration"  ,"_xform_id" ,"_attachments", "_geolocation" ,"_media_count" ,"formhub/uuid"   ,
+                    "_submitted_by","consent/photo","_date_modified","meta/instanceID"  ,"_submission_time", "_xform_id_string" ,"_bamboo_dataset_id"  ,
+                    "_media_all_received"  ,  "consent/read_consent_form"    ,"consent/copy",  "consent/give_consent")))%>%
+  rename(
+    ENID = `intro/enumerator_id`,
+    HHID = `intro/household_id`,
+    Country = `location/country`,
+    Event= `intro/event`,
+    latitude= `location/latitude`,
+    longitude= `location/longitude`,
+    today = today
+  ) %>%
+  mutate(today = as.IDate(today)) %>%
+  arrange(ENID,HHID, desc(today)) %>% #sort to Keep last entry by date in duplicated records
+  distinct(ENID,HHID,today,Event, .keep_all = TRUE)  %>%
+  mutate(Stage = "Validation") %>%
+  mutate(Country = capitalize(Country))
+
+
+
+MC.val2 <- MC.val1 %>%
+  dplyr::select(any_of(c("today", "Event", "ENID", "HHID"))) %>%
+  arrange(Event) %>%
+  pivot_wider(names_from = Event, values_from = today, values_fn = last) %>%
+  mutate(across(starts_with("event"), as.Date, format = "%Y-%m-%d")) %>%
+  arrange( ENID, HHID)%>%
+  suppressWarnings()
+
+
+#join to include all EN details... some not in the hh details. 
+
+MC.ENHHReg2<-MC.ENHHReg %>%
+  dplyr::select(-any_of(c("Country", "ENtoday", "ENfirstName","ENSurname","ENphoneNo" ))) 
+
+
+#get hh details
+MC.SUM_data <- MC.val2 %>%
+  full_join(MC.ENHHReg2, by = c("ENID","HHID")) %>% #join identifiers and val data while keeping all enumerators/households
+  left_join(MC.ENReg, by = "ENID")  %>%
+  arrange(ENID,HHID, desc(`Site Selection`)) %>% 
+  distinct(ENID,HHID, .keep_all = TRUE) %>% 
+  filter(!(duplicated(ENID) & is.na(HHID))) %>% # remove rows where ENID is not unique and HHID is NA
+  mutate(Stage = "Validation") %>%
+  mutate(Trial = "Validation") %>%
+  suppressWarnings()
+
+MC.val1 <- lapply(MC.val1, function(x) {
+  if (is.list(x)) {
+    sapply(x, paste, collapse = ',')
+  } else {
+    x
+  }
+})
+
+MC.val1 <- as.data.frame(MC.val1)
+
+
+temp_file <- tempfile()
+write.csv(MC.val1, temp_file, row.names = FALSE)
+aws.s3::put_object(file = temp_file,
+                   bucket = "rtbglr", 
+                   object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "MCOdata.csv"))
+unlink(temp_file)
+
+temp_file <- tempfile()
+write.csv(MC.SUM_data, temp_file, row.names = FALSE)
+aws.s3::put_object(file = temp_file,
+                   bucket = "rtbglr", 
+                   object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "MCSUMdata.csv"))
+unlink(temp_file)

@@ -202,7 +202,7 @@ create_tab_panel <- function(tab_name) {
 
                  tabPanel(tabName="Enumerators","ENUMERATORS",
                           HTML('<br>'),
-                          HTML('<span  style="background-color: #BFffa590 ;align:right;" class="dot">Complete</span>&nbsp; <span  style="background-color: orange ;align:right;" class="dot">Missing Details</span>&nbsp;<span  style="background-color: #ffa590;align:right;" class="dot">Overdue</span>  &nbsp;<span  style="background-color: #BE93D4;align:left;" class="dot">Future Event</span>'),
+                          HTML('<span  style="background-color: #55b047 ;align:right;" class="dot">Complete</span>&nbsp; <span  style="background-color: #fdb415 ;align:right;" class="dot">Missing Details</span>&nbsp;<span  style="background-color: #c3531f;align:right;" class="dot">Overdue</span>  &nbsp;<span  style="background-color: #BE93D4;align:left;" class="dot">Future Event</span>'),
                           HTML('<br>'),
                           reactableOutput(paste0("tableR_",uc))
                  ),
