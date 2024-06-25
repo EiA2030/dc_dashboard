@@ -472,7 +472,7 @@ NOTSol2<-NOTSol1%>%
   ) %>%
   mutate(today = as.IDate(today)) %>%
   arrange(ENID,HHID, desc(today)) %>% #sort to Keep last entry by date in duplicated records
-  distinct(ENID,HHID,today,Event, .keep_all = TRUE)  %>%
+  distinct(ENID,HHID,Event, .keep_all = TRUE)  %>%
   mutate(Stage = "Validation") %>%
   mutate(
     Country = coalesce(`intro/country`, Country) )%>%
@@ -660,7 +660,7 @@ KL.val1<-KL.valData%>%
   mutate(ENID = if_else(ENID == "KHENKE000028", "KLENKE000028", ENID)) %>%
   mutate(today = as.IDate(today)) %>%
   arrange(ENID,HHID, desc(today)) %>% #sort to Keep last entry by date in duplicated records
-  distinct(ENID,HHID,today,Event, .keep_all = TRUE)  %>%
+  distinct(ENID,HHID,Event, .keep_all = TRUE)  %>%
   mutate(Stage = "Validation") %>%
   mutate(Country = capitalize(Country))%>%
   filter(ENID != "KLENKE000000" ) %>%#leave out the enumerator registered for testing and monitoring the tool and is not expected to collect data
@@ -760,10 +760,10 @@ MC.HHReg<-MC.RegisterVerify_HH%>%
   select(any_of(c( "register_hh/today"
                    ,"register_hh/country_ID"
                    ,"register_hh/enumerator_ID"
-                   ,"register_hh/new_barcode/surname" 
+                   ,"register_hh/new_barcode/surname"
                    ,"register_hh/new_barcode/first_name"
                    ,"register_hh/new_barcode/household_id"
-                   ,"register_hh/new_barcode/phone_number" 
+                   ,"register_hh/new_barcode/phone_number"
   )))%>%
   rename(`Site Selection` =`register_hh/today`,
          Country = `register_hh/country_ID`,
@@ -771,12 +771,12 @@ MC.HHReg<-MC.RegisterVerify_HH%>%
          HHfirstName=`register_hh/new_barcode/first_name`,
          HHSurname = `register_hh/new_barcode/surname`,
          HHID=`register_hh/new_barcode/household_id`,
-         HHphoneNo=`register_hh/new_barcode/phone_number` 
-         
+         HHphoneNo=`register_hh/new_barcode/phone_number`
+
   )%>%
   mutate(`Site Selection` = as.Date(`Site Selection`)) %>%
   filter(!is.na(HHID)) %>%  # Filter out rows where HHID is NA
-  distinct(ENID,HHID,Country,`Site Selection`,HHphoneNo, .keep_all = TRUE)  
+  distinct(ENID,HHID,Country,`Site Selection`,HHphoneNo, .keep_all = TRUE)
 
 
 MC.ENHHReg <- MC.ENReg %>%
@@ -787,7 +787,7 @@ MC.ENHHReg <- MC.ENReg %>%
 
 #Validation data
 MC.val1<-MC.valData%>%
-  
+
   as.data.frame()%>%
   select(-any_of(c( "_notes" , "_total_media", "_id", "_tags", "_uuid" ,"start", "_edited","_status" ,"_version" , "_duration"  ,"_xform_id" ,"_attachments", "_geolocation" ,"_media_count" ,"formhub/uuid"   ,
                     "_submitted_by","consent/photo","_date_modified","meta/instanceID"  ,"_submission_time", "_xform_id_string" ,"_bamboo_dataset_id"  ,
@@ -803,7 +803,7 @@ MC.val1<-MC.valData%>%
   ) %>%
   mutate(today = as.IDate(today)) %>%
   arrange(ENID,HHID, desc(today)) %>% #sort to Keep last entry by date in duplicated records
-  distinct(ENID,HHID,today,Event, .keep_all = TRUE)  %>%
+  distinct(ENID,HHID,Event, .keep_all = TRUE)  %>%
   mutate(Stage = "Validation") %>%
   mutate(Country = capitalize(Country))
 
@@ -818,18 +818,18 @@ MC.val2 <- MC.val1 %>%
   suppressWarnings()
 
 
-#join to include all EN details... some not in the hh details. 
+#join to include all EN details... some not in the hh details.
 
 MC.ENHHReg2<-MC.ENHHReg %>%
-  dplyr::select(-any_of(c("Country", "ENtoday", "ENfirstName","ENSurname","ENphoneNo" ))) 
+  dplyr::select(-any_of(c("Country", "ENtoday", "ENfirstName","ENSurname","ENphoneNo" )))
 
 
 #get hh details
 MC.SUM_data <- MC.val2 %>%
   full_join(MC.ENHHReg2, by = c("ENID","HHID")) %>% #join identifiers and val data while keeping all enumerators/households
   left_join(MC.ENReg, by = "ENID")  %>%
-  arrange(ENID,HHID, desc(`Site Selection`)) %>% 
-  distinct(ENID,HHID, .keep_all = TRUE) %>% 
+  arrange(ENID,HHID, desc(`Site Selection`)) %>%
+  distinct(ENID,HHID, .keep_all = TRUE) %>%
   filter(!(duplicated(ENID) & is.na(HHID))) %>% # remove rows where ENID is not unique and HHID is NA
   mutate(Stage = "Validation") %>%
   mutate(Trial = "Validation") %>%
@@ -849,13 +849,13 @@ MC.val1 <- as.data.frame(MC.val1)
 temp_file <- tempfile()
 write.csv(MC.val1, temp_file, row.names = FALSE)
 aws.s3::put_object(file = temp_file,
-                   bucket = "rtbglr", 
+                   bucket = "rtbglr",
                    object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "MCOdata.csv"))
 unlink(temp_file)
 
 temp_file <- tempfile()
 write.csv(MC.SUM_data, temp_file, row.names = FALSE)
 aws.s3::put_object(file = temp_file,
-                   bucket = "rtbglr", 
+                   bucket = "rtbglr",
                    object = paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "MCSUMdata.csv"))
 unlink(temp_file)
