@@ -255,6 +255,24 @@ server <- function(input, output, session) {
         
         
         
+      }else if (input$nav== " Mercy Corps SPROUT"){
+        MC.O_data <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "MCOdata.csv"),
+                                 file = tempfile(fileext = ".csv")
+        ) %>%
+          fread()
+        
+        MC.SUM_data <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "MCSUMdata.csv"),
+                                   file = tempfile(fileext = ".csv")
+        ) %>%
+          fread()
+        
+        datacrop <- MC.SUM_data
+        rawdata <- MC.O_data
+        patternissues<-""
+        patternissuesE<-""
+        columns_to_append <- c("ENID", "HHID", "Trial",#"treat",
+                               "Site Selection", "event1", "event2", "event3", "event4", "event5", "event6", "event7")
+        
       }else{
         datacrop <- data.frame()
         rawdata <- data.frame()
@@ -443,6 +461,24 @@ server <- function(input, output, session) {
               
               
               
+            }else if (input$nav== " Mercy Corps SPROUT"){
+              MC.O_data <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "MCOdata.csv"),
+                                       file = tempfile(fileext = ".csv")
+              ) %>%
+                fread()
+              
+              MC.SUM_data <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "MCSUMdata.csv"),
+                                         file = tempfile(fileext = ".csv")
+              ) %>%
+                fread()
+              
+              datacrop <- MC.SUM_data
+              rawdata <- MC.O_data
+              patternissues<-""
+              patternissuesE<-""
+              columns_to_append <- c("ENID", "HHID", "Trial",#"treat",
+                                     "Site Selection", "event1", "event2", "event3", "event4", "event5", "event6", "event7")
+              
             }else {
               datacrop <- data.frame()
               rawdata <- data.frame()
@@ -566,7 +602,7 @@ server <- function(input, output, session) {
           output[[paste0("trials_map_",i)]] <-renderLeaflet({
             leaflet() %>%
               addProviderTiles(providers$CartoDB.Positron) %>%
-              addCircles(data = datacropO ,lng = as.numeric(datacropO$longitude), lat = as.numeric(datacropO$latitude),color = "orange") %>%suppressWarnings()
+              addCircles(data = datacropO ,lng = as.numeric(datacropO$longitude), lat = as.numeric(datacropO$latitude),color = "#fdb415") %>%suppressWarnings()
             #fitBounds(max(as.numeric(datacrop$`intro/longitude`)), max(as.numeric(datacrop$`intro/latitude`)),min(as.numeric(datacrop$`intro/longitude`)), min(as.numeric(datacrop$`intro/latitude`)))
           })
           
@@ -585,8 +621,8 @@ server <- function(input, output, session) {
           
           # #plot of submissions trend
           Ir<-ggplot(wgroup, aes(x=date, y= n, group=1)) +
-            geom_line(color="orange")+
-            geom_point(color="orange")+
+            geom_line(color="#fdb415")+
+            geom_point(color="#fdb415")+
             #scale_x_discrete(labels= paste("Week", c(1:length(ff))))+
             theme_bw(base_size = 24)+
             labs(title="", x="Month", y="Submissions Count")+scale_x_date(date_breaks = "1 month", date_minor_breaks = "1 week", date_labels = "%m-%Y")+them2
@@ -820,9 +856,9 @@ server <- function(input, output, session) {
                             
                             # Check if the value is missing or not in the expected date format
                             if (is.na(value) ) {
-                              list(background = "#ffa590")  # Set default background color for missing or invalid values
+                              list(background = "#c3531f")  # Set default background color for missing or invalid values
                             } else {
-                              list(background = "#BFffa590")
+                              list(background = "#55b047")
                               # # Convert the date string to a Date object
                               # date_value <- as.Date(value, format ="%Y-%m-%d")
                               # 
@@ -830,17 +866,17 @@ server <- function(input, output, session) {
                               # target_date <- as.Date("2023-08-16", format ="%Y-%m-%d") + 14
                               # 
                               # if (date_value > target_date) {
-                              #   list(background = "#BFffa590") #WONT SET OVERDUE... NOT Necessary? 16/08/2023 -is just training date
+                              #   list(background = "#55b047") #WONT SET OVERDUE... NOT Necessary? 16/08/2023 -is just training date
                               # } else {
-                              #   list(background = "#BFffa590")
+                              #   list(background = "#55b047")
                               # }
                             }
                           }
                           # 
-                          # color<-ifelse(is.na(value) ,"orange","#BFffa590")
+                          # color<-ifelse(is.na(value) ,"#fdb415","#55b047")
                           # 
                           # # if (value <= format((format('16/8/2023',"%d/%m/%Y"))+weeks(2), "%d/%m/%Y") ){
-                          # #   color<-ifelse(is.na(value) ,"orange","#BFffa590")
+                          # #   color<-ifelse(is.na(value) ,"#fdb415","#55b047")
                           # #   list(background =color)
                           # # } 
                           #ist(background =color)
@@ -853,13 +889,13 @@ server <- function(input, output, session) {
                           #   current_date <-as.Date(Sys.Date() , format = "%Y-%m-%d")   
                           #   
                           #   if (is.na(value)) {
-                          #     list(background = "orange")
+                          #     list(background = "#fdb415")
                           #     # If Event1 is NA and current date is more than Site Selection + 4 weeks, color is red
                           #     # if (current_date > (as.Date(datacroptable$`Site Selection`, format = "%Y-%m-%d") + 28)) {
                           #     #   list(background = "red")
                           #     # } else {
-                          #     #   # If Event1 is NA and current date is less than Site Selection + 4 weeks, color is orange
-                          #     #   list(background = "orange")
+                          #     #   # If Event1 is NA and current date is less than Site Selection + 4 weeks, color is #fdb415
+                          #     #   list(background = "#fdb415")
                           #     # }
                           #   } 
                           # else {
@@ -891,13 +927,13 @@ server <- function(input, output, session) {
                               color <-"#BE93D4"
                                 list(background =color)
                             }else if (!is.na(target_dates)&& is.na(value) && current_date >= target_dates){
-                              color <-"#ffa590"
+                              color <-"#c3531f"
                                 list(background =color)
                             }else if (!is.na(target_dates)&& is.na(value) && current_date <= target_dates){
-                              color <-"orange"
+                              color <-"#fdb415"
                                 list(background =color)
                             } else if (!is.na(target_dates)&& !is.na(value) ) {
-                              color <-"#BFffa590"
+                              color <-"#55b047"
                                 list(background =color)
                             }
                             
@@ -912,16 +948,16 @@ server <- function(input, output, session) {
                             
                             #print(!is.na(value) && current_date > target_dates)
                             if (!is.na(target_dates)&& !is.na(value) &&  as.Date(value , format = "%Y-%m-%d") <= target_dates) {
-                              color <-"#BFffa590"
+                              color <-"#55b047"
                                 list(background =color)
                             } else if (!is.na(target_dates)&& !is.na(value) && as.Date(value , format = "%Y-%m-%d") >= target_dates){
-                              color <-"#ffa590"
+                              color <-"#c3531f"
                                 list(background =color)
                             } else if(!is.na(target_dates)&&  is.na(value) && current_date <= target_dates){
-                              color <-"orange"
+                              color <-"#fdb415"
                                 list(background =color)
                             }else if( !is.na(target_dates)&& is.na(value) && current_date >= target_dates){
-                              color <-"#ffa590"
+                              color <-"#c3531f"
                                 list(background =color)
                             } else if (is.na(target_dates)&& is.na(value) ){
                               color <-"#BE93D4"
@@ -934,7 +970,7 @@ server <- function(input, output, session) {
                             #list(background =color)
                             
                             # if (current_date < target_date_4_weeks){
-                            #   color<-ifelse(is.na(value) ,"orange","#BFffa590")
+                            #   color<-ifelse(is.na(value) ,"#fdb415","#55b047")
                             #   list(background =color)
                             # }
                             
@@ -949,19 +985,19 @@ server <- function(input, output, session) {
                             
                             #print(!is.na(value) && current_date > target_dates)
                             if (!is.na(target_dates)&& !is.na(value) &&  as.Date(value , format = "%Y-%m-%d") <= target_dates) {
-                              color <-"#BFffa590"
+                              color <-"#55b047"
                                 list(background =color)
                             } else if (!is.na(target_dates)&& !is.na(value) && as.Date(value , format = "%Y-%m-%d") >= target_dates){
-                              color <-"#ffa590"
+                              color <-"#c3531f"
                                 list(background =color)
                             } else if(!is.na(target_dates)&&  is.na(value) && current_date <= target_dates && current_date >= target_dates_prev){
-                              color <-"orange"
+                              color <-"#fdb415"
                                 list(background =color)
                             } else if(!is.na(target_dates)&&  is.na(value) && current_date <= target_dates && current_date <= target_dates_prev){
                               color <-"#BE93D4"
                                 list(background =color)
                             }else if( !is.na(target_dates)&& is.na(value) && current_date >= target_dates){
-                              color <-"#ffa590"
+                              color <-"#c3531f"
                                 list(background =color)
                             } else if (is.na(target_dates)&& is.na(value) ){
                               color <-"#BE93D4"
@@ -979,22 +1015,22 @@ server <- function(input, output, session) {
                             
                             #print(!is.na(value) && current_date > target_dates)
                             if (datacroptable$Trial[index]=="potatoIrish" && !is.na(target_dates_potato)&& !is.na(value) &&  as.Date(value , format = "%Y-%m-%d") <= target_dates_potato) {
-                              color <-"#BFffa590"
+                              color <-"#55b047"
                                 list(background =color)
                             }else if (datacroptable$Trial[index]=="rice" && !is.na(target_dates_rice)&& !is.na(value) &&  as.Date(value , format = "%Y-%m-%d") <= target_dates_rice) {
-                              color <-"#BFffa590"
+                              color <-"#55b047"
                                 list(background =color)
                             } else if (datacroptable$Trial[index]=="potatoIrish" && !is.na(target_dates_potato)&& !is.na(value) && as.Date(value , format = "%Y-%m-%d") >= target_dates_potato){
-                              color <-"#ffa590"
+                              color <-"#c3531f"
                                 list(background =color)
                             }else if (datacroptable$Trial[index]=="rice" && !is.na(target_dates_rice)&& !is.na(value) && as.Date(value , format = "%Y-%m-%d") >= target_dates_rice){
-                              color <-"#ffa590"
+                              color <-"#c3531f"
                                 list(background =color)
                             }  else if( datacroptable$Trial[index]=="potatoIrish" && !is.na(target_dates_potato)&&  is.na(value) && current_date <= target_dates_potato && current_date >= target_dates_prev){
-                              color <-"orange"
+                              color <-"#fdb415"
                                 list(background =color)
                             }  else if( datacroptable$Trial[index]=="rice" && !is.na(target_dates_rice)&&  is.na(value) && current_date <= target_dates_rice && current_date >= target_dates_prev){
-                              color <-"orange"
+                              color <-"#fdb415"
                                 list(background =color)
                             }else if(datacroptable$Trial[index]=="potatoIrish" && !is.na(target_dates_potato)&&  is.na(value) && current_date <= target_dates_potato && current_date <= target_dates_prev){
                               color <-"#BE93D4"
@@ -1003,10 +1039,10 @@ server <- function(input, output, session) {
                               color <-"#BE93D4"
                                 list(background =color)
                             }else if( datacroptable$Trial[index]=="potatoIrish" && !is.na(target_dates_potato)&& is.na(value) && current_date >= target_dates_potato){
-                              color <-"#ffa590"
+                              color <-"#c3531f"
                                 list(background =color)
                             }else if( datacroptable$Trial[index]=="rice" && !is.na(target_dates_rice)&& is.na(value) && current_date >= target_dates_rice){
-                              color <-"#ffa590"
+                              color <-"#c3531f"
                                 list(background =color)
                             } else if (is.na(target_dates_potato)&& is.na(value) ){
                               color <-"#BE93D4"
@@ -1028,22 +1064,22 @@ server <- function(input, output, session) {
                             
                             #print(!is.na(value) && current_date > target_dates)
                             if (datacroptable$Trial[index]=="potatoIrish" && !is.na(target_dates_potato)&& !is.na(value) &&  as.Date(value , format = "%Y-%m-%d") <= target_dates_potato) {
-                              color <-"#BFffa590"
+                              color <-"#55b047"
                                 list(background =color)
                             }else if (datacroptable$Trial[index]=="rice" && !is.na(target_dates_rice)&& !is.na(value) &&  as.Date(value , format = "%Y-%m-%d") <= target_dates_rice) {
-                              color <-"#BFffa590"
+                              color <-"#55b047"
                                 list(background =color)
                             } else if (datacroptable$Trial[index]=="potatoIrish" && !is.na(target_dates_potato)&& !is.na(value) && as.Date(value , format = "%Y-%m-%d") >= target_dates_potato){
-                              color <-"#ffa590"
+                              color <-"#c3531f"
                                 list(background =color)
                             }else if (datacroptable$Trial[index]=="rice" && !is.na(target_dates_rice)&& !is.na(value) && as.Date(value , format = "%Y-%m-%d") >= target_dates_rice){
-                              color <-"#ffa590"
+                              color <-"#c3531f"
                                 list(background =color)
                             }  else if( datacroptable$Trial[index]=="potatoIrish" && !is.na(target_dates_potato)&&  is.na(value) && current_date <= target_dates_potato && current_date >= target_dates_prev_potato){
-                              color <-"orange"
+                              color <-"#fdb415"
                                 list(background =color)
                             }  else if( datacroptable$Trial[index]=="rice" && !is.na(target_dates_rice)&&  is.na(value) && current_date <= target_dates_rice && current_date >= target_dates_prev_rice){
-                              color <-"orange"
+                              color <-"#fdb415"
                                 list(background =color)
                             }else if(datacroptable$Trial[index]=="potatoIrish" && !is.na(target_dates_potato)&&  is.na(value) && current_date <= target_dates_potato && current_date <= target_dates_prev_potato){
                               color <-"#BE93D4"
@@ -1052,10 +1088,10 @@ server <- function(input, output, session) {
                               color <-"#BE93D4"
                                 list(background =color)
                             }else if( datacroptable$Trial[index]=="potatoIrish" && !is.na(target_dates_potato)&& is.na(value) && current_date >= target_dates_potato){
-                              color <-"#ffa590"
+                              color <-"#c3531f"
                                 list(background =color)
                             }else if( datacroptable$Trial[index]=="rice" && !is.na(target_dates_rice)&& is.na(value) && current_date >= target_dates_rice){
-                              color <-"#ffa590"
+                              color <-"#c3531f"
                                 list(background =color)
                             }else if (is.na(target_dates_potato)&& is.na(value) ){
                               color <-"#BE93D4"
@@ -1077,22 +1113,22 @@ server <- function(input, output, session) {
                             
                             #print(!is.na(value) && current_date > target_dates)
                             if (datacroptable$Trial[index]=="potatoIrish" && !is.na(target_dates_potato)&& !is.na(value) &&  as.Date(value , format = "%Y-%m-%d") <= target_dates_potato) {
-                              color <-"#BFffa590"
+                              color <-"#55b047"
                                 list(background =color)
                             }else if (datacroptable$Trial[index]=="rice" && !is.na(target_dates_rice)&& !is.na(value) &&  as.Date(value , format = "%Y-%m-%d") <= target_dates_rice) {
-                              color <-"#BFffa590"
+                              color <-"#55b047"
                                 list(background =color)
                             } else if (datacroptable$Trial[index]=="potatoIrish" && !is.na(target_dates_potato)&& !is.na(value) && as.Date(value , format = "%Y-%m-%d") >= target_dates_potato){
-                              color <-"#ffa590"
+                              color <-"#c3531f"
                                 list(background =color)
                             }else if (datacroptable$Trial[index]=="rice" && !is.na(target_dates_rice)&& !is.na(value) && as.Date(value , format = "%Y-%m-%d") >= target_dates_rice){
-                              color <-"#ffa590"
+                              color <-"#c3531f"
                                 list(background =color)
                             }  else if( datacroptable$Trial[index]=="potatoIrish" && !is.na(target_dates_potato)&&  is.na(value) && current_date <= target_dates_potato && current_date >= target_dates_prev_potato){
-                              color <-"orange"
+                              color <-"#fdb415"
                                 list(background =color)
                             }  else if( datacroptable$Trial[index]=="rice" && !is.na(target_dates_rice)&&  is.na(value) && current_date <= target_dates_rice && current_date >= target_dates_prev_rice){
-                              color <-"orange"
+                              color <-"#fdb415"
                                 list(background =color)
                             }else if(datacroptable$Trial[index]=="potatoIrish" && !is.na(target_dates_potato)&&  is.na(value) && current_date <= target_dates_potato && current_date <= target_dates_prev_potato){
                               color <-"#BE93D4"
@@ -1101,10 +1137,10 @@ server <- function(input, output, session) {
                               color <-"#BE93D4"
                                 list(background =color)
                             }else if( datacroptable$Trial[index]=="potatoIrish" && !is.na(target_dates_potato)&& is.na(value) && current_date >= target_dates_potato){
-                              color <-"#ffa590"
+                              color <-"#c3531f"
                                 list(background =color)
                             }else if( datacroptable$Trial[index]=="rice" && !is.na(target_dates_rice)&& is.na(value) && current_date >= target_dates_rice){
-                              color <-"#ffa590"
+                              color <-"#c3531f"
                                 list(background =color)
                             }else if (is.na(target_dates_potato)&& is.na(value) ){
                               color <-"#BE93D4"
@@ -1126,22 +1162,22 @@ server <- function(input, output, session) {
                             
                             #print(!is.na(value) && current_date > target_dates)
                             if (datacroptable$Trial[index]=="potatoIrish" && !is.na(target_dates_potato)&& !is.na(value) &&  as.Date(value , format = "%Y-%m-%d") <= target_dates_potato) {
-                              color <-"#BFffa590"
+                              color <-"#55b047"
                                 list(background =color)
                             }else if (datacroptable$Trial[index]=="rice" && !is.na(target_dates_rice)&& !is.na(value) &&  as.Date(value , format = "%Y-%m-%d") <= target_dates_rice) {
-                              color <-"#BFffa590"
+                              color <-"#55b047"
                                 list(background =color)
                             } else if (datacroptable$Trial[index]=="potatoIrish" && !is.na(target_dates_potato)&& !is.na(value) && as.Date(value , format = "%Y-%m-%d") >= target_dates_potato){
-                              color <-"#ffa590"
+                              color <-"#c3531f"
                                 list(background =color)
                             }else if (datacroptable$Trial[index]=="rice" && !is.na(target_dates_rice)&& !is.na(value) && as.Date(value , format = "%Y-%m-%d") >= target_dates_rice){
-                              color <-"#ffa590"
+                              color <-"#c3531f"
                                 list(background =color)
                             }  else if( datacroptable$Trial[index]=="potatoIrish" && !is.na(target_dates_potato)&&  is.na(value) && current_date <= target_dates_potato && current_date >= target_dates_prev_potato){
-                              color <-"orange"
+                              color <-"#fdb415"
                                 list(background =color)
                             }  else if( datacroptable$Trial[index]=="rice" && !is.na(target_dates_rice)&&  is.na(value) && current_date <= target_dates_rice && current_date >= target_dates_prev_rice){
-                              color <-"orange"
+                              color <-"#fdb415"
                                 list(background =color)
                             }else if(datacroptable$Trial[index]=="potatoIrish" && !is.na(target_dates_potato)&&  is.na(value) && current_date <= target_dates_potato && current_date <= target_dates_prev_potato){
                               color <-"#BE93D4"
@@ -1150,10 +1186,10 @@ server <- function(input, output, session) {
                               color <-"#BE93D4"
                                 list(background =color)
                             }else if( datacroptable$Trial[index]=="potatoIrish" && !is.na(target_dates_potato)&& is.na(value) && current_date >= target_dates_potato){
-                              color <-"#ffa590"
+                              color <-"#c3531f"
                                 list(background =color)
                             }else if( datacroptable$Trial[index]=="rice" && !is.na(target_dates_rice)&& is.na(value) && current_date >= target_dates_rice){
-                              color <-"#ffa590"
+                              color <-"#c3531f"
                                 list(background =color)
                             } else if (is.na(target_dates_potato)&& is.na(value) ){
                               color <-"#BE93D4"
@@ -1171,7 +1207,7 @@ server <- function(input, output, session) {
                         #     
                         #     if (){}
                         #     
-                        #     color<-ifelse(is.na(value) ,"#BE93D4","#BFffa590")
+                        #     color<-ifelse(is.na(value) ,"#BE93D4","#55b047")
                         #     list(background =color)
                         #   }
                         # ),
@@ -1186,7 +1222,7 @@ server <- function(input, output, session) {
                         #      # tippy(value,tooltip = paste("NAME:", s2$detailsHH.firstName , s2$detailsHH.surName))
                         #     },
                         #     style  = function(value) {
-                        #       #color<-ifelse(value=="NA" ,"#BE93D4","#BFffa590")
+                        #       #color<-ifelse(value=="NA" ,"#BE93D4","#55b047")
                         #       list(background ="white")
                         #     }
                         #   ),
@@ -1200,7 +1236,7 @@ server <- function(input, output, session) {
                           },
                           header = function(value) {tippy(value,tooltip = paste("NAME:", "<br>", "CONTACT:"))},
                           style  = function(value) {
-                            #color<-ifelse(value=="NA" ,"#BE93D4","#BFffa590")
+                            #color<-ifelse(value=="NA" ,"#BE93D4","#55b047")
                             list(background ="white")
                           }
                         )
@@ -1221,16 +1257,16 @@ server <- function(input, output, session) {
                         ),
                         style  = function(value) {
                           # if (name=="Site Selection"){
-                          #   color<-ifelse(is.na(value) ,"orange","#BFffa590")
+                          #   color<-ifelse(is.na(value) ,"#fdb415","#55b047")
                           # }
                           
-                          color<-ifelse(is.na(value) ,"#BE93D4","#BFffa590")
+                          color<-ifelse(is.na(value) ,"#BE93D4","#55b047")
                           # if (input[[paste0("seasonfinder_",i)]]== "2022B"){
-                          #   color<-ifelse(value=="NA" ,"#ffa590","#BFffa590")
+                          #   color<-ifelse(value=="NA" ,"#c3531f","#55b047")
                           # } else if (input[[paste0("seasonfinder_",i)]]== "2022A"){
-                          #   color<-ifelse(value=="NA" ,"#BE93D4","#BFffa590")
+                          #   color<-ifelse(value=="NA" ,"#BE93D4","#55b047")
                           # } else {
-                          #   color<-ifelse(value=="NA" ,"#ffa590","#BFffa590")
+                          #   color<-ifelse(value=="NA" ,"#c3531f","#55b047")
                           # }
                           #list(background =color)
                         }

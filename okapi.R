@@ -48,3 +48,14 @@ KL.RegisterVerify_HH<-ona_data_get(base_url = "https://api.ona.io", auth_mode = 
 KL.valData<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id =793461 )
 
 
+##########################################################################################
+##########################MercyCorpsSprot###########################################################
+##########################################################################################
+
+# Define the ONA base URL, token and form ID
+MC.Register_EN<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id = 805762)
+MC.RegisterVerify_HH<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id = 805781)
+#PotatoFertRT<-  ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id = 757128)
+MC.valData<-ona_data_get(base_url = "https://api.ona.io", auth_mode =  "token",form_id =808517 )
+
+
