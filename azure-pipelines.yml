@@ -18,5 +18,7 @@ steps:
 - script: |
     echo Add other tasks to build, test, and deploy your project.
     echo See https://aka.ms/yaml
-    echo $(test-secret)
+    echo $(TEST_SECRET)
+  env:
+    TEST_SECRET: $(test-secret)
   displayName: 'Run a multi-line script'
