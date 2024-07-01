@@ -1,0 +1,45 @@
+---
+title: "Summary of Complete Submissions"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+
+# header-includes:
+#   - \usepackage{graphicx}
+#   - \usepackage{fancyhdr}
+#   - \pagestyle{fancy}
+#   - \fancyfoot[C]{\includegraphics[width=17cm]{footer.png}}
+#   - \fancyhead[RO]{}
+#   - \fancyfoot[LE,RO]{\thepage}
+#   - \usepackage{titling}
+#   - \pretitle{\begin{center}
+#     \includegraphics[width=2in,height=2in]{logo.png}\LARGE\\}
+#   - \posttitle{\end{center}}
+
+output: 
+  pdf_document
+  
+params:
+  df1: NA
+  df2: NA
+  
+
+---
+
+
+***
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE, comment = NA)
+
+
+
+```
+
+
+
+```{r table1, echo=FALSE, size="tiny", results='asis'}
+knitr::kable(params$df1) 
+knitr::kable(params$df2) 
+```
+
+
