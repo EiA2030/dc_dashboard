@@ -4,7 +4,9 @@
 # https://aka.ms/yaml
 
 trigger:
-- main
+- release/development
+- release/staging
+- release/production
 
 pool:
   vmImage: ubuntu-latest
