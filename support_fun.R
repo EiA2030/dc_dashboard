@@ -4,6 +4,7 @@ usersdata <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "usec
 ) %>%
   fread()
 
+# usersdata <- read.csv("./data/usecases_updated.csv")
 usersdata<-usersdata[, -1]
 usersdata$shortName <- paste("",usersdata$shortName)
 
@@ -123,7 +124,7 @@ shinyjs.hrefAuto = function(url) { window.location.href = url;};
 usecases.index<-c(  " SAA-Nigeria"  =1           , " DigGreen-Ethiopia"  =2  ," Fert-Ethiopia"     =3    , " SNS-Rwanda"  =4  ,  " ATAFI/MOVE"    =5      , " ex-Wcover-Ghana" =6     ,
                     " Planting-S-Asia" =7     ," DSRC-SE-Asia" =8       ,   " Govt-Egypt"     =9    ," Govt-LatAm"  =10     ,   " Cocoa Soils"  =11   ,   " Rainforest Alliance" =12  ,
                     " One Acre Fund"    =13     ,  " DRC Coffee OLAM"  =14       ,   " Solidaridad Soy Advisory" =15 , " DSR Extension Vietnam" =16  , " Morocco CA" =17          ,  " Mercy Corps SPROUT"  =18,
-                    " BAYGAP (BAYER)" =19, " KALRO" =20  )
+                    " BAYGAP (BAYER)" =19, " KALRO" =20, " DEMO" =21 )
 
 #usecases.index<-c(  " SNS-Rwanda"  =4  ,   " Solidaridad Soy Advisory" =15 ," KALRO" =20  )
 

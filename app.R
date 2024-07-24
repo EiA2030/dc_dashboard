@@ -273,6 +273,26 @@ server <- function(input, output, session) {
         columns_to_append <- c("ENID", "HHID", "Trial",#"treat",
                                "Site Selection", "event1", "event2", "event3", "event4", "event5", "event6", "event7")
         
+      }else if (input$nav== " DEMO"){
+        DEMO.O_data <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "DEMOOdata.csv"),
+                                   file = tempfile(fileext = ".csv")
+        ) %>%
+          fread()
+        
+        DEMO.SUM_data <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "DEMOSUMdata.csv"),
+                                     file = tempfile(fileext = ".csv")
+        ) %>%
+          fread()
+        
+        datacrop <- DEMO.SUM_data
+        rawdata <- DEMO.O_data
+        patternissues<-""
+        patternissuesE<-""
+        columns_to_append <- c("ENID", "HHID", "Trial",#"treat",
+                               "Site Selection","event1R", "event2R", "event3R", "event4R", "event5R", "event6R", "event7R",
+                               "event1C", "event2C", "event3C", "event4C", "event5C", "event6C", "event7C","event8C",
+                               "event1M", "event2M", "event3M", "event4M", "event5M")
+        
       }else{
         datacrop <- data.frame()
         rawdata <- data.frame()
@@ -289,7 +309,7 @@ server <- function(input, output, session) {
     selectInput_ids <- list()
     selectInput_values <- list()
     
-    lapply(1:20, function(k) {
+    lapply(1:21, function(k) {
       i<- usecases.index[names(usecases.index[ k ])]
       
       selectInput_ids <- c(selectInput_ids,
@@ -389,7 +409,7 @@ server <- function(input, output, session) {
       
       
       # Create a reactive expression for all use cases
-      lapply(1:20, function(k) {
+      lapply(1:21, function(k) {
         
         i <- usecases.index[names(usecases.index[ k ])]
         
@@ -478,6 +498,26 @@ server <- function(input, output, session) {
               patternissuesE<-""
               columns_to_append <- c("ENID", "HHID", "Trial",#"treat",
                                      "Site Selection", "event1", "event2", "event3", "event4", "event5", "event6", "event7")
+              
+            }else if (input$nav== " DEMO"){
+              DEMO.O_data <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "DEMOOdata.csv"),
+                                       file = tempfile(fileext = ".csv")
+              ) %>%
+                fread()
+              
+              DEMO.SUM_data <- save_object(paste0("s3://rtbglr/", Sys.getenv("bucket_path"), "DEMOSUMdata.csv"),
+                                         file = tempfile(fileext = ".csv")
+              ) %>%
+                fread()
+              
+              datacrop <- DEMO.SUM_data
+              rawdata <- DEMO.O_data
+              patternissues<-""
+              patternissuesE<-""
+              columns_to_append <- c("ENID", "HHID", "Trial",#"treat",
+                                     "Site Selection","event1R", "event2R", "event3R", "event4R", "event5R", "event6R", "event7R",
+                                     "event1C", "event2C", "event3C", "event4C", "event5C", "event6C", "event7C","event8C",
+                                     "event1M", "event2M", "event3M", "event4M", "event5M")
               
             }else {
               datacrop <- data.frame()
